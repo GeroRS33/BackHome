@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import { Routes, Route } from "react-router";
 
 import HomePage from "./pages/HomePage.jsx";
@@ -62,6 +63,14 @@ function App() {
 
   );
 
+=======
+import LoginPage from "./pages/LoginPage";
+import "./styles/variables.css";
+import "./styles/global.css";
+
+function App() {
+  return <LoginPage />;
+>>>>>>> Stashed changes
 }
 
 export default App;
