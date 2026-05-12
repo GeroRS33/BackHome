@@ -8,6 +8,7 @@ function InputField({
   rightIcon,
   register,
   nombre,
+  reglas,
   error,
 }) {
   return (
@@ -20,7 +21,7 @@ function InputField({
         <input
           type={type}
           placeholder={placeholder}
-          {...(register && nombre ? register(nombre) : {})}
+          {...(register && nombre ? register(nombre, reglas) : {})}
         />
 
         {rightIcon && (
