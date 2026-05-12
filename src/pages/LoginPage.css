@@ -3,14 +3,15 @@
   background: #f8ead5;
   color: #3b2a24;
   display: grid;
-  grid-template-columns: minmax(470px, 50%) 1fr;
+  grid-template-columns: minmax(460px, 50%) 1fr;
   grid-template-rows: 1fr auto;
+  overflow: hidden;
 }
 
 .login-content {
   position: relative;
-  min-height: calc(100vh - 76px);
-  padding: 24px 72px 20px;
+  min-height: calc(100vh - 68px);
+  padding: 18px 70px 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -19,9 +20,9 @@
 .login-decoration {
   position: absolute;
   left: 0;
-  top: 100px;
-  width: 135px;
-  opacity: 0.42;
+  top: 92px;
+  width: 120px;
+  opacity: 0.38;
   pointer-events: none;
 }
 
@@ -32,14 +33,14 @@
 
 .login-form-wrapper {
   width: 100%;
-  max-width: 410px;
+  max-width: 400px;
   position: relative;
   z-index: 1;
 }
 
 .login-eyebrow {
-  margin: 0 0 8px;
-  font-size: 0.72rem;
+  margin: 0 0 6px;
+  font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -47,9 +48,9 @@
 }
 
 .login-form-wrapper h1 {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(3.1rem, 4.8vw, 4.25rem);
+  font-size: clamp(2.85rem, 4.35vw, 3.95rem);
   line-height: 0.9;
   font-weight: 700;
   color: #3b2a24;
@@ -57,38 +58,38 @@
 
 .login-description {
   max-width: 390px;
-  margin: 0 0 18px;
-  font-size: 0.95rem;
-  line-height: 1.38;
+  margin: 0 0 14px;
+  font-size: 0.9rem;
+  line-height: 1.32;
   color: #4a3a32;
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .login-options {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
-  font-size: 0.9rem;
+  gap: 14px;
+  font-size: 0.84rem;
 }
 
 .remember-me {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   color: #4a3a32;
   cursor: pointer;
   white-space: nowrap;
 }
 
 .remember-me input {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   accent-color: #d96c2b;
 }
 
@@ -101,12 +102,12 @@
 }
 
 .auth-secondary-button {
-  height: 48px;
+  height: 44px;
   border: 1.5px solid #7a4e2d;
-  border-radius: 15px;
+  border-radius: 14px;
   background: transparent;
   color: #7a4e2d;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
   transition: 0.2s ease;
@@ -122,7 +123,7 @@
 }
 
 .login-image {
-  min-height: calc(100vh - 76px);
+  min-height: calc(100vh - 68px);
   overflow: hidden;
 }
 
@@ -136,21 +137,22 @@
 
 .login-benefits {
   grid-column: 1 / -1;
-  min-height: 76px;
+  height: 68px;
   border-top: 1px solid #decbb8;
   background: rgba(255, 248, 237, 0.96);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  padding: 12px 5vw;
-  gap: 18px;
+  padding: 8px 5vw;
+  gap: 16px;
 }
 
 .login-benefits article {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  padding-inline: 18px;
+  gap: 12px;
+  padding-inline: 16px;
+  min-width: 0;
 }
 
 .login-benefits article:not(:last-child) {
@@ -158,8 +160,8 @@
 }
 
 .benefit-icon {
-  width: 46px;
-  height: 46px;
+  width: 42px;
+  height: 42px;
   border: 1px solid #decbb8;
   border-radius: 50%;
   display: grid;
@@ -168,27 +170,29 @@
 }
 
 .benefit-icon img {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   object-fit: contain;
 }
 
 .login-benefits h3 {
-  margin: 0 0 3px;
-  font-size: 0.92rem;
+  margin: 0 0 2px;
+  font-size: 0.82rem;
   color: #3b2a24;
+  line-height: 1.1;
 }
 
 .login-benefits p {
   margin: 0;
   color: #75675d;
-  font-size: 0.82rem;
-  line-height: 1.25;
+  font-size: 0.74rem;
+  line-height: 1.15;
 }
 
 @media (max-width: 1100px) {
   .login-page {
     grid-template-columns: 1fr;
+    overflow: auto;
   }
 
   .login-image {
@@ -197,11 +201,16 @@
 
   .login-content {
     min-height: auto;
-    padding: 44px 24px;
+    padding: 40px 24px;
   }
 
   .login-decoration {
     width: 110px;
+  }
+
+  .login-benefits {
+    height: auto;
+    min-height: 68px;
   }
 }
 
@@ -219,11 +228,11 @@
 
 @media (max-width: 520px) {
   .login-content {
-    padding: 36px 20px;
+    padding: 32px 20px;
   }
 
   .login-form-wrapper h1 {
-    font-size: 3.1rem;
+    font-size: 3rem;
   }
 
   .login-options {
