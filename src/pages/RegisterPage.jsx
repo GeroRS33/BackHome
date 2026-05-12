@@ -52,15 +52,7 @@ function RegisterPage() {
               icon={lockIcon}
               rightIcon={eyeIcon}
             />
-
-            <InputField
-              label="Confirmar contraseña"
-              type="password"
-              placeholder="Repite tu contraseña"
-              icon={lockIcon}
-              rightIcon={eyeIcon}
-            />
-
+            
             <PrimaryButton type="submit">Crear cuenta</PrimaryButton>
 
             <a className="auth-secondary-button" href="/login">
