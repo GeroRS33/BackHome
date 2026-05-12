@@ -13,9 +13,9 @@ function Navbar() {
         <a className="active" href="/">
           Inicio
         </a>
-        <a href="/productos">Catálogo</a>
         <a href="/productos">Décadas</a>
         <a href="/perfil">Favoritos</a>
+        <a href="/perfil">Perfil</a>
       </nav>
     </header>
   );

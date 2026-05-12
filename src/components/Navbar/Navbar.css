@@ -24,7 +24,7 @@
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 38px;
+  gap: 42px;
 }
 
 .navbar-links a {
