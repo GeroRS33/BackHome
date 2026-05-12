@@ -6,7 +6,7 @@ function Navbar() {
   return (
     <header className="navbar">
       <a className="navbar-logo" href="/">
-        <img src={logo} alt="BackHome retro living" />
+        <img src={logo} alt="BackHome" />
       </a>
 
       <nav className="navbar-links">
