@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Routes, Route } from "react-router";
 
 import HomePage from "./pages/HomePage.jsx";
@@ -15,11 +16,35 @@ import "./styles/variables.css";
 import "./styles/global.css";
 
 function App() {
+  const [carrito, setCarrito] = useState([]);
+  const [favoritos, setFavoritos] = useState([]);
+
+  const agregarAlCarrito = (producto) => {
+    setCarrito([...carrito, producto]);
+  };
+
+  const toggleFavorito = (productoId) => {
+    if (favoritos.includes(productoId)) {
+      setFavoritos(favoritos.filter((id) => id !== productoId));
+    } else {
+      setFavoritos([...favoritos, productoId]);
+    }
+  };
+
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
 
-      <Route path="/productos" element={<CatalogPage />} />
+      <Route
+        path="/productos"
+        element={
+          <CatalogPage
+            favoritos={favoritos}
+            agregarAlCarrito={agregarAlCarrito}
+            toggleFavorito={toggleFavorito}
+          />
+        }
+      />
 
       <Route path="/producto/:id" element={<ProductDetailPage />} />
 
@@ -27,9 +52,9 @@ function App() {
 
       <Route path="/registro" element={<RegisterPage />} />
 
-      <Route path="/carrito" element={<CartPage />} />
+      <Route path="/carrito" element={<CartPage carrito={carrito} />} />
 
-      <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/checkout" element={<CheckoutPage carrito={carrito} />} />
 
       <Route path="/confirmacion" element={<ConfirmationPage />} />
 

@@ -1,68 +1,117 @@
 export const productos = [
     {
       id: 1,
+  
       nombre: "Sillón Space Age",
+  
       categoria: "Sala",
-      decada: 1970,
-      descripcion: "Sillón giratorio con tapizado en tela texturizada y base metálica.",
+  
+      decada: "70s",
+  
       precio: 890000,
-      imagen: "/src/assets/hero.png",
+  
+      descripcion:
+        "Sillón giratorio con tapizado naranja y estructura curva inspirada en el diseño futurista de los años 70.",
+  
+      imagen: "/src/assets/images/productos/sillon-space-age.png",
+  
+      imagenes: [
+        "/src/assets/images/productos/sillon-space-age.png",
+      ],
+  
       material: "Tela",
-      colores: ["Naranja", "Mostaza", "Oliva"],
+  
+      colores: ["Naranja", "Mostaza"],
+  
+      stock: 3,
+  
+      destacado: true,
     },
+  
     {
       id: 2,
-      nombre: "Aparador Nogal 70s",
-      categoria: "Comedor",
-      decada: 1970,
-      descripcion: "Aparador en madera de nogal con puertas corredizas y patas cónicas.",
-      precio: 1250000,
-      imagen: "/src/assets/hero.png",
-      material: "Madera",
-      colores: ["Marrón", "Crema"],
+  
+      nombre: "Lámpara Hongo",
+  
+      categoria: "Iluminación",
+  
+      decada: "70s",
+  
+      precio: 320000,
+  
+      descripcion:
+        "Lámpara de mesa acrílica con acabado brillante y luz cálida ambiental.",
+  
+      imagen: "/src/assets/images/productos/lampara-hongo.png",
+  
+      imagenes: [
+        "/src/assets/images/productos/lampara-hongo.png",
+      ],
+  
+      material: "Acrílico",
+  
+      colores: ["Naranja", "Blanco"],
+  
+      stock: 8,
+  
+      destacado: true,
     },
+  
     {
       id: 3,
-      nombre: "Lámpara Hongo",
-      categoria: "Iluminación",
-      decada: 1970,
-      descripcion: "Lámpara de mesa con pantalla acrílica naranja y base cerámica.",
-      precio: 320000,
-      imagen: "/src/assets/hero.png",
-      material: "Vidrio",
-      colores: ["Naranja", "Crema"],
+  
+      nombre: "Mesa Tulip",
+  
+      categoria: "Comedor",
+  
+      decada: "60s",
+  
+      precio: 1480000,
+  
+      descripcion:
+        "Mesa redonda blanca inspirada en el diseño modernista americano.",
+  
+      imagen: "/src/assets/images/productos/mesa-tulip.png",
+  
+      imagenes: [
+        "/src/assets/images/productos/mesa-tulip.png",
+      ],
+  
+      material: "Metal",
+  
+      colores: ["Blanco"],
+  
+      stock: 2,
+  
+      destacado: false,
     },
+  
     {
       id: 4,
-      nombre: "Mesa de Centro Redonda",
-      categoria: "Sala",
-      decada: 1970,
-      descripcion: "Mesa de centro en madera maciza con acabado natural y diseño bajo.",
-      precio: 680000,
-      imagen: "/src/assets/hero.png",
+  
+      nombre: "Televisor Woodline",
+  
+      categoria: "Electrodomésticos",
+  
+      decada: "70s",
+  
+      precio: 760000,
+  
+      descripcion:
+        "Televisor vintage con estructura de madera oscura y detalles cromados.",
+  
+      imagen: "/src/assets/images/productos/tv-woodline.png",
+  
+      imagenes: [
+        "/src/assets/images/productos/tv-woodline.png",
+      ],
+  
       material: "Madera",
+  
       colores: ["Marrón"],
-    },
-    {
-      id: 5,
-      nombre: "Mesa Tulip con Sillas",
-      categoria: "Comedor",
-      decada: 1970,
-      descripcion: "Mesa tulip blanca con sillas tapizadas en tono mostaza. Set de 5 piezas.",
-      precio: 1480000,
-      imagen: "/src/assets/hero.png",
-      material: "Metal",
-      colores: ["Blanco", "Mostaza"],
-    },
-    {
-      id: 6,
-      nombre: "Reloj de Pared Sol",
-      categoria: "Decoración",
-      decada: 1970,
-      descripcion: "Reloj de pared con diseño radial en madera y detalles metálicos.",
-      precio: 210000,
-      imagen: "/src/assets/hero.png",
-      material: "Madera",
-      colores: ["Marrón", "Dorado"],
+  
+      stock: 1,
+  
+      destacado: true,
     },
   ];
