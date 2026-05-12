@@ -1,10 +1,10 @@
 .primary-button {
-  height: 58px;
+  height: 54px;
   border: none;
   border-radius: 16px;
   background: linear-gradient(90deg, #b84a00, #d96c2b);
   color: white;
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
   transition: 0.2s ease;
