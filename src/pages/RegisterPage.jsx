@@ -1,3 +1,6 @@
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
+
 import "./LoginPage.css";
 
 import InputField from "../components/InputField/InputField";
@@ -13,6 +16,26 @@ import tagIcon from "../assets/images/etiqueta.png";
 import plantIcon from "../assets/images/iconoplanta.png";
 
 function RegisterPage() {
+  const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isValid, isSubmitting },
+  } = useForm({
+    mode: "onChange",
+  });
+
+  const password = watch("password");
+
+  const crearCuenta = (datos) => {
+    console.log("Datos de registro:", datos);
+
+    // Registro simulado
+    navigate("/login");
+  };
+
   return (
     <main className="login-page">
       <section className="login-content">
@@ -30,12 +53,22 @@ function RegisterPage() {
             piezas retro seleccionadas para tu hogar.
           </p>
 
-          <form className="login-form">
+          <form className="login-form" onSubmit={handleSubmit(crearCuenta)}>
             <InputField
               label="Nombre completo"
               type="text"
               placeholder="Ingresa tu nombre"
               icon={heartIcon}
+              nombre="nombre"
+              register={register}
+              error={errors.nombre}
+              reglas={{
+                required: "El nombre es obligatorio",
+                minLength: {
+                  value: 3,
+                  message: "El nombre debe tener al menos 3 caracteres",
+                },
+              }}
             />
 
             <InputField
@@ -43,6 +76,16 @@ function RegisterPage() {
               type="email"
               placeholder="ejemplo@correo.com"
               icon={mailIcon}
+              nombre="email"
+              register={register}
+              error={errors.email}
+              reglas={{
+                required: "El correo es obligatorio",
+                pattern: {
+                  value: /^\S+@\S+\.\S+$/,
+                  message: "Ingresá un correo válido",
+                },
+              }}
             />
 
             <InputField
@@ -51,9 +94,37 @@ function RegisterPage() {
               placeholder="Crea una contraseña"
               icon={lockIcon}
               rightIcon={eyeIcon}
+              nombre="password"
+              register={register}
+              error={errors.password}
+              reglas={{
+                required: "La contraseña es obligatoria",
+                minLength: {
+                  value: 6,
+                  message: "La contraseña debe tener al menos 6 caracteres",
+                },
+              }}
             />
-            
-            <PrimaryButton type="submit">Crear cuenta</PrimaryButton>
+
+            <InputField
+              label="Confirmar contraseña"
+              type="password"
+              placeholder="Repite tu contraseña"
+              icon={lockIcon}
+              rightIcon={eyeIcon}
+              nombre="confirmarPassword"
+              register={register}
+              error={errors.confirmarPassword}
+              reglas={{
+                required: "Debes confirmar la contraseña",
+                validate: (valor) =>
+                  valor === password || "Las contraseñas no coinciden",
+              }}
+            />
+
+            <PrimaryButton type="submit" disabled={!isValid || isSubmitting}>
+              {isSubmitting ? "Creando cuenta..." : "Crear cuenta"}
+            </PrimaryButton>
 
             <a className="auth-secondary-button" href="/login">
               Ya tengo cuenta
