@@ -53,3 +53,11 @@
 .input-box input::placeholder {
   color: #a99a8b;
 }
+
+.input-error {
+  min-height: 13px;
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1;
+  color: #b84a00;
+}

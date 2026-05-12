@@ -29,7 +29,7 @@ function InputField({
         )}
       </div>
 
-      {error && <p className="input-error">{error.message}</p>}
+      <p className="input-error">{error?.message || " "}</p>
     </div>
   );
 }
