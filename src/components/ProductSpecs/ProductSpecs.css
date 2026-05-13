@@ -1,0 +1,33 @@
+.product-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 26px;
+  border-top: 1px solid #decbb8;
+}
+
+.product-spec {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.product-spec img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  opacity: 0.78;
+}
+
+.product-spec h3 {
+  margin: 0 0 5px;
+  color: #3b2a24;
+  font-size: 0.98rem;
+}
+
+.product-spec p {
+  margin: 0;
+  color: #5c4a40;
+  line-height: 1.45;
+}

@@ -4,10 +4,11 @@ import "./HomePage.css";
 
 import Navbar from "../components/Navbar/Navbar";
 import TimelineSelector from "../components/TimelineSelector/TimelineSelector";
+import ProductCard from "../components/ProductCard/ProductCard";
+import Palette from "../components/Palette/Palette";
 
 import heroImage from "../assets/images/fondohome.png";
 import searchIcon from "../assets/images/buscar.png";
-import favoriteIcon from "../assets/images/favorito.png";
 
 import sillonSpace from "../assets/images/sillonspace.png";
 import aparadorNogal from "../assets/images/aparadornogal.png";
@@ -21,38 +22,38 @@ const decadesInfo = {
   1950: {
     title: "Años 50",
     description:
-      "Líneas elegantes, detalles cromados y piezas funcionales con encanto clásico.",
-    palette: ["#5b2f1c", "#b75f2a", "#d6a85f", "#7f7b52", "#d9c29d", "#efe1ca"],
+      "Pasteles suaves, madera clara, detalles cromados y una estética optimista marcada por el diseño funcional de posguerra.",
+    palette: ["#F4D6B8", "#B7D7D8", "#F2A7A0", "#D9C27E", "#8B5E3C", "#EFE6D8"],
   },
   1960: {
     title: "Años 60",
     description:
-      "Formas simples, madera clara y una estética moderna con aire optimista.",
-    palette: ["#3d2b20", "#a65f2b", "#d6b36a", "#8c9364", "#c9ad82", "#eadcc3"],
+      "Colores pop, formas geométricas, contrastes fuertes y una mezcla entre modernidad espacial y diseño gráfico expresivo.",
+    palette: ["#F27A1A", "#F2C230", "#2F8F83", "#D9487D", "#F4EFE3", "#3B2A24"],
   },
   1970: {
     title: "Años 70",
     description:
       "Colores tierra, formas orgánicas y mucho carácter. Descubre lo mejor del diseño setentero.",
-    palette: ["#71380f", "#d85105", "#d89a27", "#7f873c", "#d4ae73", "#e5d6bd"],
+    palette: ["#71380F", "#D85105", "#D89A27", "#7F873C", "#D4AE73", "#E5D6BD"],
   },
   1980: {
     title: "Años 80",
     description:
-      "Contrastes marcados, siluetas expresivas y objetos decorativos con personalidad.",
-    palette: ["#2f241f", "#c45b2c", "#d89a27", "#6f7c55", "#b98f63", "#ead8c2"],
+      "Tonos intensos, contrastes gráficos, negro brillante, acentos neón y una estética más expresiva y atrevida.",
+    palette: ["#111111", "#F25CA2", "#00A6A6", "#F2D230", "#6A4C93", "#F4F1E8"],
   },
   1990: {
     title: "Años 90",
     description:
-      "Comodidad, tonos neutros y piezas versátiles para espacios cálidos y simples.",
-    palette: ["#3b2a24", "#7a4e2d", "#c49a62", "#8d8f72", "#d3b994", "#eee1cf"],
+      "Neutros cálidos, verdes apagados, madera natural y una sensibilidad más simple, cómoda y relajada.",
+    palette: ["#D8C7B0", "#8A8F73", "#7A4E2D", "#B8A58A", "#EFE8DC", "#4A3A32"],
   },
   2000: {
     title: "Años 2000",
     description:
-      "Minimalismo cálido, materiales nobles y objetos retro reinterpretados.",
-    palette: ["#352821", "#8b5733", "#d1a35d", "#8a8b68", "#d8c2a2", "#f1e4d2"],
+      "Minimalismo claro, plateados, blancos cálidos, vidrio, líneas limpias y acentos tecnológicos suaves.",
+    palette: ["#F1EEE8", "#C9CED3", "#8D9AA5", "#6F7F8F", "#D7B98E", "#3A3A3A"],
   },
 };
 
@@ -247,8 +248,10 @@ function HomePage() {
 
             <p className="selected-description">{decadeInfo.description}</p>
 
+            <Palette colors={decadeInfo.palette} />
+
             <a href="/productos" className="selected-link">
-              Ver inspiración de los {String(selectedDecade).slice(2)}{" "}
+              Ver inspiración de los {String(selectedDecade).slice(2)}
               <span>›</span>
             </a>
 
@@ -260,45 +263,13 @@ function HomePage() {
           <div className="selected-products">
             {filteredProducts.length > 0 ? (
               filteredProducts.map((product) => (
-                <article className="home-product-card" key={product.id}>
-                  <img src={product.image} alt={product.name} />
-
-                  <div className="home-product-info">
-                    <h3>{product.name}</h3>
-                    <p>{product.category}</p>
-
-                    <div className="home-product-actions">
-                      <a href={`/producto/${product.id}`}>Ver detalle</a>
-
-                      <button type="button">
-                        <img src={favoriteIcon} alt="Guardar favorito" />
-                      </button>
-                    </div>
-                  </div>
-                </article>
+                <ProductCard key={product.id} product={product} />
               ))
             ) : (
               <p className="no-products-message">
                 No encontramos productos para esa búsqueda en esta década.
               </p>
             )}
-          </div>
-        </section>
-
-        <section className="home-explore">
-          <div>
-            <h2>Explora por década</h2>
-            <p>Viaja por el tiempo y encuentra tu estilo.</p>
-          </div>
-
-          <div className="palette-row">
-            <span>Paleta inspiracional</span>
-
-            <div className="palette-colors">
-              {decadeInfo.palette.map((color) => (
-                <i key={color} style={{ backgroundColor: color }}></i>
-              ))}
-            </div>
           </div>
         </section>
       </main>
