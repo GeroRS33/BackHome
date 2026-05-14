@@ -2,19 +2,36 @@ import "./ProductCard.css";
 
 import favoriteIcon from "../../assets/images/favorito.png";
 
-function HomeProductCard({ product }) {
+function ProductCard({ product, isFavorite = false, onToggleFavorite }) {
+  const handleFavoriteClick = () => {
+    if (onToggleFavorite) {
+      onToggleFavorite(product.id);
+    }
+  };
+
   return (
-    <article className="home-product-card">
-      <img src={product.image} alt={product.name} />
+    <article className="product-card">
+      <img className="product-card-image" src={product.image} alt={product.name} />
 
-      <div className="home-product-info">
+      <div className="product-card-info">
         <h3>{product.name}</h3>
-        <p>{product.category}</p>
 
-        <div className="home-product-actions">
+        <p className="product-card-category">{product.category}</p>
+
+        {product.description && (
+          <p className="product-card-description">{product.description}</p>
+        )}
+
+        {product.price && <strong>{product.price}</strong>}
+
+        <div className="product-card-actions">
           <a href={`/producto/${product.id}`}>Ver detalle</a>
 
-          <button type="button">
+          <button
+            className={isFavorite ? "active" : ""}
+            type="button"
+            onClick={handleFavoriteClick}
+          >
             <img src={favoriteIcon} alt="Guardar favorito" />
           </button>
         </div>
@@ -23,4 +40,4 @@ function HomeProductCard({ product }) {
   );
 }
 
-export default HomeProductCard;
+export default ProductCard;
