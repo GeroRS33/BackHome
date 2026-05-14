@@ -20,7 +20,8 @@ const products = [
     decade: 1970,
     price: "$21.000",
     image: sillonSpace,
-    description: "Sillón giratorio con tapizado en tela texturizada y base metálica.",
+    description:
+      "Sillón giratorio con tapizado en tela texturizada y base metálica.",
   },
   {
     id: 32,
@@ -30,7 +31,8 @@ const products = [
     decade: 1970,
     price: "$78.000",
     image: aparadorNogal,
-    description: "Aparador en madera de nogal con puertas curvas y patas cónicas.",
+    description:
+      "Aparador en madera de nogal con puertas curvas y patas cónicas.",
   },
   {
     id: 33,
@@ -40,7 +42,8 @@ const products = [
     decade: 1970,
     price: "$18.000",
     image: lamparaHongo,
-    description: "Lámpara de mesa con pantalla naranja y base blanca brillante.",
+    description:
+      "Lámpara de mesa con pantalla naranja y base blanca brillante.",
   },
   {
     id: 41,
@@ -50,7 +53,8 @@ const products = [
     decade: 1980,
     price: "$29.000",
     image: sillonSpace,
-    description: "Sillón bajo con líneas envolventes y estética retro ochentera.",
+    description:
+      "Sillón bajo con líneas envolventes y estética retro ochentera.",
   },
   {
     id: 51,
@@ -60,7 +64,8 @@ const products = [
     decade: 1990,
     price: "$64.000",
     image: aparadorNogal,
-    description: "Mueble de guardado en madera cálida para espacios simples.",
+    description:
+      "Mueble de guardado en madera cálida para espacios simples.",
   },
   {
     id: 61,
@@ -70,7 +75,8 @@ const products = [
     decade: 2000,
     price: "$24.000",
     image: lamparaHongo,
-    description: "Lámpara reinterpretada con curvas suaves y brillo cálido.",
+    description:
+      "Lámpara reinterpretada con curvas suaves y brillo cálido.",
   },
 ];
 
