@@ -1,0 +1,21 @@
+.primary-button {
+  height: 44px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #b84a00, #d96c2b);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.primary-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(184, 74, 0, 0.22);
+}
+
+.primary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

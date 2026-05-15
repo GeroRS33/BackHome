@@ -1,0 +1,150 @@
+.catalog-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.filter-box {
+  border: 1px solid #ead6c2;
+  border-radius: 14px;
+  background: rgba(255, 247, 236, 0.78);
+  padding: 18px;
+}
+
+.filter-box h2 {
+  margin: 0 0 14px;
+  color: #4a3a32;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.category-list button {
+  min-height: 46px;
+  border: 0;
+  border-bottom: 1px solid #ead6c2;
+  background: transparent;
+  color: #2f241f;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 10px;
+  transition: 0.2s ease;
+}
+
+.category-list button:first-child {
+  border-radius: 9px 9px 0 0;
+}
+
+.category-list button:last-child {
+  border-bottom: 0;
+}
+
+.category-list button:hover,
+.category-list button.active {
+  background: #f1ddc5;
+}
+
+.category-list img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.price-range {
+  padding-top: 8px;
+}
+
+.price-line {
+  position: relative;
+  height: 24px;
+}
+
+.price-line::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 11px;
+  height: 3px;
+  border-radius: 999px;
+  background: #c47a17;
+}
+
+.price-line span {
+  position: absolute;
+  top: 3px;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #c47a17;
+}
+
+.price-line span:first-child {
+  left: 0;
+}
+
+.price-line span:last-child {
+  right: 0;
+}
+
+.price-values {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.price-values p {
+  margin: 0;
+  color: #2f241f;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.material-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.material-list label {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  color: #3b2a24;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.material-list input {
+  width: 16px;
+  height: 16px;
+  accent-color: #c47a17;
+}
+
+.material-list small {
+  color: #75675d;
+  font-size: 0.85rem;
+}
+
+.see-more-filter {
+  margin-top: 14px;
+  border: 0;
+  background: transparent;
+  color: #7a4e2d;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
