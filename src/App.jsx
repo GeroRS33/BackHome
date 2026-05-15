@@ -11,6 +11,7 @@ import CheckoutPage from "./pages/CheckoutPage.jsx";
 import ConfirmationPage from "./pages/ConfirmationPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
+import FavoritesPage from "./pages/FavoritesPage.jsx";
 
 import "./styles/variables.css";
 import "./styles/global.css";
