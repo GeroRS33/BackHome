@@ -165,6 +165,16 @@ function App() {
       />
 
       <Route
+        path="/favoritos"
+        element={
+          <FavoritesPage
+            favoritos={favoritos}
+            toggleFavorito={toggleFavorito}
+          />
+        }
+      />
+
+      <Route
         path="/carrito"
         element={
           <CartPage

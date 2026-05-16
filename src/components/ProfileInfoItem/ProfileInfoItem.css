@@ -1,0 +1,15 @@
+.profile-info-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #4a3a32;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.profile-info-item img {
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+  flex-shrink: 0;
+}

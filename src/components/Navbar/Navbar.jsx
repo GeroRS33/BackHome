@@ -18,10 +18,7 @@ function Navbar({ activePage = "inicio" }) {
           Décadas
         </a>
 
-        <a
-          className={activePage === "favoritos" ? "active" : ""}
-          href="/perfil"
-        >
+        <a className={activePage === "favoritos" ? "active" : ""} href="/favoritos">
           Favoritos
         </a>
 

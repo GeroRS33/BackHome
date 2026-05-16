@@ -61,7 +61,8 @@
   font-weight: 700;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 12px;
   cursor: pointer;
   transition: 0.2s ease;
 }
@@ -75,10 +76,11 @@
   cursor: not-allowed;
 }
 
-.clear-favorites-button img {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
+.clear-favorites-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: block;
 }
 
 .favorites-grid {
