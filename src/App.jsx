@@ -7,7 +7,6 @@ import ProductDetailPage from "./pages/ProductDetailPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import CartPage from "./pages/CartPage.jsx";
-import CheckoutPage from "./pages/CheckoutPage.jsx";
 import ConfirmationPage from "./pages/ConfirmationPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
@@ -46,9 +45,7 @@ function App() {
   }, [favoritos]);
 
   const agregarAlCarrito = (producto) => {
-    const productoExiste = carrito.find(
-      (item) => item.id === producto.id
-    );
+    const productoExiste = carrito.find((item) => item.id === producto.id);
 
     if (productoExiste) {
       const carritoActualizado = carrito.map((item) => {
@@ -66,12 +63,13 @@ function App() {
       return;
     }
 
-    const nuevoProducto = {
-      ...producto,
-      cantidad: 1,
-    };
-
-    setCarrito([...carrito, nuevoProducto]);
+    setCarrito([
+      ...carrito,
+      {
+        ...producto,
+        cantidad: 1,
+      },
+    ]);
   };
 
   const eliminarDelCarrito = (productoId) => {
@@ -114,9 +112,7 @@ function App() {
 
   const toggleFavorito = (productoId) => {
     if (favoritos.includes(productoId)) {
-      const favoritosActualizados = favoritos.filter(
-        (id) => id !== productoId
-      );
+      const favoritosActualizados = favoritos.filter((id) => id !== productoId);
 
       setFavoritos(favoritosActualizados);
       return;
@@ -127,10 +123,7 @@ function App() {
 
   return (
     <Routes>
-      <Route
-        path="/"
-        element={<HomePage />}
-      />
+      <Route path="/" element={<HomePage />} />
 
       <Route
         path="/productos"
@@ -154,15 +147,9 @@ function App() {
         }
       />
 
-      <Route
-        path="/login"
-        element={<LoginPage />}
-      />
+      <Route path="/login" element={<LoginPage />} />
 
-      <Route
-        path="/registro"
-        element={<RegisterPage />}
-      />
+      <Route path="/registro" element={<RegisterPage />} />
 
       <Route
         path="/favoritos"
@@ -187,31 +174,11 @@ function App() {
         }
       />
 
-      <Route
-        path="/checkout"
-        element={
-          <CheckoutPage
-            carrito={carrito}
-            total={calcularTotal()}
-            vaciarCarrito={vaciarCarrito}
-          />
-        }
-      />
+      <Route path="/confirmacion" element={<ConfirmationPage />} />
 
-      <Route
-        path="/confirmacion"
-        element={<ConfirmationPage />}
-      />
+      <Route path="/perfil" element={<ProfilePage />} />
 
-      <Route
-        path="/perfil"
-        element={<ProfilePage />}
-      />
-
-      <Route
-        path="*"
-        element={<NotFoundPage />}
-      />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

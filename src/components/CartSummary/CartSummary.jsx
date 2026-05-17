@@ -36,7 +36,7 @@ function CartSummary({ total = 0, itemCount = 0 }) {
         <strong>{formatPrice(total)}</strong>
       </div>
 
-      <a className="checkout-button" href="/checkout">
+      <a className="checkout-button" href="/confirmacion">
         Continuar al checkout
       </a>
 

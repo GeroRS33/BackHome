@@ -1,6 +1,6 @@
 .login-page {
   min-height: 100vh;
-  background: #f8ead5;
+    background: #f8ead5;
   color: #3b2a24;
   display: grid;
   grid-template-columns: minmax(460px, 50%) 1fr;
