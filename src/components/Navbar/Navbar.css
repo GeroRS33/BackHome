@@ -80,3 +80,31 @@
     font-size: 0.9rem;
   }
 }
+
+.cart-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.cart-count {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #b46221;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}

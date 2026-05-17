@@ -1,0 +1,125 @@
+.cart-item {
+  min-height: 155px;
+  padding: 16px;
+  border: 1px solid #ead6c2;
+  border-radius: 18px;
+  background: #fffaf3;
+  box-shadow: 0 8px 20px rgba(76, 47, 31, 0.06);
+  display: grid;
+  grid-template-columns: 270px 1fr 130px 120px 38px;
+  align-items: center;
+  gap: 22px;
+}
+
+.cart-item-image {
+  width: 270px;
+  height: 130px;
+  border-radius: 12px;
+  object-fit: cover;
+  display: block;
+}
+
+.cart-item-info h3 {
+  margin: 0 0 6px;
+  color: #2f2119;
+  font-size: 1.25rem;
+}
+
+.cart-item-category {
+  margin: 0 0 18px;
+  color: #5f4d42;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.cart-item-description {
+  max-width: 340px;
+  margin: 0;
+  color: #75675d;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.cart-item-price {
+  color: #241912;
+  font-size: 1.45rem;
+  text-align: right;
+}
+
+.cart-item-controls {
+  height: 46px;
+  border: 1.5px solid #a37b5b;
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: 38px 1fr 38px;
+  align-items: center;
+  overflow: hidden;
+}
+
+.cart-item-controls button {
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: #4c2f1f;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.cart-item-controls span {
+  text-align: center;
+  color: #241912;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.cart-item-delete {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.cart-item-delete img {
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+}
+
+@media (max-width: 1050px) {
+  .cart-item {
+    grid-template-columns: 180px 1fr;
+  }
+
+  .cart-item-image {
+    width: 180px;
+    height: 120px;
+  }
+
+  .cart-item-price,
+  .cart-item-controls,
+  .cart-item-delete {
+    grid-column: 2;
+  }
+
+  .cart-item-price {
+    text-align: left;
+  }
+}
+
+@media (max-width: 650px) {
+  .cart-item {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-item-image {
+    width: 100%;
+    height: 210px;
+  }
+
+  .cart-item-price,
+  .cart-item-controls,
+  .cart-item-delete {
+    grid-column: auto;
+  }
+}

@@ -2,7 +2,7 @@ import "./Navbar.css";
 
 import logo from "../../assets/images/Logo BackHome.svg";
 
-function Navbar({ activePage = "inicio" }) {
+function Navbar({ activePage = "inicio", cartCount = 0 }) {
   return (
     <header className="navbar">
       <a className="navbar-logo" href="/">
@@ -20,6 +20,10 @@ function Navbar({ activePage = "inicio" }) {
 
         <a className={activePage === "favoritos" ? "active" : ""} href="/favoritos">
           Favoritos
+        </a>
+
+        <a className={activePage === "carrito" ? "active" : ""} href="/carrito">
+          Carrito
         </a>
 
         <a className={activePage === "perfil" ? "active" : ""} href="/perfil">
