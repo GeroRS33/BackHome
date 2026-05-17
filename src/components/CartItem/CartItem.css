@@ -75,15 +75,17 @@
 .cart-item-delete {
   border: 0;
   background: transparent;
+  color: #b46221;
   cursor: pointer;
   display: grid;
   place-items: center;
 }
 
-.cart-item-delete img {
-  width: 25px;
-  height: 25px;
-  object-fit: contain;
+.cart-delete-icon {
+  width: 26px;
+  height: 26px;
+  color: #b46221;
+  display: block;
 }
 
 @media (max-width: 1050px) {

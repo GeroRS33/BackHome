@@ -4,8 +4,28 @@ import Navbar from "../components/Navbar/Navbar";
 import CartItem from "../components/CartItem/CartItem";
 import CartSummary from "../components/CartSummary/CartSummary";
 
-import carritoIcon from "../assets/images/carrito.png";
 import disponibilidadIcon from "../assets/images/disponibilidad.png";
+
+function CartIcon({ className = "" }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 32 32"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M6 7H9L12 21H25L28 11H11"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="14" cy="26" r="2" stroke="currentColor" strokeWidth="2.2" />
+      <circle cx="24" cy="26" r="2" stroke="currentColor" strokeWidth="2.2" />
+    </svg>
+  );
+}
 
 function CartPage({
   carrito = [],
@@ -35,7 +55,7 @@ function CartPage({
       <main className="cart-page">
         <section className="cart-header">
           <h1>
-            Mi carrito <img src={carritoIcon} alt="" />
+            Mi carrito <CartIcon className="cart-title-icon" />
           </h1>
 
           <p>Revisa tus piezas seleccionadas antes de finalizar tu compra.</p>
@@ -72,7 +92,7 @@ function CartPage({
         ) : (
           <section className="cart-empty">
             <div className="cart-empty-icon">
-              <img src={carritoIcon} alt="" />
+              <CartIcon className="cart-empty-svg" />
             </div>
 
             <h2>Tu carrito está vacío</h2>
