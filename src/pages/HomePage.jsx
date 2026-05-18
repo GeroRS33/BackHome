@@ -138,7 +138,7 @@ function HomePage({
 
             <Palette colors={decadeInfo.palette} />
 
-            <a href="/productos" className="selected-link">
+            <a href={`/productos?decada=${selectedDecade}`} className="selected-link">
               Ver inspiración de los {String(selectedDecade).slice(2)}
               <span>›</span>
             </a>

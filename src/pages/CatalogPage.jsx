@@ -21,7 +21,11 @@ function CatalogPage({
   agregarAlCarrito,
   toggleFavorito,
 }) {
-  const [selectedDecade, setSelectedDecade] = useState(1970);
+  const initialDecade = Number(
+    new URLSearchParams(window.location.search).get("decada")
+  ) || 1970;
+
+  const [selectedDecade, setSelectedDecade] = useState(initialDecade);
   const [selectedCategory, setSelectedCategory] = useState("Sala");
   const [selectedMaterials, setSelectedMaterials] = useState([]);
   const [maxPrice, setMaxPrice] = useState(80000);
