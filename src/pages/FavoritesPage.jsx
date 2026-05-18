@@ -3,10 +3,16 @@ import "./FavoritesPage.css";
 import Navbar from "../components/Navbar/Navbar";
 import FavoriteCard from "../components/FavoriteCard/FavoriteCard";
 
+import { productos } from "../data/products";
+
 import corazonIcon from "../assets/images/corazon.png";
 
 function FavoritesPage({ favoritos = [], toggleFavorito, vaciarFavoritos }) {
-  const cantidad = favoritos.length;
+  const productosFavoritos = productos.filter((producto) =>
+    favoritos.includes(producto.id)
+  );
+
+  const cantidad = productosFavoritos.length;
 
   const handleRemoveFavorite = (productId) => {
     if (toggleFavorito) {
@@ -89,7 +95,7 @@ function FavoritesPage({ favoritos = [], toggleFavorito, vaciarFavoritos }) {
 
         {cantidad > 0 ? (
           <section className="favorites-grid">
-            {favoritos.map((product) => (
+            {productosFavoritos.map((product) => (
               <FavoriteCard
                 key={product.id}
                 product={product}
