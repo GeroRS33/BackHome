@@ -9,7 +9,7 @@ import ProductCard from "../components/ProductCard/ProductCard";
 
 import { productos } from "../data/products";
 
-import coloresIcon from "../assets/images/coloresdisponibles.png";
+import precioIcon from "../assets/images/etiquetaprecio.png";
 import envioIcon from "../assets/images/envio.png";
 
 function formatPrice(value) {
@@ -91,7 +91,7 @@ function ProductDetailPage({
 
             <div className="product-price-box">
               <div className="product-color-icon">
-                <img src={coloresIcon} alt="" />
+                <img src={precioIcon} alt="" />
               </div>
 
               <div>

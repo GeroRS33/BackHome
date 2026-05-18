@@ -1,6 +1,7 @@
 .product-card {
+  position: relative;
   width: 100%;
-  max-width: 280px;
+  max-width: 340px;
   justify-self: center;
   border: 1px solid #decbb8;
   border-radius: 16px;
@@ -50,20 +51,23 @@
 
 .product-card-actions {
   display: grid;
-  grid-template-columns: 1fr 104px 38px;
+  grid-template-columns: 1fr 1fr;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .product-card-actions a,
 .product-add-button {
-  height: 36px;
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 0 12px;
   border: 1.4px solid #7a4e2d;
-  border-radius: 9px;
+  border-radius: 12px;
   color: #3b2a24;
   background: transparent;
   text-decoration: none;
-  font-size: 0.76rem;
+  font-size: 0.9rem;
   font-weight: 800;
   display: grid;
   place-items: center;
@@ -80,6 +84,10 @@
   border-color: #b84a00;
   background: #c96110;
   color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
 }
 
 .product-add-button:hover {
@@ -87,39 +95,37 @@
   transform: translateY(-1px);
 }
 
-.product-favorite-button {
-  width: 34px;
-  height: 36px;
-  border: 0;
-  border-radius: 9px;
-  background: transparent;
-  color: #4c2f1f;
-  font-size: 1.45rem;
-  line-height: 1;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  transition: 0.2s ease;
-}
-
-.product-favorite-button:hover,
-.product-favorite-button.active {
-  background: rgba(180, 98, 33, 0.12);
-  color: #b84a00;
-}
-
-.product-add-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
 .product-add-cart-icon {
   width: 20px;
   height: 20px;
   color: #fff;
   flex-shrink: 0;
+}
+
+.product-favorite-button {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 250, 243, 0.92);
+  color: #4c2f1f;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 6px 14px rgba(76, 47, 31, 0.16);
+  transition: 0.2s ease;
+  z-index: 2;
+}
+
+.product-favorite-button:hover,
+.product-favorite-button.active {
+  background: #fff3e4;
+  color: #b84a00;
 }
 
 @media (max-width: 1100px) {
@@ -137,8 +143,8 @@
     grid-template-columns: 1fr;
   }
 
-  .product-favorite-button {
-    width: 100%;
-    border: 1.4px solid #decbb8;
+  .product-card-actions a,
+  .product-add-button {
+    height: 46px;
   }
 }
