@@ -24,6 +24,8 @@ function ProductCard({
     }
   };
 
+  const productPrice = product.price || product.precio;
+
   return (
     <article className="product-card">
       <img
@@ -38,21 +40,16 @@ function ProductCard({
         <p className="product-card-category">{product.category}</p>
 
         {product.description && (
-          <p className="product-card-description">
-            {product.description}
-          </p>
+          <p className="product-card-description">{product.description}</p>
         )}
 
-        {product.price && (
-          <strong>{formatPrice(product.price)}</strong>
-        )}
+        {productPrice && <strong>{formatPrice(productPrice)}</strong>}
 
         <div className="product-card-actions">
-          <a href={`/producto/${product.id}`}>
-            Ver detalle
-          </a>
+          <a href={`/producto/${product.id}`}>Ver detalle</a>
 
           <button
+            className="product-add-button"
             type="button"
             onClick={handleAddToCart}
           >
@@ -66,9 +63,7 @@ function ProductCard({
             type="button"
             onClick={handleFavoriteClick}
             aria-label={
-              isFavorite
-                ? "Quitar de favoritos"
-                : "Agregar a favoritos"
+              isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"
             }
           >
             {isFavorite ? "♥" : "♡"}

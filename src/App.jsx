@@ -128,7 +128,16 @@ function App() {
 
       <Route path="/login" element={<LoginPage />} />
 
-      <Route path="/home" element={<HomePage />} />
+      <Route
+        path="/home"
+        element={
+          <HomePage
+            favoritos={favoritos}
+            agregarAlCarrito={agregarAlCarrito}
+            toggleFavorito={toggleFavorito}
+          />
+        }
+      />
 
       <Route
         path="/productos"
