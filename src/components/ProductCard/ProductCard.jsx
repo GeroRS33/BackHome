@@ -65,7 +65,7 @@ function ProductCard({
         )}
 
         {productPrice && <strong>{formatPrice(productPrice)}</strong>}
-
+        
         <div className="product-card-actions">
           <a href={`/producto/${product.id}`}>Ver detalle</a>
 
@@ -77,20 +77,16 @@ function ProductCard({
             <span>Agregar</span>
             <CartIcon className="product-add-cart-icon" />
           </button>
-
-          <button
-            className={`product-favorite-button ${
-              isFavorite ? "active" : ""
-            }`}
-            type="button"
-            onClick={handleFavoriteClick}
-            aria-label={
-              isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"
-            }
-          >
-            {isFavorite ? "♥" : "♡"}
-          </button>
         </div>
+
+        <button
+          className={`product-favorite-button ${isFavorite ? "active" : ""}`}
+          type="button"
+          onClick={handleFavoriteClick}
+          aria-label={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
+        >
+          {isFavorite ? "♥" : "♡"}
+        </button>
       </div>
     </article>
   );
