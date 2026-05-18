@@ -7,7 +7,7 @@ import Navbar from "../components/Navbar/Navbar";
 import ProfileInfoItem from "../components/ProfileInfoItem/ProfileInfoItem";
 import OrderList from "../components/OrderList/OrderList";
 import OrderDetail from "../components/OrderDetail/OrderDetail";
-
+import cambiarImagenIcon from "../assets/images/cambiarimagen.png";
 import mailIcon from "../assets/images/mail.png";
 import ubicacionIcon from "../assets/images/ubicacion.png";
 import calendarioIcon from "../assets/images/calendario.png";
@@ -100,11 +100,28 @@ function ProfilePage() {
     email: "valentina@backhome.com",
     location: "Montevideo, Uruguay",
     memberSince: "Miembro desde mayo 2024",
+    avatar:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&auto=format&fit=crop&q=80",
   });
 
   const [formData, setFormData] = useState(profile);
 
   const selectedOrder = orders.find((order) => order.id === selectedOrderId);
+
+  const handleAvatarChange = (event) => {
+    const file = event.target.files[0];
+
+    if (!file) {
+      return;
+    }
+
+    const imageUrl = URL.createObjectURL(file);
+
+    setFormData((currentData) => ({
+      ...currentData,
+      avatar: imageUrl,
+    }));
+  };
 
   const handleEdit = () => {
     setFormData(profile);
@@ -143,9 +160,20 @@ function ProfilePage() {
         <section className="profile-card">
           <div className="profile-avatar">
             <img
-              src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&auto=format&fit=crop&q=80"
+              src={isEditing ? formData.avatar : profile.avatar}
               alt="Foto de perfil"
             />
+
+            {isEditing && (
+              <label className="change-avatar-button">
+                <img src={cambiarImagenIcon} alt="" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                />
+              </label>
+            )}
           </div>
 
           <div className="profile-info">

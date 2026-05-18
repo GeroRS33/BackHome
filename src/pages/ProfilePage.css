@@ -241,7 +241,40 @@
   background: rgba(163, 123, 91, 0.08);
 }
 
+.profile-avatar {
+  position: relative;
+}
 
+.change-avatar-button {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 52px;
+  height: 52px;
+  border: 1.5px solid #d7b98e;
+  border-radius: 999px;
+  background: #fffaf3;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(76, 47, 31, 0.18);
+  transition: 0.2s ease;
+}
+
+.change-avatar-button:hover {
+  background: #fff3e4;
+  transform: translateY(-1px);
+}
+
+.change-avatar-button img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.change-avatar-button input {
+  display: none;
+}
 
 @media (max-width: 1150px) {
   .profile-card {
