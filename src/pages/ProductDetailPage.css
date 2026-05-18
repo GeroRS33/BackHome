@@ -1,6 +1,6 @@
 .product-detail-page {
   min-height: 100vh;
-    background: #f8ead5;
+  background: #f8ead5;
   color: #3b2a24;
   padding: 34px 72px 48px;
 }
@@ -17,6 +17,7 @@
 .product-breadcrumb a {
   color: #4a3a32;
   text-decoration: none;
+  font-weight: 700;
 }
 
 .product-breadcrumb a:hover {
@@ -26,6 +27,7 @@
 .product-breadcrumb p {
   margin: 0;
   color: #3b2a24;
+  font-weight: 700;
 }
 
 .product-detail-main {
@@ -203,23 +205,6 @@
 }
 
 @media (max-width: 760px) {
-  .product-gallery {
-    grid-template-columns: 1fr;
-  }
-
-  .product-thumbnails {
-    flex-direction: row;
-  }
-
-  .product-thumbnails button {
-    width: 96px;
-    height: 96px;
-  }
-
-  .product-main-image img {
-    height: 420px;
-  }
-
   .product-actions {
     grid-template-columns: 1fr;
   }

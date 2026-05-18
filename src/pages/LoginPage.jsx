@@ -21,16 +21,11 @@ function LoginPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid, isSubmitting },
-  } = useForm({
-    mode: "onChange",
-  });
+    formState: { errors },
+  } = useForm();
 
-  const iniciarSesion = (datos) => {
-    console.log("Datos del login:", datos);
-
-    // Login simulado: si el formulario es válido, entra.
-    navigate("/");
+  const onSubmit = () => {
+    navigate("/home");
   };
 
   return (
@@ -50,22 +45,22 @@ function LoginPage() {
             y seguir explorando piezas retro.
           </p>
 
-          <form className="login-form" onSubmit={handleSubmit(iniciarSesion)}>
+          <form className="login-form" onSubmit={handleSubmit(onSubmit)}>
             <InputField
               label="Correo electrónico"
               type="email"
               placeholder="ejemplo@correo.com"
               icon={mailIcon}
-              nombre="email"
               register={register}
-              error={errors.email}
+              nombre="email"
               reglas={{
                 required: "El correo es obligatorio",
                 pattern: {
-                  value: /^\S+@\S+\.\S+$/,
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                   message: "Ingresá un correo válido",
                 },
               }}
+              error={errors.email}
             />
 
             <InputField
@@ -74,16 +69,16 @@ function LoginPage() {
               placeholder="Ingresa tu contraseña"
               icon={lockIcon}
               rightIcon={eyeIcon}
-              nombre="password"
               register={register}
-              error={errors.password}
+              nombre="password"
               reglas={{
                 required: "La contraseña es obligatoria",
                 minLength: {
                   value: 6,
-                  message: "La contraseña debe tener al menos 6 caracteres",
+                  message: "Debe tener al menos 6 caracteres",
                 },
               }}
+              error={errors.password}
             />
 
             <div className="login-options">
@@ -95,9 +90,7 @@ function LoginPage() {
               <a href="#">¿Olvidaste tu contraseña?</a>
             </div>
 
-            <PrimaryButton type="submit" disabled={!isValid || isSubmitting}>
-              {isSubmitting ? "Ingresando..." : "Iniciar sesión"}
-            </PrimaryButton>
+            <PrimaryButton type="submit">Iniciar sesión</PrimaryButton>
 
             <a className="auth-secondary-button" href="/registro">
               Crear cuenta

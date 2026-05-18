@@ -1,3 +1,5 @@
+import { useNavigate, useParams } from "react-router";
+
 import "./ProductDetailPage.css";
 
 import Navbar from "../components/Navbar/Navbar";
@@ -5,68 +7,41 @@ import ProductGallery from "../components/ProductGallery/ProductGallery";
 import ProductSpecs from "../components/ProductSpecs/ProductSpecs";
 import ProductCard from "../components/ProductCard/ProductCard";
 
-import sofa1 from "../assets/images/sofa1.png";
-import sofa2 from "../assets/images/sofa2.png";
-import sofa3 from "../assets/images/sofa3.png";
+import { productos } from "../data/products";
 
-import aparadorNogal from "../assets/images/aparadornogal.png";
-import lamparaHongo from "../assets/images/lamparahongo.png";
-import sillonSpace from "../assets/images/sillonspace.png";
-
-import materialesIcon from "../assets/images/materiales.png";
-import dimensionesIcon from "../assets/images/dimensiones.png";
 import coloresIcon from "../assets/images/coloresdisponibles.png";
 import envioIcon from "../assets/images/envio.png";
-
-const product = {
-  id: 31,
-  name: "Sillón Space Age",
-  tag: "Inspiración años 70",
-  description:
-    "Un ícono del diseño retro que combina curvas envolventes y comodidad excepcional. Perfecto para darle personalidad y calidez a cualquier espacio.",
-  images: [sofa1, sofa2, sofa3],
-  colors: ["#c64f05", "#d89a27", "#8a8b42", "#5a3215", "#d9c7aa"],
-  specs: [
-    {
-      title: "Materiales",
-      text: "Tapizado en pana de algodón, base metálica cromada.",
-      icon: materialesIcon,
-    },
-    {
-      title: "Dimensiones",
-      text: "Ancho 82 cm · Profundidad 85 cm · Alto 80 cm. Altura del asiento 42 cm.",
-      icon: dimensionesIcon,
-    },
-  ],
-};
-
-const relatedProducts = [
-  {
-    id: 32,
-    name: "Aparador Nogal 70s",
-    category: "Almacenaje",
-    image: aparadorNogal,
-  },
-  {
-    id: 33,
-    name: "Lámpara Hongo",
-    category: "Iluminación",
-    image: lamparaHongo,
-  },
-  {
-    id: 34,
-    name: "Mesa Ratona Orbital",
-    category: "Sala",
-    image: sillonSpace,
-  },
-];
 
 function ProductDetailPage({
   favoritos = [],
   agregarAlCarrito,
   toggleFavorito,
 }) {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const product = productos.find((item) => item.id === Number(id));
+
+  if (!product) {
+    return (
+      <>
+        <Navbar activePage="" />
+
+        <main className="product-detail-page">
+          <h1>Producto no encontrado</h1>
+          <a href="/productos">Volver al catálogo</a>
+        </main>
+      </>
+    );
+  }
+
   const isFavorite = favoritos.includes(product.id);
+
+  const relatedProducts = productos
+    .filter(
+      (item) => item.id !== product.id && item.category === product.category
+    )
+    .slice(0, 3);
 
   const handleSave = () => {
     if (toggleFavorito) {
@@ -74,10 +49,12 @@ function ProductDetailPage({
     }
   };
 
-  const handleAvailability = () => {
+  const handleComprar = () => {
     if (agregarAlCarrito) {
       agregarAlCarrito(product);
     }
+
+    navigate("/carrito");
   };
 
   return (
@@ -86,7 +63,7 @@ function ProductDetailPage({
 
       <main className="product-detail-page">
         <div className="product-breadcrumb">
-          <a href="/">Inicio</a>
+          <a href="/home">Inicio</a>
           <span>›</span>
           <a href="/productos">Productos</a>
           <span>›</span>
@@ -130,16 +107,16 @@ function ProductDetailPage({
                 type="button"
                 onClick={handleSave}
               >
-                <span>{isFavorite ? "♥" : "♡"}</span>
+                <span>{isFavorite ? "♥️" : "♡"}</span>
                 Guardar
               </button>
 
               <button
                 className="availability-button"
                 type="button"
-                onClick={handleAvailability}
+                onClick={handleComprar}
               >
-                Consultar disponibilidad
+                Comprar
               </button>
             </div>
 
@@ -157,7 +134,13 @@ function ProductDetailPage({
 
           <div className="related-grid">
             {relatedProducts.map((relatedProduct) => (
-              <ProductCard key={relatedProduct.id} product={relatedProduct} />
+              <ProductCard
+                key={relatedProduct.id}
+                product={relatedProduct}
+                isFavorite={favoritos.includes(relatedProduct.id)}
+                onToggleFavorite={toggleFavorito}
+                onAddToCart={agregarAlCarrito}
+              />
             ))}
           </div>
         </section>

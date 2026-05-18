@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 import "./ProfilePage.css";
 
@@ -85,46 +86,54 @@ const orders = [
       },
     ],
   },
-  {
-    id: 4,
-    code: "BH-2024-003",
-    date: "5 de enero, 2024",
-    status: "Completado",
-    total: "$1.450.000",
-    products: [
-      {
-        id: 31,
-        name: "Sillón Space Age",
-        category: "Sala",
-        quantity: 1,
-        price: "$890.000",
-        image: sillonSpace,
-      },
-    ],
-  },
-  {
-    id: 5,
-    code: "BH-2023-012",
-    date: "22 de diciembre, 2023",
-    status: "Completado",
-    total: "$560.000",
-    products: [
-      {
-        id: 33,
-        name: "Lámpara Hongo",
-        category: "Iluminación",
-        quantity: 1,
-        price: "$320.000",
-        image: lamparaHongo,
-      },
-    ],
-  },
 ];
 
 function ProfilePage() {
+  const navigate = useNavigate();
+
   const [selectedOrderId, setSelectedOrderId] = useState(orders[0].id);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const [profile, setProfile] = useState({
+    name: "Valentina Retro",
+    bio: "Amante del diseño y lo vintage ✨",
+    email: "valentina@backhome.com",
+    location: "Montevideo, Uruguay",
+    memberSince: "Miembro desde mayo 2024",
+  });
+
+  const [formData, setFormData] = useState(profile);
 
   const selectedOrder = orders.find((order) => order.id === selectedOrderId);
+
+  const handleEdit = () => {
+    setFormData(profile);
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setFormData(profile);
+    setIsEditing(false);
+  };
+
+  const handleSave = (event) => {
+    event.preventDefault();
+    setProfile(formData);
+    setIsEditing(false);
+  };
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    setFormData((currentData) => ({
+      ...currentData,
+      [name]: value,
+    }));
+  };
+
+  const handleLogout = () => {
+    navigate("/login");
+  };
 
   return (
     <>
@@ -140,29 +149,102 @@ function ProfilePage() {
           </div>
 
           <div className="profile-info">
-            <h1>Valentina Retro</h1>
-            <p>Amante del diseño y lo vintage ✨</p>
+            {!isEditing ? (
+              <>
+                <h1>{profile.name}</h1>
+                <p>{profile.bio}</p>
 
-            <div className="profile-info-list">
-              <ProfileInfoItem icon={mailIcon} text="valentina@backhome.com" />
-              <ProfileInfoItem icon={ubicacionIcon} text="Montevideo, Uruguay" />
-              <ProfileInfoItem
-                icon={calendarioIcon}
-                text="Miembro desde mayo 2024"
-              />
-            </div>
+                <div className="profile-info-list">
+                  <ProfileInfoItem icon={mailIcon} text={profile.email} />
+                  <ProfileInfoItem
+                    icon={ubicacionIcon}
+                    text={profile.location}
+                  />
+                  <ProfileInfoItem
+                    icon={calendarioIcon}
+                    text={profile.memberSince}
+                  />
+                </div>
 
-            <button type="button" className="edit-profile-button">
-              <img src={lapizIcon} alt="" />
-              Editar perfil
-            </button>
+                <div className="profile-actions">
+                  <button
+                    type="button"
+                    className="edit-profile-button"
+                    onClick={handleEdit}
+                  >
+                    <img src={lapizIcon} alt="" />
+                    Editar perfil
+                  </button>
+
+                  <button
+                    type="button"
+                    className="logout-profile-button"
+                    onClick={handleLogout}
+                  >
+                    Cerrar sesión
+                  </button>
+                </div>
+              </>
+            ) : (
+              <form className="profile-edit-form" onSubmit={handleSave}>
+                <label>
+                  Nombre
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                  />
+                </label>
+
+                <label>
+                  Descripción
+                  <input
+                    type="text"
+                    name="bio"
+                    value={formData.bio}
+                    onChange={handleChange}
+                  />
+                </label>
+
+                <label>
+                  Email
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                </label>
+
+                <label>
+                  Ubicación
+                  <input
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                  />
+                </label>
+
+                <div className="profile-edit-actions">
+                  <button type="submit" className="save-profile-button">
+                    Guardar cambios
+                  </button>
+
+                  <button
+                    type="button"
+                    className="cancel-profile-button"
+                    onClick={handleCancel}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
 
-          <img
-            className="profile-decoration"
-            src={decoracionPerfil}
-            alt=""
-          />
+          <img className="profile-decoration" src={decoracionPerfil} alt="" />
         </section>
 
         <section className="profile-orders-section">
