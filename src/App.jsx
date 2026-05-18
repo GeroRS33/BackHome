@@ -7,6 +7,7 @@ import ProductDetailPage from "./pages/ProductDetailPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import CartPage from "./pages/CartPage.jsx";
+import CheckoutPage from "./pages/CheckoutPage.jsx";
 import ConfirmationPage from "./pages/ConfirmationPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
@@ -102,7 +103,9 @@ function App() {
 
   const calcularTotal = () => {
     return carrito.reduce((total, item) => {
-      return total + item.price * item.cantidad;
+      const precioProducto = item.price || item.precio || 0;
+
+      return total + precioProducto * item.cantidad;
     }, 0);
   };
 
@@ -121,7 +124,11 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
+      <Route path="/" element={<LoginPage />} />
+
+      <Route path="/login" element={<LoginPage />} />
+
+      <Route path="/home" element={<HomePage />} />
 
       <Route
         path="/productos"
@@ -145,8 +152,6 @@ function App() {
         }
       />
 
-      <Route path="/login" element={<LoginPage />} />
-
       <Route path="/registro" element={<RegisterPage />} />
 
       <Route
@@ -169,6 +174,17 @@ function App() {
             modificarCantidad={modificarCantidad}
             vaciarCarrito={vaciarCarrito}
             total={calcularTotal()}
+          />
+        }
+      />
+
+      <Route
+        path="/checkout"
+        element={
+          <CheckoutPage
+            carrito={carrito}
+            total={calcularTotal()}
+            vaciarCarrito={vaciarCarrito}
           />
         }
       />
