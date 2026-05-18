@@ -9,7 +9,8 @@ import PrimaryButton from "../components/PrimaryButton/PrimaryButton";
 
 import mailIcon from "../assets/images/mail.png";
 import ubicacionIcon from "../assets/images/ubicacion.png";
-import calendarioIcon from "../assets/images/calendario.png";
+import nombreIcon from "../assets/images/nombre.png";
+import telefonoIcon from "../assets/images/telefono.png";
 import decoracionPerfil from "../assets/images/decoracionperfil.png";
 
 function formatPrice(value) {
@@ -55,7 +56,7 @@ function CheckoutPage({ carrito = [], total = 0, vaciarCarrito }) {
               label="Nombre completo"
               type="text"
               placeholder="Ingresá tu nombre"
-              icon={calendarioIcon}
+              icon={nombreIcon}
               register={register}
               nombre="nombre"
               reglas={{
@@ -89,7 +90,7 @@ function CheckoutPage({ carrito = [], total = 0, vaciarCarrito }) {
               label="Dirección de envío"
               type="text"
               placeholder="Calle, número, apartamento"
-              icon={ubicacionIcon}
+              icon={telefonoIcon}
               register={register}
               nombre="direccion"
               reglas={{

@@ -158,14 +158,14 @@ function ProfilePage() {
 
       <main className="profile-page">
         <section className="profile-card">
-          <div className="profile-avatar">
+          <div className={isEditing ? "profile-avatar editing" : "profile-avatar"}>
             <img
               src={isEditing ? formData.avatar : profile.avatar}
               alt="Foto de perfil"
             />
 
             {isEditing && (
-              <label className="change-avatar-button">
+              <label className="change-avatar-overlay">
                 <img src={cambiarImagenIcon} alt="" />
                 <input
                   type="file"

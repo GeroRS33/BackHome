@@ -1,7 +1,7 @@
 .profile-page {
   min-height: 100vh;
   padding: 28px 56px 56px;
-   background: #f8ead5;
+  background: #f8ead5;
   color: #3b2418;
 }
 
@@ -21,6 +21,7 @@
 }
 
 .profile-avatar {
+  position: relative;
   width: 220px;
   height: 220px;
   border-radius: 50%;
@@ -28,14 +29,47 @@
   border: 1px solid #ead6c2;
   background: #fff7ec;
   overflow: hidden;
+  isolation: isolate;
 }
 
-.profile-avatar img {
+.profile-avatar > img {
   width: 100%;
   height: 100%;
   border-radius: 50%;
   display: block;
   object-fit: cover;
+}
+
+.profile-avatar.editing::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: rgba(30, 24, 20, 0.48);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.change-avatar-overlay {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 3;
+}
+
+.change-avatar-overlay img {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  transform: scale(2);
+}
+
+.change-avatar-overlay input {
+  display: none;
 }
 
 .profile-info {
@@ -62,6 +96,13 @@
   flex-direction: column;
   gap: 17px;
   margin-bottom: 28px;
+}
+
+.profile-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
 .edit-profile-button {
@@ -92,66 +133,6 @@
   object-fit: contain;
 }
 
-.profile-decoration {
-  align-self: end;
-  justify-self: end;
-  max-width: 330px;
-  max-height: 270px;
-  object-fit: contain;
-  opacity: 0.95;
-}
-
-.profile-orders-section {
-  margin-top: 28px;
-}
-
-.profile-section-title {
-  margin-bottom: 16px;
-}
-
-.profile-section-title h2 {
-  margin: 0 0 6px;
-  color: #3b2418;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(2.2rem, 3.2vw, 3.3rem);
-  line-height: 1;
-}
-
-.profile-section-title p {
-  margin: 0;
-  color: #4a3a32;
-  font-size: 1rem;
-}
-
-.profile-orders-layout {
-  display: grid;
-  grid-template-columns: minmax(360px, 0.95fr) minmax(480px, 1fr);
-  gap: 36px;
-  align-items: start;
-}
-
-.logout-profile-button {
-  min-width: 170px;
-  height: 52px;
-  margin-left: 14px;
-  padding: 0 24px;
-  border: 1.5px solid #b46221;
-  border-radius: 999px;
-  background: transparent;
-  color: #b46221;
-  font-size: 1rem;
-  font-weight: 800;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.profile-actions {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
 .logout-profile-button {
   min-width: 170px;
   height: 52px;
@@ -168,6 +149,15 @@
 
 .logout-profile-button:hover {
   background: rgba(180, 98, 33, 0.08);
+}
+
+.profile-decoration {
+  align-self: end;
+  justify-self: end;
+  max-width: 330px;
+  max-height: 270px;
+  object-fit: contain;
+  opacity: 0.95;
 }
 
 .profile-edit-form {
@@ -241,39 +231,33 @@
   background: rgba(163, 123, 91, 0.08);
 }
 
-.profile-avatar {
-  position: relative;
+.profile-orders-section {
+  margin-top: 28px;
 }
 
-.change-avatar-button {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  width: 52px;
-  height: 52px;
-  border: 1.5px solid #d7b98e;
-  border-radius: 999px;
-  background: #fffaf3;
+.profile-section-title {
+  margin-bottom: 16px;
+}
+
+.profile-section-title h2 {
+  margin: 0 0 6px;
+  color: #3b2418;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.2rem, 3.2vw, 3.3rem);
+  line-height: 1;
+}
+
+.profile-section-title p {
+  margin: 0;
+  color: #4a3a32;
+  font-size: 1rem;
+}
+
+.profile-orders-layout {
   display: grid;
-  place-items: center;
-  cursor: pointer;
-  box-shadow: 0 8px 18px rgba(76, 47, 31, 0.18);
-  transition: 0.2s ease;
-}
-
-.change-avatar-button:hover {
-  background: #fff3e4;
-  transform: translateY(-1px);
-}
-
-.change-avatar-button img {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-}
-
-.change-avatar-button input {
-  display: none;
+  grid-template-columns: minmax(360px, 0.95fr) minmax(480px, 1fr);
+  gap: 36px;
+  align-items: start;
 }
 
 @media (max-width: 1150px) {
@@ -319,5 +303,10 @@
   .profile-info-list {
     align-items: flex-start;
     text-align: left;
+  }
+
+  .change-avatar-overlay img {
+    width: 46px;
+    height: 46px;
   }
 }
