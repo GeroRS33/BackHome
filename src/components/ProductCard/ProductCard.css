@@ -50,7 +50,7 @@
 
 .product-card-actions {
   display: grid;
-  grid-template-columns: 1fr 86px 34px;
+  grid-template-columns: 1fr 104px 38px;
   align-items: center;
   gap: 8px;
 }
@@ -115,11 +115,11 @@
   gap: 8px;
 }
 
-.product-add-button img {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
-  filter: brightness(0) invert(1);
+.product-add-cart-icon {
+  width: 20px;
+  height: 20px;
+  color: #fff;
+  flex-shrink: 0;
 }
 
 @media (max-width: 1100px) {

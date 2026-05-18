@@ -1,6 +1,25 @@
 import "./ProductCard.css";
 
-import carritoIcon from "../../assets/images/carrito.png";
+function CartIcon({ className = "" }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 32 32"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M6 7H9L12 21H25L28 11H11"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="14" cy="26" r="2" stroke="currentColor" strokeWidth="2.2" />
+      <circle cx="24" cy="26" r="2" stroke="currentColor" strokeWidth="2.2" />
+    </svg>
+  );
+}
 
 function formatPrice(value) {
   const price = typeof value === "number" ? value : Number(value) || 0;
@@ -56,7 +75,7 @@ function ProductCard({
             onClick={handleAddToCart}
           >
             <span>Agregar</span>
-            <img src={carritoIcon} alt="" />
+            <CartIcon className="product-add-cart-icon" />
           </button>
 
           <button
