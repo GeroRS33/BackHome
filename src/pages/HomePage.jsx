@@ -19,6 +19,8 @@ import lamparaIcon from "../assets/images/lampara.png";
 import lineasIcon from "../assets/images/lineas.png";
 import plantaIcon from "../assets/images/planta.png";
 
+import { productos } from "../data/products";
+
 const decadesInfo = {
   1950: {
     title: "Años 50",
@@ -58,182 +60,7 @@ const decadesInfo = {
   },
 };
 
-const productsByDecade = {
-  1950: [
-    {
-      id: 11,
-      name: "Butaca Classic 50s",
-      category: "Sillones",
-      description: "Butaca retro de líneas suaves y madera clara.",
-      price: 620000,
-      precio: 620000,
-      image: sillonSpace,
-    },
-    {
-      id: 12,
-      name: "Aparador Vintage Claro",
-      category: "Almacenaje",
-      description: "Aparador compacto con estética de los años cincuenta.",
-      price: 980000,
-      precio: 980000,
-      image: aparadorNogal,
-    },
-    {
-      id: 13,
-      name: "Lámpara Dome",
-      category: "Iluminación",
-      description: "Lámpara cálida con silueta clásica de mesa.",
-      price: 240000,
-      precio: 240000,
-      image: lamparaHongo,
-    },
-  ],
-  1960: [
-    {
-      id: 21,
-      name: "Sillón Mid Century",
-      category: "Sillones",
-      description: "Sillón bajo de inspiración moderna y cómoda.",
-      price: 760000,
-      precio: 760000,
-      image: sillonSpace,
-    },
-    {
-      id: 22,
-      name: "Aparador Línea 60s",
-      category: "Almacenaje",
-      description: "Madera cálida y proporciones simples.",
-      price: 1180000,
-      precio: 1180000,
-      image: aparadorNogal,
-    },
-    {
-      id: 23,
-      name: "Lámpara Soft Glow",
-      category: "Iluminación",
-      description: "Luz ambiental para espacios retro modernos.",
-      price: 280000,
-      precio: 280000,
-      image: lamparaHongo,
-    },
-  ],
-  1970: [
-    {
-      id: 31,
-      name: "Sillón Space Age",
-      category: "Sillones",
-      description: "Sillón giratorio con tapizado en tela texturizada.",
-      price: 890000,
-      precio: 890000,
-      image: sillonSpace,
-    },
-    {
-      id: 32,
-      name: "Aparador Nogal 70s",
-      category: "Almacenaje",
-      description: "Aparador de nogal con puertas curvas.",
-      price: 1250000,
-      precio: 1250000,
-      image: aparadorNogal,
-    },
-    {
-      id: 33,
-      name: "Lámpara Hongo",
-      category: "Iluminación",
-      description: "Lámpara naranja con luz cálida ambiental.",
-      price: 320000,
-      precio: 320000,
-      image: lamparaHongo,
-    },
-  ],
-  1980: [
-    {
-      id: 41,
-      name: "Sillón Lounge 80s",
-      category: "Sillones",
-      description: "Sillón expresivo con presencia fuerte.",
-      price: 740000,
-      precio: 740000,
-      image: sillonSpace,
-    },
-    {
-      id: 42,
-      name: "Aparador Dark Wood",
-      category: "Almacenaje",
-      description: "Mueble oscuro con estética ochentera.",
-      price: 1100000,
-      precio: 1100000,
-      image: aparadorNogal,
-    },
-    {
-      id: 43,
-      name: "Lámpara Pop Orange",
-      category: "Iluminación",
-      description: "Lámpara protagonista de color intenso.",
-      price: 290000,
-      precio: 290000,
-      image: lamparaHongo,
-    },
-  ],
-  1990: [
-    {
-      id: 51,
-      name: "Sillón Cozy Retro",
-      category: "Sillones",
-      description: "Sillón cómodo de tonos neutros y cálidos.",
-      price: 690000,
-      precio: 690000,
-      image: sillonSpace,
-    },
-    {
-      id: 52,
-      name: "Aparador Natural",
-      category: "Almacenaje",
-      description: "Aparador simple de madera natural.",
-      price: 960000,
-      precio: 960000,
-      image: aparadorNogal,
-    },
-    {
-      id: 53,
-      name: "Lámpara Mesa Cálida",
-      category: "Iluminación",
-      description: "Iluminación suave para espacios relajados.",
-      price: 260000,
-      precio: 260000,
-      image: lamparaHongo,
-    },
-  ],
-  2000: [
-    {
-      id: 61,
-      name: "Sillón Neo Retro",
-      category: "Sillones",
-      description: "Sillón claro con detalles modernos.",
-      price: 720000,
-      precio: 720000,
-      image: sillonSpace,
-    },
-    {
-      id: 62,
-      name: "Aparador Curvo Moderno",
-      category: "Almacenaje",
-      description: "Aparador minimalista con líneas limpias.",
-      price: 1050000,
-      precio: 1050000,
-      image: aparadorNogal,
-    },
-    {
-      id: 63,
-      name: "Lámpara Mushroom 2000",
-      category: "Iluminación",
-      description: "Lámpara tipo mushroom con acabado brillante.",
-      price: 350000,
-      precio: 350000,
-      image: lamparaHongo,
-    },
-  ],
-};
+
 
 function HomePage({
   favoritos = [],
@@ -244,7 +71,9 @@ function HomePage({
   const [searchTerm, setSearchTerm] = useState("");
 
   const decadeInfo = decadesInfo[selectedDecade];
-  const decadeProducts = productsByDecade[selectedDecade];
+  const decadeProducts = productos.filter(
+    (product) => product.decade === selectedDecade
+  );
 
   const filteredProducts = useMemo(() => {
     const normalizedSearch = searchTerm.toLowerCase().trim();
