@@ -1,5 +1,7 @@
 import "./ProductCard.css";
 
+import carritoIcon from "../../assets/images/carrito.png";
+
 function formatPrice(value) {
   const price = typeof value === "number" ? value : Number(value) || 0;
 
@@ -53,7 +55,8 @@ function ProductCard({
             type="button"
             onClick={handleAddToCart}
           >
-            Agregar
+            <span>Agregar</span>
+            <img src={carritoIcon} alt="" />
           </button>
 
           <button

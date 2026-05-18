@@ -108,6 +108,20 @@
   color: #b84a00;
 }
 
+.product-add-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.product-add-button img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
 @media (max-width: 1100px) {
   .product-card {
     max-width: none;

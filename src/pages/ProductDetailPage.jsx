@@ -12,6 +12,13 @@ import { productos } from "../data/products";
 import coloresIcon from "../assets/images/coloresdisponibles.png";
 import envioIcon from "../assets/images/envio.png";
 
+function formatPrice(value) {
+  const price = typeof value === "number" ? value : Number(value) || 0;
+
+  return `$${new Intl.NumberFormat("es-UY").format(price)}`;
+}
+
+
 function ProductDetailPage({
   favoritos = [],
   agregarAlCarrito,
@@ -82,22 +89,14 @@ function ProductDetailPage({
 
             <ProductSpecs specs={product.specs} />
 
-            <div className="product-colors">
+            <div className="product-price-box">
               <div className="product-color-icon">
                 <img src={coloresIcon} alt="" />
               </div>
 
               <div>
-                <h3>Colores disponibles</h3>
-
-                <div className="product-color-list">
-                  {product.colors.map((color) => (
-                    <span
-                      key={color}
-                      style={{ backgroundColor: color }}
-                    ></span>
-                  ))}
-                </div>
+                <h3>Precio</h3>
+                <strong>{formatPrice(product.price || product.precio)}</strong>
               </div>
             </div>
 

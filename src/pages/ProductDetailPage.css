@@ -92,18 +92,25 @@
   font-size: 0.98rem;
 }
 
-.product-color-list {
-  display: flex;
-  align-items: center;
-  gap: 13px;
+.product-price-box {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  gap: 18px;
+  align-items: start;
+  margin-top: 24px;
 }
 
-.product-color-list span {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: block;
-  border: 1px solid rgba(76, 47, 31, 0.12);
+.product-price-box h3 {
+  margin: 0 0 8px;
+  color: #3b2a24;
+  font-size: 0.98rem;
+}
+
+.product-price-box strong {
+  color: #3b2a24;
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 900;
 }
 
 .product-actions {
