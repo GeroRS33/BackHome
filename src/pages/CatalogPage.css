@@ -13,25 +13,36 @@
   margin-bottom: 26px;
 }
 
-.back-button {
+.catalog-back-button {
   width: fit-content;
   min-width: 150px;
-  height: 48px;
+  height: 52px;
+  padding: 0 24px;
   border: 1.5px solid #c9ad96;
   border-radius: 999px;
-  color: #8a6b58;
-  background: rgba(255, 247, 236, 0.68);
-  font-weight: 700;
+  background: rgba(255, 250, 243, 0.7);
+  color: #7a4e2d;
   text-decoration: none;
+  font-size: 1rem;
+  font-weight: 800;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
+  box-shadow: 0 8px 18px rgba(76, 47, 31, 0.06);
+  transition: 0.2s ease;
 }
 
-.back-button span {
-  font-size: 2rem;
+.catalog-back-button span {
+  font-size: 1.8rem;
   line-height: 1;
+  transform: translateY(-1px);
+}
+
+.catalog-back-button:hover {
+  background: #fff7ec;
+  border-color: #a37b5b;
+  transform: translateY(-1px);
 }
 
 .catalog-title-row {
@@ -56,33 +67,32 @@
 }
 
 .catalog-sort {
-  min-width: 250px;
-  height: 48px;
-  padding: 0 16px;
+  min-width: 285px;
+  height: 52px;
+  padding: 0 18px 0 22px;
   border: 1px solid #ead6c2;
   border-radius: 999px;
-  background: rgba(255, 247, 236, 0.72);
+  background: rgba(255, 250, 243, 0.78);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
 }
 
 .catalog-sort span {
-  color: #a18b78;
-  font-size: 0.9rem;
+  color: #9c8778;
+  font-size: 0.95rem;
+  white-space: nowrap;
 }
 
-.catalog-sort strong {
-  color: #3b2a24;
-  font-size: 0.9rem;
-}
-
-.catalog-sort button {
+.catalog-sort select {
+  width: 100%;
   border: 0;
+  outline: 0;
   background: transparent;
-  color: #3b2a24;
-  font-size: 1.4rem;
+  color: #3b2418;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 800;
   cursor: pointer;
 }
 
@@ -95,7 +105,7 @@
 
 .catalog-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(230px, 360px));
+  grid-template-columns: repeat(3, minmax(300px, 340px));
   justify-content: center;
   gap: 22px;
 }
@@ -111,6 +121,12 @@
   font-weight: 700;
 }
 
+@media (max-width: 1250px) {
+  .catalog-grid {
+    grid-template-columns: repeat(2, minmax(300px, 340px));
+  }
+}
+
 @media (max-width: 1150px) {
   .catalog-page {
     padding: 28px 24px 48px;
@@ -124,10 +140,6 @@
   .catalog-layout {
     grid-template-columns: 1fr;
   }
-
-  .catalog-grid {
-    grid-template-columns: repeat(2, minmax(230px, 360px));
-  }
 }
 
 @media (max-width: 720px) {
@@ -138,6 +150,7 @@
 
   .catalog-sort {
     width: 100%;
+    min-width: 0;
   }
 
   .catalog-grid {

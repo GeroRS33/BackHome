@@ -17,6 +17,8 @@ function CatalogPage({
   const [selectedDecade, setSelectedDecade] = useState(1970);
   const [selectedCategory, setSelectedCategory] = useState("Sala");
   const [selectedMaterials, setSelectedMaterials] = useState([]);
+const [maxPrice, setMaxPrice] = useState(80000);
+  const [sortOption, setSortOption] = useState("relevantes");
 
   const handleToggleMaterial = (material) => {
     setSelectedMaterials((currentMaterials) => {
@@ -28,19 +30,45 @@ function CatalogPage({
     });
   };
 
+  const getProductPrice = (product) => {
+    return Number(product.price || product.precio || 0);
+  };
+
   const filteredProducts = useMemo(() => {
-    return productos.filter((product) => {
+    const filtered = productos.filter((product) => {
       const matchesDecade = product.decade === selectedDecade;
+
       const matchesCategory = selectedCategory
         ? product.category === selectedCategory
         : true;
+
       const matchesMaterial =
         selectedMaterials.length === 0 ||
         selectedMaterials.includes(product.material);
 
-      return matchesDecade && matchesCategory && matchesMaterial;
+      const matchesPrice = getProductPrice(product) <= maxPrice;
+
+      return matchesDecade && matchesCategory && matchesMaterial && matchesPrice;
     });
-  }, [selectedDecade, selectedCategory, selectedMaterials]);
+
+    if (sortOption === "precio-menor") {
+      return [...filtered].sort(
+        (a, b) => getProductPrice(a) - getProductPrice(b)
+      );
+    }
+
+    if (sortOption === "precio-mayor") {
+      return [...filtered].sort(
+        (a, b) => getProductPrice(b) - getProductPrice(a)
+      );
+    }
+
+    if (sortOption === "nombre") {
+      return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    return filtered;
+  }, [selectedDecade, selectedCategory, selectedMaterials, maxPrice, sortOption]);
 
   return (
     <>
@@ -49,6 +77,7 @@ function CatalogPage({
       <main className="catalog-page">
         <section className="catalog-header">
           <a href="/home" className="catalog-back-button">
+            <span>‹</span>
             Volver
           </a>
 
@@ -64,11 +93,19 @@ function CatalogPage({
             <p>Mostrando {filteredProducts.length} productos</p>
           </div>
 
-          <div className="catalog-sort">
+          <label className="catalog-sort">
             <span>Ordenar por</span>
-            <strong>Más relevantes</strong>
-            <button type="button">⌄</button>
-          </div>
+
+            <select
+              value={sortOption}
+              onChange={(event) => setSortOption(event.target.value)}
+            >
+              <option value="relevantes">Más relevantes</option>
+              <option value="precio-menor">Menor precio</option>
+              <option value="precio-mayor">Mayor precio</option>
+              <option value="nombre">Nombre</option>
+            </select>
+          </label>
         </section>
 
         <section className="catalog-layout">
@@ -77,6 +114,8 @@ function CatalogPage({
             onSelectCategory={setSelectedCategory}
             selectedMaterials={selectedMaterials}
             onToggleMaterial={handleToggleMaterial}
+            maxPrice={maxPrice}
+            onChangeMaxPrice={setMaxPrice}
           />
 
           <div className="catalog-grid">

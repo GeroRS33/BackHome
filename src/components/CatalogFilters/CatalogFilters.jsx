@@ -23,12 +23,24 @@ const materials = [
   { name: "Vidrio", count: 6 },
 ];
 
+function formatPrice(value) {
+  return `$${new Intl.NumberFormat("es-UY").format(value)}`;
+}
+
 function CatalogFilters({
   selectedCategory,
   onSelectCategory,
   selectedMaterials,
   onToggleMaterial,
+  maxPrice = 80000,
+  onChangeMaxPrice,
 }) {
+  const handlePriceChange = (event) => {
+    if (onChangeMaxPrice) {
+      onChangeMaxPrice(Number(event.target.value));
+    }
+  };
+
   return (
     <aside className="catalog-filters">
       <section className="filter-box">
@@ -53,14 +65,18 @@ function CatalogFilters({
         <h2>Rango de precio</h2>
 
         <div className="price-range">
-          <div className="price-line">
-            <span></span>
-            <span></span>
-          </div>
+          <input
+            type="range"
+            min="1000"
+            max="80000"
+            step="1000"
+            value={maxPrice}
+            onChange={handlePriceChange}
+          />
 
           <div className="price-values">
             <p>$1.000</p>
-            <p>$120.000</p>
+            <p>{formatPrice(maxPrice)}</p>
           </div>
         </div>
       </section>
@@ -82,10 +98,6 @@ function CatalogFilters({
             </label>
           ))}
         </div>
-
-        <button className="see-more-filter" type="button">
-          Ver más
-        </button>
       </section>
     </aside>
   );
