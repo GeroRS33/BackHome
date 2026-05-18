@@ -6,16 +6,16 @@
 
 .filter-box {
   border: 1px solid #ead6c2;
-  border-radius: 14px;
-  background: rgba(255, 247, 236, 0.78);
-  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 247, 236, 0.82);
+  padding: 20px;
 }
 
 .filter-box h2 {
-  margin: 0 0 14px;
+  margin: 0 0 16px;
   color: #4a3a32;
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.08rem;
+  font-weight: 800;
 }
 
 .category-list {
@@ -24,24 +24,24 @@
 }
 
 .category-list button {
-  min-height: 46px;
+  min-height: 48px;
   border: 0;
   border-bottom: 1px solid #ead6c2;
   background: transparent;
   color: #2f241f;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 0.98rem;
+  font-weight: 700;
   text-align: left;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 10px;
+  padding: 0 12px;
   transition: 0.2s ease;
 }
 
 .category-list button:first-child {
-  border-radius: 9px 9px 0 0;
+  border-radius: 10px 10px 0 0;
 }
 
 .category-list button:last-child {
@@ -117,33 +117,34 @@
 .price-values p {
   margin: 0;
   color: #2f241f;
-  font-size: 0.88rem;
-  font-weight: 700;
+  font-size: 0.9rem;
+  font-weight: 800;
 }
 
 .material-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .material-list label {
   display: grid;
-  grid-template-columns: 18px 1fr auto;
+  grid-template-columns: 20px 1fr auto;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   color: #3b2a24;
-  font-size: 0.92rem;
+  font-size: 1rem;
   cursor: pointer;
 }
 
 .material-list input {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   accent-color: #c47a17;
 }
 
 .material-list small {
   color: #75675d;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 700;
 }

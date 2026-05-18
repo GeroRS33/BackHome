@@ -7,6 +7,7 @@ import Navbar from "../components/Navbar/Navbar";
 import ProfileInfoItem from "../components/ProfileInfoItem/ProfileInfoItem";
 import OrderList from "../components/OrderList/OrderList";
 import OrderDetail from "../components/OrderDetail/OrderDetail";
+
 import cambiarImagenIcon from "../assets/images/cambiarimagen.png";
 import mailIcon from "../assets/images/mail.png";
 import ubicacionIcon from "../assets/images/ubicacion.png";
@@ -14,9 +15,7 @@ import calendarioIcon from "../assets/images/calendario.png";
 import lapizIcon from "../assets/images/lapiz.png";
 import decoracionPerfil from "../assets/images/decoracionperfil.png";
 
-import sillonSpace from "../assets/images/sillonspace.png";
-import lamparaHongo from "../assets/images/lamparahongo.png";
-import plantaImg from "../assets/images/planta.png";
+const productImage = (fileName) => `/images/productos/${fileName}`;
 
 const orders = [
   {
@@ -24,31 +23,31 @@ const orders = [
     code: "BH-2024-006",
     date: "12 de mayo, 2024",
     status: "Completado",
-    total: "$1.210.000",
+    total: "$125.500",
     products: [
       {
         id: 31,
         name: "Sillón Space Age",
         category: "Sala",
         quantity: 1,
-        price: "$890.000",
-        image: sillonSpace,
+        price: "$42.000",
+        image: productImage("sillon-space-age-1.png"),
       },
       {
-        id: 33,
-        name: "Lámpara Hongo",
-        category: "Iluminación",
+        id: 32,
+        name: "Aparador Nogal 70s",
+        category: "Comedor",
         quantity: 1,
-        price: "$320.000",
-        image: lamparaHongo,
+        price: "$68.000",
+        image: productImage("aparador-nogal-70s-1.png"),
       },
       {
         id: 34,
-        name: "Florero Cerámica",
-        category: "Decoración",
+        name: "Lámpara Hongo",
+        category: "Iluminación",
         quantity: 1,
-        price: "$150.000",
-        image: plantaImg,
+        price: "$15.500",
+        image: productImage("lampara-hongo-1.png"),
       },
     ],
   },
@@ -57,15 +56,15 @@ const orders = [
     code: "BH-2024-005",
     date: "2 de abril, 2024",
     status: "Completado",
-    total: "$680.000",
+    total: "$68.000",
     products: [
       {
-        id: 35,
-        name: "Mesa Ratona Orbital",
-        category: "Sala",
+        id: 32,
+        name: "Aparador Nogal 70s",
+        category: "Comedor",
         quantity: 1,
-        price: "$680.000",
-        image: sillonSpace,
+        price: "$68.000",
+        image: productImage("aparador-nogal-70s-1.png"),
       },
     ],
   },
@@ -74,15 +73,23 @@ const orders = [
     code: "BH-2024-004",
     date: "18 de febrero, 2024",
     status: "Completado",
-    total: "$320.000",
+    total: "$57.500",
     products: [
       {
-        id: 33,
+        id: 31,
+        name: "Sillón Space Age",
+        category: "Sala",
+        quantity: 1,
+        price: "$42.000",
+        image: productImage("sillon-space-age-1.png"),
+      },
+      {
+        id: 34,
         name: "Lámpara Hongo",
         category: "Iluminación",
         quantity: 1,
-        price: "$320.000",
-        image: lamparaHongo,
+        price: "$15.500",
+        image: productImage("lampara-hongo-1.png"),
       },
     ],
   },

@@ -9,6 +9,13 @@ import ProductCard from "../components/ProductCard/ProductCard";
 
 import { productos } from "../data/products";
 
+const sortOptions = [
+  { value: "relevantes", label: "Más relevantes" },
+  { value: "precio-menor", label: "Menor precio" },
+  { value: "precio-mayor", label: "Mayor precio" },
+  { value: "nombre", label: "Nombre" },
+];
+
 function CatalogPage({
   favoritos = [],
   agregarAlCarrito,
@@ -17,8 +24,9 @@ function CatalogPage({
   const [selectedDecade, setSelectedDecade] = useState(1970);
   const [selectedCategory, setSelectedCategory] = useState("Sala");
   const [selectedMaterials, setSelectedMaterials] = useState([]);
-const [maxPrice, setMaxPrice] = useState(80000);
+  const [maxPrice, setMaxPrice] = useState(80000);
   const [sortOption, setSortOption] = useState("relevantes");
+  const [isSortOpen, setIsSortOpen] = useState(false);
 
   const handleToggleMaterial = (material) => {
     setSelectedMaterials((currentMaterials) => {
@@ -30,9 +38,27 @@ const [maxPrice, setMaxPrice] = useState(80000);
     });
   };
 
+  const handleSortChange = (value) => {
+    setSortOption(value);
+    setIsSortOpen(false);
+  };
+
   const getProductPrice = (product) => {
     return Number(product.price || product.precio || 0);
   };
+
+  const selectedSortLabel =
+    sortOptions.find((option) => option.value === sortOption)?.label ||
+    "Más relevantes";
+
+  const materialCounts = useMemo(() => {
+    return productos
+      .filter((product) => product.decade === selectedDecade)
+      .reduce((counts, product) => {
+        counts[product.material] = (counts[product.material] || 0) + 1;
+        return counts;
+      }, {});
+  }, [selectedDecade]);
 
   const filteredProducts = useMemo(() => {
     const filtered = productos.filter((product) => {
@@ -93,19 +119,35 @@ const [maxPrice, setMaxPrice] = useState(80000);
             <p>Mostrando {filteredProducts.length} productos</p>
           </div>
 
-          <label className="catalog-sort">
+          <div className="catalog-sort">
             <span>Ordenar por</span>
 
-            <select
-              value={sortOption}
-              onChange={(event) => setSortOption(event.target.value)}
-            >
-              <option value="relevantes">Más relevantes</option>
-              <option value="precio-menor">Menor precio</option>
-              <option value="precio-mayor">Mayor precio</option>
-              <option value="nombre">Nombre</option>
-            </select>
-          </label>
+            <div className="catalog-sort-dropdown">
+              <button
+                type="button"
+                className="catalog-sort-trigger"
+                onClick={() => setIsSortOpen(!isSortOpen)}
+              >
+                {selectedSortLabel}
+                <span>⌄</span>
+              </button>
+
+              {isSortOpen && (
+                <div className="catalog-sort-menu">
+                  {sortOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      className={sortOption === option.value ? "active" : ""}
+                      onClick={() => handleSortChange(option.value)}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </section>
 
         <section className="catalog-layout">
@@ -116,6 +158,7 @@ const [maxPrice, setMaxPrice] = useState(80000);
             onToggleMaterial={handleToggleMaterial}
             maxPrice={maxPrice}
             onChangeMaxPrice={setMaxPrice}
+            materialCounts={materialCounts}
           />
 
           <div className="catalog-grid">

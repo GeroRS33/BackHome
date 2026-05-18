@@ -11,38 +11,26 @@ import numeroPedidoIcon from "../assets/images/numeropedido.png";
 import ubicacionIcon from "../assets/images/ubicacion.png";
 import disponibilidadIcon from "../assets/images/disponibilidad.png";
 
-import sillonSpace from "../assets/images/sillonspace.png";
-import lamparaHongo from "../assets/images/lamparahongo.png";
-import plantaImg from "../assets/images/planta.png";
+function formatPrice(value) {
+  const price = typeof value === "number" ? value : Number(value) || 0;
 
-const orderProducts = [
-  {
-    id: 31,
-    name: "Sillón Space Age",
-    category: "Sala",
-    quantity: 1,
-    price: "$890.000",
-    image: sillonSpace,
-  },
-  {
-    id: 33,
-    name: "Lámpara Hongo",
-    category: "Iluminación",
-    quantity: 1,
-    price: "$320.000",
-    image: lamparaHongo,
-  },
-  {
-    id: 34,
-    name: "Florero Cerámica",
-    category: "Decoración",
-    quantity: 1,
-    price: "$150.000",
-    image: plantaImg,
-  },
-];
+  return `$${new Intl.NumberFormat("es-UY").format(price)}`;
+}
+
+function getProductPrice(product) {
+  return Number(product.price || product.precio || 0);
+}
 
 function ConfirmationPage() {
+  const ultimoPedidoGuardado = localStorage.getItem("ultimoPedido");
+  const ultimoPedido = ultimoPedidoGuardado
+    ? JSON.parse(ultimoPedidoGuardado)
+    : null;
+
+  const productosPedido = ultimoPedido?.productos || [];
+  const datosEntrega = ultimoPedido?.datosEntrega || {};
+  const totalPedido = ultimoPedido?.total || 0;
+
   return (
     <>
       <Navbar />
@@ -73,7 +61,7 @@ function ConfirmationPage() {
                 <img src={numeroPedidoIcon} alt="" />
               </div>
 
-              <h2>Pedido #BH-2024-007</h2>
+              <h2>Pedido #{ultimoPedido?.codigo || "BH-2024-007"}</h2>
             </header>
 
             <section className="order-status-grid">
@@ -82,8 +70,8 @@ function ConfirmationPage() {
 
                 <div>
                   <h3>Fecha del pedido</h3>
-                  <p>12 de mayo, 2024</p>
-                  <p>11:24 hs</p>
+                  <p>{ultimoPedido?.fecha || "Fecha no disponible"}</p>
+                  <p>{ultimoPedido?.hora || ""}</p>
                 </div>
               </div>
 
@@ -110,26 +98,34 @@ function ConfirmationPage() {
             <section className="order-products-summary">
               <h3>Resumen de tu pedido</h3>
 
-              <div className="confirmation-products-list">
-                {orderProducts.map((product) => (
-                  <article key={product.id} className="confirmation-product">
-                    <img src={product.image} alt={product.name} />
+              {productosPedido.length > 0 ? (
+                <div className="confirmation-products-list">
+                  {productosPedido.map((product) => (
+                    <article key={product.id} className="confirmation-product">
+                      <img src={product.image} alt={product.name} />
 
-                    <div>
-                      <h4>{product.name}</h4>
-                      <p>{product.category}</p>
-                    </div>
+                      <div>
+                        <h4>{product.name}</h4>
+                        <p>{product.category}</p>
+                      </div>
 
-                    <span>Cantidad: {product.quantity}</span>
+                      <span>Cantidad: {product.cantidad || 1}</span>
 
-                    <strong>{product.price}</strong>
-                  </article>
-                ))}
-              </div>
+                      <strong>
+                        {formatPrice(getProductPrice(product) * (product.cantidad || 1))}
+                      </strong>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p className="confirmation-empty">
+                  No hay productos guardados en este pedido.
+                </p>
+              )}
 
               <footer className="confirmation-total">
                 <span>Total pagado</span>
-                <strong>$1.360.000</strong>
+                <strong>{formatPrice(totalPedido)}</strong>
               </footer>
             </section>
           </article>
@@ -146,25 +142,22 @@ function ConfirmationPage() {
             <div className="delivery-info">
               <div>
                 <h3>Nombre</h3>
-                <p>Valentina Retro</p>
+                <p>{datosEntrega.nombre || "No disponible"}</p>
               </div>
 
               <div>
                 <h3>Email</h3>
-                <p>valentina@backhome.com</p>
+                <p>{datosEntrega.email || "No disponible"}</p>
               </div>
 
               <div>
                 <h3>Dirección de envío</h3>
-                <p>Calle Solís 1234, Apto. 5B</p>
-                <p>Barrio Centro</p>
-                <p>Montevideo, Uruguay</p>
-                <p>CP 11000</p>
+                <p>{datosEntrega.direccion || "No disponible"}</p>
               </div>
 
               <div>
                 <h3>Teléfono de contacto</h3>
-                <p>+598 99 123 456</p>
+                <p>{datosEntrega.telefono || "No disponible"}</p>
               </div>
             </div>
 

@@ -30,7 +30,32 @@ function CheckoutPage({ carrito = [], total = 0, vaciarCarrito }) {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = () => {
+  const onSubmit = (data) => {
+    const fechaActual = new Date();
+
+    const ultimoPedido = {
+      codigo: "BH-2024-007",
+      fecha: fechaActual.toLocaleDateString("es-UY", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      }),
+      hora: fechaActual.toLocaleTimeString("es-UY", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      productos: carrito,
+      total,
+      datosEntrega: {
+        nombre: data.nombre,
+        email: data.email,
+        direccion: data.direccion,
+        telefono: data.telefono,
+      },
+    };
+
+    localStorage.setItem("ultimoPedido", JSON.stringify(ultimoPedido));
+
     if (vaciarCarrito) {
       vaciarCarrito();
     }
@@ -90,7 +115,7 @@ function CheckoutPage({ carrito = [], total = 0, vaciarCarrito }) {
               label="Dirección de envío"
               type="text"
               placeholder="Calle, número, apartamento"
-              icon={telefonoIcon}
+              icon={ubicacionIcon}
               register={register}
               nombre="direccion"
               reglas={{
@@ -107,7 +132,7 @@ function CheckoutPage({ carrito = [], total = 0, vaciarCarrito }) {
               label="Teléfono"
               type="tel"
               placeholder="+598 99 123 456"
-              icon={ubicacionIcon}
+              icon={telefonoIcon}
               register={register}
               nombre="telefono"
               reglas={{

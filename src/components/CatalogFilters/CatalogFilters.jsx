@@ -16,12 +16,7 @@ const categories = [
   { name: "Textiles", icon: textilesIcon },
 ];
 
-const materials = [
-  { name: "Madera", count: 18 },
-  { name: "Cuero", count: 12 },
-  { name: "Metal", count: 15 },
-  { name: "Vidrio", count: 6 },
-];
+const materials = ["Madera", "Cuero", "Metal", "Vidrio"];
 
 function formatPrice(value) {
   return `$${new Intl.NumberFormat("es-UY").format(value)}`;
@@ -30,10 +25,11 @@ function formatPrice(value) {
 function CatalogFilters({
   selectedCategory,
   onSelectCategory,
-  selectedMaterials,
+  selectedMaterials = [],
   onToggleMaterial,
   maxPrice = 80000,
   onChangeMaxPrice,
+  materialCounts = {},
 }) {
   const handlePriceChange = (event) => {
     if (onChangeMaxPrice) {
@@ -86,15 +82,15 @@ function CatalogFilters({
 
         <div className="material-list">
           {materials.map((material) => (
-            <label key={material.name}>
+            <label key={material}>
               <input
                 type="checkbox"
-                checked={selectedMaterials.includes(material.name)}
-                onChange={() => onToggleMaterial(material.name)}
+                checked={selectedMaterials.includes(material)}
+                onChange={() => onToggleMaterial(material)}
               />
 
-              <span>{material.name}</span>
-              <small>{material.count}</small>
+              <span>{material}</span>
+              <small>{materialCounts[material] || 0}</small>
             </label>
           ))}
         </div>

@@ -11,10 +11,6 @@ import heroImage from "../assets/images/fondohome.png";
 import searchIcon from "../assets/images/buscar.png";
 import ubicacionIcon from "../assets/images/ubicacion.png";
 
-import sillonSpace from "../assets/images/sillonspace.png";
-import aparadorNogal from "../assets/images/aparadornogal.png";
-import lamparaHongo from "../assets/images/lamparahongo.png";
-
 import lamparaIcon from "../assets/images/lampara.png";
 import lineasIcon from "../assets/images/lineas.png";
 import plantaIcon from "../assets/images/planta.png";
@@ -60,8 +56,6 @@ const decadesInfo = {
   },
 };
 
-
-
 function HomePage({
   favoritos = [],
   agregarAlCarrito,
@@ -71,25 +65,30 @@ function HomePage({
   const [searchTerm, setSearchTerm] = useState("");
 
   const decadeInfo = decadesInfo[selectedDecade];
-  const decadeProducts = productos.filter(
-    (product) => product.decade === selectedDecade
-  );
 
   const filteredProducts = useMemo(() => {
     const normalizedSearch = searchTerm.toLowerCase().trim();
 
+    const decadeProducts = productos.filter(
+      (product) => product.decade === selectedDecade
+    );
+
     if (!normalizedSearch) {
-      return decadeProducts;
+      return decadeProducts.slice(0, 3);
     }
 
-    return decadeProducts.filter((product) => {
-      return (
-        product.name.toLowerCase().includes(normalizedSearch) ||
-        product.category.toLowerCase().includes(normalizedSearch) ||
-        String(selectedDecade).includes(normalizedSearch)
-      );
-    });
-  }, [searchTerm, selectedDecade, decadeProducts]);
+    return decadeProducts
+      .filter((product) => {
+        return (
+          product.name.toLowerCase().includes(normalizedSearch) ||
+          product.category.toLowerCase().includes(normalizedSearch) ||
+          product.material.toLowerCase().includes(normalizedSearch) ||
+          product.description.toLowerCase().includes(normalizedSearch) ||
+          String(selectedDecade).includes(normalizedSearch)
+        );
+      })
+      .slice(0, 3);
+  }, [searchTerm, selectedDecade]);
 
   return (
     <>
@@ -113,6 +112,7 @@ function HomePage({
 
             <div className="home-search">
               <img src={searchIcon} alt="" />
+
               <input
                 type="text"
                 placeholder="Buscar por producto, estilo o década..."
