@@ -48,8 +48,7 @@ function CatalogPage({
 
       <main className="catalog-page">
         <section className="catalog-header">
-          <a className="back-button" href="/">
-            <span>‹</span>
+          <a href="/home" className="catalog-back-button">
             Volver
           </a>
 
