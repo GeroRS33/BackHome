@@ -9,6 +9,9 @@ function OrderList({
   onShowMoreOrders,
   onShowLessOrders,
 }) {
+  const showMoreButton = hasMoreOrders;
+  const showLessButton = !hasMoreOrders && canShowLessOrders;
+
   return (
     <section className="order-list">
       {orders.map((order) => (
@@ -31,7 +34,7 @@ function OrderList({
         </button>
       ))}
 
-      {hasMoreOrders && (
+      {showMoreButton && (
         <button
           type="button"
           className="more-orders-button"
@@ -41,7 +44,7 @@ function OrderList({
         </button>
       )}
 
-      {canShowLessOrders && (
+      {showLessButton && (
         <button
           type="button"
           className="more-orders-button"

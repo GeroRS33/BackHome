@@ -1,20 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-
 import "./ProfilePage.css";
-
 import Navbar from "../components/Navbar/Navbar";
 import ProfileInfoItem from "../components/ProfileInfoItem/ProfileInfoItem";
 import OrderList from "../components/OrderList/OrderList";
 import OrderDetail from "../components/OrderDetail/OrderDetail";
-
 import cambiarImagenIcon from "../assets/images/cambiarimagen.png";
 import mailIcon from "../assets/images/mail.png";
 import ubicacionIcon from "../assets/images/ubicacion.png";
 import calendarioIcon from "../assets/images/calendario.png";
 import lapizIcon from "../assets/images/lapiz.png";
 import decoracionPerfil from "../assets/images/decoracionperfil.png";
-
 import { productos } from "../data/products";
 
 function formatPrice(value) {
