@@ -1,5 +1,4 @@
 import "./CartSummary.css";
-
 import decoracionPerfil from "../../assets/images/decoracionperfil.png";
 
 function formatPrice(value) {

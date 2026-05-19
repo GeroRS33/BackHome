@@ -1,12 +1,9 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
-
 import "./CheckoutPage.css";
-
 import Navbar from "../components/Navbar/Navbar";
 import InputField from "../components/InputField/InputField";
 import PrimaryButton from "../components/PrimaryButton/PrimaryButton";
-
 import mailIcon from "../assets/images/mail.png";
 import ubicacionIcon from "../assets/images/ubicacion.png";
 import nombreIcon from "../assets/images/nombre.png";

@@ -1,11 +1,8 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
-
 import "./LoginPage.css";
-
 import InputField from "../components/InputField/InputField";
 import PrimaryButton from "../components/PrimaryButton/PrimaryButton";
-
 import fondo from "../assets/images/fondo.png";
 import mailIcon from "../assets/images/mail.png";
 import lockIcon from "../assets/images/candado.png";

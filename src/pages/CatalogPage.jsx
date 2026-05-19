@@ -1,12 +1,9 @@
 import { useMemo, useState } from "react";
-
 import "./CatalogPage.css";
-
 import Navbar from "../components/Navbar/Navbar";
 import TimelineSelector from "../components/TimelineSelector/TimelineSelector";
 import CatalogFilters from "../components/CatalogFilters/CatalogFilters";
 import ProductCard from "../components/ProductCard/ProductCard";
-
 import { productos } from "../data/products";
 
 const sortOptions = [

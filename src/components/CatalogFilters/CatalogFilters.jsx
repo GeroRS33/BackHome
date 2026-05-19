@@ -1,5 +1,4 @@
 import "./CatalogFilters.css";
-
 import sofaIcon from "../../assets/images/sofa.svg";
 import sillaIcon from "../../assets/images/silla.svg";
 import camaIcon from "../../assets/images/cama.svg";

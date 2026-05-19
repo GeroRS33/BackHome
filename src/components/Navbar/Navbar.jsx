@@ -1,5 +1,4 @@
 import "./Navbar.css";
-
 import logo from "../../assets/images/Logo BackHome.svg";
 
 function Navbar({ activePage = "inicio" }) {

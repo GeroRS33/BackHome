@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import "./ProductGallery.css";
 
 function ProductGallery({ images = [], productName }) {

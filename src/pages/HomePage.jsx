@@ -1,20 +1,15 @@
 import { useMemo, useState } from "react";
-
 import "./HomePage.css";
-
 import Navbar from "../components/Navbar/Navbar";
 import TimelineSelector from "../components/TimelineSelector/TimelineSelector";
 import ProductCard from "../components/ProductCard/ProductCard";
 import Palette from "../components/Palette/Palette";
-
 import heroImage from "../assets/images/fondohome.png";
 import searchIcon from "../assets/images/buscar.png";
 import ubicacionIcon from "../assets/images/ubicacion.png";
-
 import lamparaIcon from "../assets/images/lampara.png";
 import lineasIcon from "../assets/images/lineas.png";
 import plantaIcon from "../assets/images/planta.png";
-
 import { productos } from "../data/products";
 
 const decadesInfo = {

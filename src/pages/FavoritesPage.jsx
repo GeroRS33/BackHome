@@ -1,10 +1,7 @@
 import "./FavoritesPage.css";
-
 import Navbar from "../components/Navbar/Navbar";
 import FavoriteCard from "../components/FavoriteCard/FavoriteCard";
-
 import { productos } from "../data/products";
-
 import corazonIcon from "../assets/images/corazon.png";
 
 function FavoritesPage({ favoritos = [], toggleFavorito, vaciarFavoritos }) {

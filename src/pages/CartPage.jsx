@@ -1,9 +1,7 @@
 import "./CartPage.css";
-
 import Navbar from "../components/Navbar/Navbar";
 import CartItem from "../components/CartItem/CartItem";
 import CartSummary from "../components/CartSummary/CartSummary";
-
 import disponibilidadIcon from "../assets/images/disponibilidad.png";
 
 function CartIcon({ className = "" }) {

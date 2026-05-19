@@ -1,7 +1,5 @@
 import "./ConfirmationPage.css";
-
 import Navbar from "../components/Navbar/Navbar";
-
 import compraRealizadaIcon from "../assets/images/comprarealizada.png";
 import decoracionCarrito from "../assets/images/decoracioncarrito.png";
 import calendarioIcon from "../assets/images/calendario.png";
