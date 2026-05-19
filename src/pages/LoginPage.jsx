@@ -21,10 +21,39 @@ function LoginPage() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = () => {
+  const onSubmit = (datos) => {
+    const usuarioGuardado = localStorage.getItem("backhomeUser");
+
+    if (!usuarioGuardado) {
+      setError("email", {
+        type: "manual",
+        message: "Primero tenés que crear una cuenta",
+      });
+
+      return;
+    }
+
+    const usuario = JSON.parse(usuarioGuardado);
+
+    const emailCorrecto = usuario.email === datos.email;
+    const passwordCorrecta = usuario.password === datos.password;
+
+    if (!emailCorrecto || !passwordCorrecta) {
+      setError("password", {
+        type: "manual",
+        message: "Correo o contraseña incorrectos",
+      });
+
+      return;
+    }
+
+    localStorage.setItem("sesionActiva", "true");
+    localStorage.setItem("currentUser", JSON.stringify(usuario));
+
     navigate("/home");
   };
 
@@ -87,7 +116,7 @@ function LoginPage() {
                 <span>Recordarme</span>
               </label>
 
-              <a href="#">¿Olvidaste tu contraseña?</a>
+              <a href="/registro">¿No tenés cuenta?</a>
             </div>
 
             <PrimaryButton type="submit">Iniciar sesión</PrimaryButton>
@@ -119,8 +148,8 @@ function LoginPage() {
             <img src={boxIcon} alt="" />
           </div>
           <div>
-            <h3>Consulta disponibilidad</h3>
-            <p>Entérate de nuevas piezas al instante.</p>
+            <h3>Compra tus piezas favoritas</h3>
+            <p>Agregá productos al carrito y confirmá tu pedido.</p>
           </div>
         </article>
 

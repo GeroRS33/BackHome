@@ -60,6 +60,19 @@
   z-index: 3;
 }
 
+.profile-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #f1ddc5;
+  color: #7a4e2d;
+  display: grid;
+  place-items: center;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 4rem;
+  font-weight: 800;
+}
+
 .change-avatar-overlay img {
   width: 110px;
   height: 110px;

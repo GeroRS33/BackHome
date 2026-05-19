@@ -15,6 +15,15 @@ import boxIcon from "../assets/images/disponibilidad.png";
 import tagIcon from "../assets/images/etiqueta.png";
 import plantIcon from "../assets/images/iconoplanta.png";
 
+function formatMemberDate() {
+  const fecha = new Date();
+
+  return `Miembro desde ${fecha.toLocaleDateString("es-UY", {
+    month: "long",
+    year: "numeric",
+  })}`;
+}
+
 function RegisterPage() {
   const navigate = useNavigate();
 
@@ -30,10 +39,21 @@ function RegisterPage() {
   const password = watch("password");
 
   const crearCuenta = (datos) => {
-    console.log("Datos de registro:", datos);
+    const nuevoUsuario = {
+      name: datos.nombre,
+      email: datos.email,
+      password: datos.password,
+      bio: "Agregá una descripción sobre vos.",
+      location: "Montevideo, Uruguay",
+      memberSince: formatMemberDate(),
+      avatar: "",
+    };
 
-    // Registro simulado
-    navigate("/login");
+    localStorage.setItem("backhomeUser", JSON.stringify(nuevoUsuario));
+    localStorage.setItem("currentUser", JSON.stringify(nuevoUsuario));
+    localStorage.setItem("sesionActiva", "true");
+
+    navigate("/home");
   };
 
   return (

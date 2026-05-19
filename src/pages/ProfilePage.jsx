@@ -15,7 +15,43 @@ import calendarioIcon from "../assets/images/calendario.png";
 import lapizIcon from "../assets/images/lapiz.png";
 import decoracionPerfil from "../assets/images/decoracionperfil.png";
 
-const productImage = (fileName) => `/images/productos/${fileName}`;
+import { productos } from "../data/products";
+
+function getProductById(id) {
+  return productos.find((product) => product.id === id);
+}
+
+function getOrderProduct(id, quantity = 1) {
+  const product = getProductById(id);
+
+  if (!product) {
+    return null;
+  }
+
+  const price = product.price || product.precio || 0;
+
+  return {
+    id: product.id,
+    name: product.name,
+    category: product.category,
+    quantity,
+    price: `$${new Intl.NumberFormat("es-UY").format(price)}`,
+    image: product.image,
+  };
+}
+
+function getInitials(name) {
+  if (!name) {
+    return "BH";
+  }
+
+  return name
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
 
 const orders = [
   {
@@ -25,75 +61,57 @@ const orders = [
     status: "Completado",
     total: "$125.500",
     products: [
-      {
-        id: 31,
-        name: "Sillón Space Age",
-        category: "Sala",
-        quantity: 1,
-        price: "$42.000",
-        image: productImage("sillon-space-age-1.png"),
-      },
-      {
-        id: 32,
-        name: "Aparador Nogal 70s",
-        category: "Comedor",
-        quantity: 1,
-        price: "$68.000",
-        image: productImage("aparador-nogal-70s-1.png"),
-      },
-      {
-        id: 34,
-        name: "Lámpara Hongo",
-        category: "Iluminación",
-        quantity: 1,
-        price: "$15.500",
-        image: productImage("lampara-hongo-1.png"),
-      },
-    ],
+      getOrderProduct(31, 1),
+      getOrderProduct(32, 1),
+      getOrderProduct(34, 1),
+    ].filter(Boolean),
   },
   {
     id: 2,
     code: "BH-2024-005",
     date: "2 de abril, 2024",
     status: "Completado",
-    total: "$68.000",
+    total: "$119.400",
     products: [
-      {
-        id: 32,
-        name: "Aparador Nogal 70s",
-        category: "Comedor",
-        quantity: 1,
-        price: "$68.000",
-        image: productImage("aparador-nogal-70s-1.png"),
-      },
-    ],
+      getOrderProduct(21, 1),
+      getOrderProduct(24, 1),
+      getOrderProduct(26, 1),
+    ].filter(Boolean),
   },
   {
     id: 3,
     code: "BH-2024-004",
     date: "18 de febrero, 2024",
     status: "Completado",
-    total: "$57.500",
+    total: "$87.200",
     products: [
-      {
-        id: 31,
-        name: "Sillón Space Age",
-        category: "Sala",
-        quantity: 1,
-        price: "$42.000",
-        image: productImage("sillon-space-age-1.png"),
-      },
-      {
-        id: 34,
-        name: "Lámpara Hongo",
-        category: "Iluminación",
-        quantity: 1,
-        price: "$15.500",
-        image: productImage("lampara-hongo-1.png"),
-      },
-    ],
+      getOrderProduct(51, 1),
+      getOrderProduct(54, 1),
+      getOrderProduct(55, 1),
+    ].filter(Boolean),
   },
 ];
+
+function getStoredProfile() {
+  const currentUser = localStorage.getItem("currentUser");
+  const backhomeUser = localStorage.getItem("backhomeUser");
+
+  if (currentUser) {
+    return JSON.parse(currentUser);
+  }
+
+  if (backhomeUser) {
+    return JSON.parse(backhomeUser);
+  }
+  return {
+    name: "",
+    bio: "Agregá una descripción sobre vos.",
+    email: "",
+    location: "Montevideo, Uruguay",
+    memberSince: "Miembro desde hoy",
+    avatar: "",
+  };
+}
 
 function ProfilePage() {
   const navigate = useNavigate();
@@ -101,17 +119,8 @@ function ProfilePage() {
   const [selectedOrderId, setSelectedOrderId] = useState(orders[0].id);
   const [isEditing, setIsEditing] = useState(false);
 
-  const [profile, setProfile] = useState({
-    name: "Valentina Retro",
-    bio: "Amante del diseño y lo vintage ✨",
-    email: "valentina@backhome.com",
-    location: "Montevideo, Uruguay",
-    memberSince: "Miembro desde mayo 2024",
-    avatar:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&auto=format&fit=crop&q=80",
-  });
-
-  const [formData, setFormData] = useState(profile);
+  const [profile, setProfile] = useState(() => getStoredProfile());
+  const [formData, setFormData] = useState(() => getStoredProfile());
 
   const selectedOrder = orders.find((order) => order.id === selectedOrderId);
 
@@ -122,12 +131,16 @@ function ProfilePage() {
       return;
     }
 
-    const imageUrl = URL.createObjectURL(file);
+    const reader = new FileReader();
 
-    setFormData((currentData) => ({
-      ...currentData,
-      avatar: imageUrl,
-    }));
+    reader.onload = () => {
+      setFormData((currentData) => ({
+        ...currentData,
+        avatar: reader.result,
+      }));
+    };
+
+    reader.readAsDataURL(file);
   };
 
   const handleEdit = () => {
@@ -142,7 +155,16 @@ function ProfilePage() {
 
   const handleSave = (event) => {
     event.preventDefault();
-    setProfile(formData);
+
+    const updatedProfile = {
+      ...profile,
+      ...formData,
+    };
+
+    setProfile(updatedProfile);
+    localStorage.setItem("currentUser", JSON.stringify(updatedProfile));
+    localStorage.setItem("backhomeUser", JSON.stringify(updatedProfile));
+
     setIsEditing(false);
   };
 
@@ -156,6 +178,9 @@ function ProfilePage() {
   };
 
   const handleLogout = () => {
+    localStorage.removeItem("sesionActiva");
+    localStorage.removeItem("currentUser");
+
     navigate("/login");
   };
 
@@ -166,10 +191,21 @@ function ProfilePage() {
       <main className="profile-page">
         <section className="profile-card">
           <div className={isEditing ? "profile-avatar editing" : "profile-avatar"}>
-            <img
-              src={isEditing ? formData.avatar : profile.avatar}
-              alt="Foto de perfil"
-            />
+            {isEditing ? (
+              formData.avatar ? (
+                <img src={formData.avatar} alt="Foto de perfil" />
+              ) : (
+                <div className="profile-avatar-placeholder">
+                  {getInitials(formData.name)}
+                </div>
+              )
+            ) : profile.avatar ? (
+              <img src={profile.avatar} alt="Foto de perfil" />
+            ) : (
+              <div className="profile-avatar-placeholder">
+                {getInitials(profile.name)}
+              </div>
+            )}
 
             {isEditing && (
               <label className="change-avatar-overlay">
@@ -237,6 +273,7 @@ function ProfilePage() {
                   <input
                     type="text"
                     name="bio"
+                    placeholder="Contá algo sobre vos"
                     value={formData.bio}
                     onChange={handleChange}
                   />

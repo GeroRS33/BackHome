@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Routes, Route } from "react-router";
+import { Navigate, Routes, Route } from "react-router";
 
 import HomePage from "./pages/HomePage.jsx";
 import CatalogPage from "./pages/CatalogPage.jsx";
@@ -15,6 +15,16 @@ import FavoritesPage from "./pages/FavoritesPage.jsx";
 
 import "./styles/variables.css";
 import "./styles/global.css";
+
+function ProtectedRoute({ children }) {
+  const sesionActiva = localStorage.getItem("sesionActiva") === "true";
+
+  if (!sesionActiva) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
 
 function App() {
   const [carrito, setCarrito] = useState(() => {
@@ -124,83 +134,109 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<LoginPage />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
 
       <Route path="/login" element={<LoginPage />} />
+
+      <Route path="/registro" element={<RegisterPage />} />
 
       <Route
         path="/home"
         element={
-          <HomePage
-            favoritos={favoritos}
-            agregarAlCarrito={agregarAlCarrito}
-            toggleFavorito={toggleFavorito}
-          />
+          <ProtectedRoute>
+            <HomePage
+              favoritos={favoritos}
+              agregarAlCarrito={agregarAlCarrito}
+              toggleFavorito={toggleFavorito}
+            />
+          </ProtectedRoute>
         }
       />
 
       <Route
         path="/productos"
         element={
-          <CatalogPage
-            favoritos={favoritos}
-            agregarAlCarrito={agregarAlCarrito}
-            toggleFavorito={toggleFavorito}
-          />
+          <ProtectedRoute>
+            <CatalogPage
+              favoritos={favoritos}
+              agregarAlCarrito={agregarAlCarrito}
+              toggleFavorito={toggleFavorito}
+            />
+          </ProtectedRoute>
         }
       />
 
       <Route
         path="/producto/:id"
         element={
-          <ProductDetailPage
-            favoritos={favoritos}
-            agregarAlCarrito={agregarAlCarrito}
-            toggleFavorito={toggleFavorito}
-          />
+          <ProtectedRoute>
+            <ProductDetailPage
+              favoritos={favoritos}
+              agregarAlCarrito={agregarAlCarrito}
+              toggleFavorito={toggleFavorito}
+            />
+          </ProtectedRoute>
         }
       />
-
-      <Route path="/registro" element={<RegisterPage />} />
 
       <Route
         path="/favoritos"
         element={
-          <FavoritesPage
-            favoritos={favoritos}
-            toggleFavorito={toggleFavorito}
-            vaciarFavoritos={vaciarFavoritos}
-          />
+          <ProtectedRoute>
+            <FavoritesPage
+              favoritos={favoritos}
+              toggleFavorito={toggleFavorito}
+              vaciarFavoritos={vaciarFavoritos}
+            />
+          </ProtectedRoute>
         }
       />
 
       <Route
         path="/carrito"
         element={
-          <CartPage
-            carrito={carrito}
-            eliminarDelCarrito={eliminarDelCarrito}
-            modificarCantidad={modificarCantidad}
-            vaciarCarrito={vaciarCarrito}
-            total={calcularTotal()}
-          />
+          <ProtectedRoute>
+            <CartPage
+              carrito={carrito}
+              eliminarDelCarrito={eliminarDelCarrito}
+              modificarCantidad={modificarCantidad}
+              vaciarCarrito={vaciarCarrito}
+              total={calcularTotal()}
+            />
+          </ProtectedRoute>
         }
       />
 
       <Route
         path="/checkout"
         element={
-          <CheckoutPage
-            carrito={carrito}
-            total={calcularTotal()}
-            vaciarCarrito={vaciarCarrito}
-          />
+          <ProtectedRoute>
+            <CheckoutPage
+              carrito={carrito}
+              total={calcularTotal()}
+              vaciarCarrito={vaciarCarrito}
+            />
+          </ProtectedRoute>
         }
       />
 
-      <Route path="/confirmacion" element={<ConfirmationPage />} />
+      <Route
+        path="/confirmacion"
+        element={
+          <ProtectedRoute>
+            <ConfirmationPage />
+          </ProtectedRoute>
+        }
+      />
 
-      <Route path="/perfil" element={<ProfilePage />} />
+      <Route
+        path="/perfil"
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
