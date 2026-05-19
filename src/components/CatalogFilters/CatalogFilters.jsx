@@ -16,7 +16,7 @@ const categories = [
   { name: "Textiles", icon: textilesIcon },
 ];
 
-const materials = ["Madera", "Cuero", "Metal", "Vidrio"];
+const materials = ["Madera", "Tapizados", "Metal", "Vidrio"];
 
 function formatPrice(value) {
   return `$${new Intl.NumberFormat("es-UY").format(value)}`;
