@@ -1,6 +1,14 @@
 import "./OrderList.css";
 
-function OrderList({ orders = [], selectedOrderId, onSelectOrder }) {
+function OrderList({
+  orders = [],
+  selectedOrderId,
+  onSelectOrder,
+  hasMoreOrders = false,
+  canShowLessOrders = false,
+  onShowMoreOrders,
+  onShowLessOrders,
+}) {
   return (
     <section className="order-list">
       {orders.map((order) => (
@@ -23,9 +31,25 @@ function OrderList({ orders = [], selectedOrderId, onSelectOrder }) {
         </button>
       ))}
 
-      <button type="button" className="more-orders-button">
-        Ver más pedidos
-      </button>
+      {hasMoreOrders && (
+        <button
+          type="button"
+          className="more-orders-button"
+          onClick={onShowMoreOrders}
+        >
+          Ver más pedidos
+        </button>
+      )}
+
+      {canShowLessOrders && (
+        <button
+          type="button"
+          className="more-orders-button"
+          onClick={onShowLessOrders}
+        >
+          Ver menos pedidos
+        </button>
+      )}
     </section>
   );
 }

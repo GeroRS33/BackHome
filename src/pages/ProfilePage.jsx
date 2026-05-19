@@ -17,6 +17,12 @@ import decoracionPerfil from "../assets/images/decoracionperfil.png";
 
 import { productos } from "../data/products";
 
+function formatPrice(value) {
+  const price = typeof value === "number" ? value : Number(value) || 0;
+
+  return `$${new Intl.NumberFormat("es-UY").format(price)}`;
+}
+
 function getProductById(id) {
   return productos.find((product) => product.id === id);
 }
@@ -35,9 +41,20 @@ function getOrderProduct(id, quantity = 1) {
     name: product.name,
     category: product.category,
     quantity,
-    price: `$${new Intl.NumberFormat("es-UY").format(price)}`,
+    price: formatPrice(price),
     image: product.image,
   };
+}
+
+function getOrderTotal(products) {
+  const total = products.reduce((acc, product) => {
+    const originalProduct = getProductById(product.id);
+    const price = originalProduct?.price || originalProduct?.precio || 0;
+
+    return acc + price * product.quantity;
+  }, 0);
+
+  return formatPrice(total);
 }
 
 function getInitials(name) {
@@ -53,42 +70,76 @@ function getInitials(name) {
     .toUpperCase();
 }
 
+const orderOneProducts = [
+  getOrderProduct(31, 1),
+  getOrderProduct(32, 1),
+  getOrderProduct(34, 1),
+].filter(Boolean);
+
+const orderTwoProducts = [
+  getOrderProduct(21, 1),
+  getOrderProduct(24, 1),
+  getOrderProduct(26, 1),
+].filter(Boolean);
+
+const orderThreeProducts = [
+  getOrderProduct(51, 1),
+  getOrderProduct(54, 1),
+  getOrderProduct(55, 1),
+].filter(Boolean);
+
+const orderFourProducts = [
+  getOrderProduct(33, 1),
+  getOrderProduct(35, 1),
+  getOrderProduct(36, 1),
+].filter(Boolean);
+
+const orderFiveProducts = [
+  getOrderProduct(62, 1),
+  getOrderProduct(64, 1),
+  getOrderProduct(65, 1),
+].filter(Boolean);
+
 const orders = [
   {
     id: 1,
-    code: "BH-2024-006",
-    date: "12 de mayo, 2024",
+    code: "BH-2026-003",
+    date: "18 de mayo, 2026",
     status: "Completado",
-    total: "$125.500",
-    products: [
-      getOrderProduct(31, 1),
-      getOrderProduct(32, 1),
-      getOrderProduct(34, 1),
-    ].filter(Boolean),
+    total: getOrderTotal(orderOneProducts),
+    products: orderOneProducts,
   },
   {
     id: 2,
-    code: "BH-2024-005",
-    date: "2 de abril, 2024",
+    code: "BH-2026-002",
+    date: "12 de mayo, 2026",
     status: "Completado",
-    total: "$119.400",
-    products: [
-      getOrderProduct(21, 1),
-      getOrderProduct(24, 1),
-      getOrderProduct(26, 1),
-    ].filter(Boolean),
+    total: getOrderTotal(orderTwoProducts),
+    products: orderTwoProducts,
   },
   {
     id: 3,
-    code: "BH-2024-004",
-    date: "18 de febrero, 2024",
+    code: "BH-2026-001",
+    date: "1 de mayo, 2026",
     status: "Completado",
-    total: "$87.200",
-    products: [
-      getOrderProduct(51, 1),
-      getOrderProduct(54, 1),
-      getOrderProduct(55, 1),
-    ].filter(Boolean),
+    total: getOrderTotal(orderThreeProducts),
+    products: orderThreeProducts,
+  },
+  {
+    id: 4,
+    code: "BH-2026-000",
+    date: "18 de abril, 2026",
+    status: "Completado",
+    total: getOrderTotal(orderFourProducts),
+    products: orderFourProducts,
+  },
+  {
+    id: 5,
+    code: "BH-2025-009",
+    date: "28 de diciembre, 2025",
+    status: "Completado",
+    total: getOrderTotal(orderFiveProducts),
+    products: orderFiveProducts,
   },
 ];
 
@@ -103,6 +154,7 @@ function getStoredProfile() {
   if (backhomeUser) {
     return JSON.parse(backhomeUser);
   }
+
   return {
     name: "",
     bio: "Agregá una descripción sobre vos.",
@@ -118,12 +170,30 @@ function ProfilePage() {
 
   const [selectedOrderId, setSelectedOrderId] = useState(orders[0].id);
   const [isEditing, setIsEditing] = useState(false);
+  const [visibleOrdersCount, setVisibleOrdersCount] = useState(3);
 
   const [profile, setProfile] = useState(() => getStoredProfile());
   const [formData, setFormData] = useState(() => getStoredProfile());
 
   const selectedOrder = orders.find((order) => order.id === selectedOrderId);
 
+  const visibleOrders = orders.slice(0, visibleOrdersCount);
+  const hasMoreOrders = visibleOrdersCount < orders.length;
+  const canShowLessOrders = visibleOrdersCount > 3;
+
+  const handleShowMoreOrders = () => {
+    setVisibleOrdersCount((currentCount) =>
+      Math.min(currentCount + 2, orders.length)
+    );
+  };
+
+  const handleShowLessOrders = () => {
+    setVisibleOrdersCount(3);
+
+    if (!orders.slice(0, 3).some((order) => order.id === selectedOrderId)) {
+      setSelectedOrderId(orders[0].id);
+    }
+  };
   const handleAvatarChange = (event) => {
     const file = event.target.files[0];
 
@@ -327,9 +397,13 @@ function ProfilePage() {
 
           <div className="profile-orders-layout">
             <OrderList
-              orders={orders}
+              orders={visibleOrders}
               selectedOrderId={selectedOrderId}
               onSelectOrder={setSelectedOrderId}
+              hasMoreOrders={hasMoreOrders}
+              canShowLessOrders={canShowLessOrders}
+              onShowMoreOrders={handleShowMoreOrders}
+              onShowLessOrders={handleShowLessOrders}
             />
 
             <OrderDetail order={selectedOrder} />
