@@ -21,6 +21,38 @@ function getProductPrice(product) {
   return Number(product.price || product.precio || 0);
 }
 
+function formatShortDate(date) {
+  return date.toLocaleDateString("es-UY", {
+    day: "numeric",
+    month: "short",
+  });
+}
+
+function getEstimatedDeliveryRange(orderDate = new Date()) {
+  const startDate = new Date(orderDate);
+  startDate.setDate(startDate.getDate() + 3);
+
+  const endDate = new Date(orderDate);
+  endDate.setDate(endDate.getDate() + 7);
+
+  return `${formatShortDate(startDate)} - ${formatShortDate(endDate)}`;
+}
+
+function getOrderDateFromLastOrder(ultimoPedido) {
+  if (!ultimoPedido?.fecha) {
+    return new Date();
+  }
+
+  const fechaCompleta = `${ultimoPedido.fecha} ${ultimoPedido.hora || ""}`;
+  const parsedDate = new Date(fechaCompleta);
+
+  if (!Number.isNaN(parsedDate.getTime())) {
+    return parsedDate;
+  }
+
+  return new Date();
+}
+
 function ConfirmationPage() {
   const ultimoPedidoGuardado = localStorage.getItem("ultimoPedido");
   const ultimoPedido = ultimoPedidoGuardado
@@ -31,9 +63,12 @@ function ConfirmationPage() {
   const datosEntrega = ultimoPedido?.datosEntrega || {};
   const totalPedido = ultimoPedido?.total || 0;
 
+  const orderDate = getOrderDateFromLastOrder(ultimoPedido);
+  const estimatedDelivery = getEstimatedDeliveryRange(orderDate);
+
   return (
     <>
-      <Navbar />
+      <Navbar activePage="carrito" />
 
       <main className="confirmation-page">
         <section className="confirmation-hero">
@@ -61,7 +96,7 @@ function ConfirmationPage() {
                 <img src={numeroPedidoIcon} alt="" />
               </div>
 
-              <h2>Pedido #{ultimoPedido?.codigo || "BH-2024-007"}</h2>
+              <h2>Pedido #{ultimoPedido?.codigo || "BH-2026-007"}</h2>
             </header>
 
             <section className="order-status-grid">
@@ -90,7 +125,7 @@ function ConfirmationPage() {
                 <div>
                   <h3>Método de envío</h3>
                   <p>Envío estándar</p>
-                  <p>Entrega estimada: 16 - 20 may</p>
+                  <p>Entrega estimada: {estimatedDelivery}</p>
                 </div>
               </div>
             </section>
@@ -112,7 +147,9 @@ function ConfirmationPage() {
                       <span>Cantidad: {product.cantidad || 1}</span>
 
                       <strong>
-                        {formatPrice(getProductPrice(product) * (product.cantidad || 1))}
+                        {formatPrice(
+                          getProductPrice(product) * (product.cantidad || 1)
+                        )}
                       </strong>
                     </article>
                   ))}

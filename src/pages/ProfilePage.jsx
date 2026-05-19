@@ -70,6 +70,41 @@ function getInitials(name) {
     .toUpperCase();
 }
 
+function getRealLastOrder() {
+  const ultimoPedidoGuardado = localStorage.getItem("ultimoPedido");
+
+  if (!ultimoPedidoGuardado) {
+    return null;
+  }
+
+  const ultimoPedido = JSON.parse(ultimoPedidoGuardado);
+
+  if (!ultimoPedido?.productos || ultimoPedido.productos.length === 0) {
+    return null;
+  }
+
+  return {
+    id: "ultimo-pedido",
+    code: ultimoPedido.codigo || "BH-2026-ULTIMO",
+    date: ultimoPedido.fecha || "Fecha no disponible",
+    status: "Completado",
+    total: formatPrice(ultimoPedido.total || 0),
+    products: ultimoPedido.productos.map((product) => {
+      const quantity = product.cantidad || 1;
+      const price = product.price || product.precio || 0;
+
+      return {
+        id: product.id,
+        name: product.name,
+        category: product.category,
+        quantity,
+        price: formatPrice(price * quantity),
+        image: product.image,
+      };
+    }),
+  };
+}
+
 const orderOneProducts = [
   getOrderProduct(21, 1),
   getOrderProduct(22, 1),
@@ -100,11 +135,11 @@ const orderFiveProducts = [
   getOrderProduct(55, 1),
 ].filter(Boolean);
 
-const orders = [
+const hardcodedOrders = [
   {
     id: 1,
     code: "BH-2026-003",
-    date: "18 de mayo, 2026",
+    date: "15 de mayo, 2026",
     status: "Completado",
     total: getOrderTotal(orderOneProducts),
     products: orderOneProducts,
@@ -120,7 +155,7 @@ const orders = [
   {
     id: 3,
     code: "BH-2026-001",
-    date: "1 de mayo, 2026",
+    date: "5 de mayo, 2026",
     status: "Completado",
     total: getOrderTotal(orderThreeProducts),
     products: orderThreeProducts,
@@ -128,7 +163,7 @@ const orders = [
   {
     id: 4,
     code: "BH-2026-000",
-    date: "18 de abril, 2026",
+    date: "3 de mayo, 2026",
     status: "Completado",
     total: getOrderTotal(orderFourProducts),
     products: orderFourProducts,
@@ -136,7 +171,7 @@ const orders = [
   {
     id: 5,
     code: "BH-2025-009",
-    date: "28 de diciembre, 2025",
+    date: "1 de mayo, 2026",
     status: "Completado",
     total: getOrderTotal(orderFiveProducts),
     products: orderFiveProducts,
@@ -168,32 +203,44 @@ function getStoredProfile() {
 function ProfilePage() {
   const navigate = useNavigate();
 
-  const [selectedOrderId, setSelectedOrderId] = useState(orders[0].id);
+  const realLastOrder = getRealLastOrder();
+  const profileOrders = realLastOrder
+    ? [realLastOrder, ...hardcodedOrders]
+    : hardcodedOrders;
+
+  const [selectedOrderId, setSelectedOrderId] = useState(profileOrders[0].id);
   const [isEditing, setIsEditing] = useState(false);
   const [visibleOrdersCount, setVisibleOrdersCount] = useState(3);
 
   const [profile, setProfile] = useState(() => getStoredProfile());
   const [formData, setFormData] = useState(() => getStoredProfile());
 
-  const selectedOrder = orders.find((order) => order.id === selectedOrderId);
+  const selectedOrder = profileOrders.find(
+    (order) => order.id === selectedOrderId
+  );
 
-  const visibleOrders = orders.slice(0, visibleOrdersCount);
-  const hasMoreOrders = visibleOrdersCount < orders.length;
+  const visibleOrders = profileOrders.slice(0, visibleOrdersCount);
+  const hasMoreOrders = visibleOrdersCount < profileOrders.length;
   const canShowLessOrders = visibleOrdersCount > 3;
 
   const handleShowMoreOrders = () => {
     setVisibleOrdersCount((currentCount) =>
-      Math.min(currentCount + 2, orders.length)
+      Math.min(currentCount + 2, profileOrders.length)
     );
   };
 
   const handleShowLessOrders = () => {
     setVisibleOrdersCount(3);
 
-    if (!orders.slice(0, 3).some((order) => order.id === selectedOrderId)) {
-      setSelectedOrderId(orders[0].id);
+    if (
+      !profileOrders
+        .slice(0, 3)
+        .some((order) => order.id === selectedOrderId)
+    ) {
+      setSelectedOrderId(profileOrders[0].id);
     }
   };
+
   const handleAvatarChange = (event) => {
     const file = event.target.files[0];
 
@@ -260,7 +307,9 @@ function ProfilePage() {
 
       <main className="profile-page">
         <section className="profile-card">
-          <div className={isEditing ? "profile-avatar editing" : "profile-avatar"}>
+          <div
+            className={isEditing ? "profile-avatar editing" : "profile-avatar"}
+          >
             {isEditing ? (
               formData.avatar ? (
                 <img src={formData.avatar} alt="Foto de perfil" />
