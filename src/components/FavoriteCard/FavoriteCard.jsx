@@ -1,7 +1,5 @@
 import "./FavoriteCard.css";
 
-import favoritoIcon from "../../assets/images/favorito.png";
-
 function formatPrice(price) {
   if (typeof price === "number") {
     return `$${new Intl.NumberFormat("es-UY").format(price)}`;
@@ -33,10 +31,14 @@ function FavoriteCard({ product, onRemove }) {
 
         <p className="favorite-card-category">{product.category}</p>
 
-        <p className="favorite-card-price">{formatPrice(product.price)}</p>
+        <p className="favorite-card-price">
+          {formatPrice(product.price || product.precio)}
+        </p>
 
         <div className="favorite-card-actions">
-          <a href={`/producto/${product.id}`}>Ver detalle</a>
+          <a href={`/producto/${product.id}?decada=${product.decade}`}>
+            Ver detalle
+          </a>
 
           <button
             type="button"
@@ -44,7 +46,7 @@ function FavoriteCard({ product, onRemove }) {
             onClick={onRemove}
             aria-label={`Quitar ${product.name} de favoritos`}
           >
-            <img src={favoritoIcon} alt="" />
+            ♥
           </button>
         </div>
       </div>

@@ -1,16 +1,12 @@
-import { useNavigate, useParams } from "react-router";
-
 import "./ProductDetailPage.css";
-
 import Navbar from "../components/Navbar/Navbar";
 import ProductGallery from "../components/ProductGallery/ProductGallery";
 import ProductSpecs from "../components/ProductSpecs/ProductSpecs";
 import ProductCard from "../components/ProductCard/ProductCard";
-
 import { productos } from "../data/products";
-
 import precioIcon from "../assets/images/etiquetaprecio.png";
 import envioIcon from "../assets/images/envio.png";
+import { useLocation, useNavigate, useParams } from "react-router";
 
 function formatPrice(value) {
   const price = typeof value === "number" ? value : Number(value) || 0;
@@ -18,6 +14,24 @@ function formatPrice(value) {
   return `$${new Intl.NumberFormat("es-UY").format(price)}`;
 }
 
+function HeartIcon({ filled = false }) {
+  return (
+    <svg
+      className="favorite-heart-icon"
+      viewBox="0 0 32 32"
+      fill={filled ? "currentColor" : "none"}
+      aria-hidden="true"
+    >
+      <path
+        d="M16 27S5 20.5 5 11.8C5 7.7 7.8 5 11.3 5C13.4 5 15.1 6.1 16 7.7C16.9 6.1 18.6 5 20.7 5C24.2 5 27 7.7 27 11.8C27 20.5 16 27 16 27Z"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 function ProductDetailPage({
   favoritos = [],
@@ -26,6 +40,9 @@ function ProductDetailPage({
 }) {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const decadeFromUrl = searchParams.get("decada");
 
   const product = productos.find((item) => item.id === Number(id));
 
@@ -72,7 +89,9 @@ function ProductDetailPage({
         <div className="product-breadcrumb">
           <a href="/home">Inicio</a>
           <span>›</span>
-          <a href="/productos">Productos</a>
+          <a href={`/productos?decada=${decadeFromUrl || product.decade}`}>
+            Productos
+          </a>
           <span>›</span>
           <p>{product.name}</p>
         </div>
@@ -106,7 +125,7 @@ function ProductDetailPage({
                 type="button"
                 onClick={handleSave}
               >
-                <span>{isFavorite ? "♥️" : "♡"}</span>
+                <HeartIcon filled={isFavorite} />
                 Guardar
               </button>
 

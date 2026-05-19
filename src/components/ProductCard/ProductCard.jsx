@@ -67,7 +67,7 @@ function ProductCard({
         {productPrice && <strong>{formatPrice(productPrice)}</strong>}
         
         <div className="product-card-actions">
-          <a href={`/producto/${product.id}`}>Ver detalle</a>
+          <a href={`/producto/${product.id}?decada=${product.decade}`}>Ver detalle</a>
 
           <button
             className="product-add-button"
