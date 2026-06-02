@@ -256,17 +256,10 @@
   object-fit: contain;
 }
 
-.home-map-placeholder {
-  position: relative;
-  min-height: 310px;
-  border: 1.5px dashed #c9ad96;
-  border-radius: 24px;
-  background:
-    linear-gradient(90deg, rgba(122, 78, 45, 0.08) 1px, transparent 1px),
-    linear-gradient(rgba(122, 78, 45, 0.08) 1px, transparent 1px),
-    #f8ead5;
-  background-size: 42px 42px;
-  overflow: hidden;
+.home-map-leaflet,
+.home-map-leaflet .leaflet-container {
+  min-height: 260px;
+  height: 260px;
 }
 
 .home-map-placeholder::before {
@@ -278,82 +271,6 @@
     radial-gradient(circle at 72% 58%, rgba(76, 47, 31, 0.12), transparent 28%);
 }
 
-.map-grid {
-  position: absolute;
-  inset: 26px;
-  border: 2px solid rgba(76, 47, 31, 0.12);
-  border-radius: 22px;
-}
-
-.map-grid::before,
-.map-grid::after {
-  content: "";
-  position: absolute;
-  background: rgba(76, 47, 31, 0.18);
-  border-radius: 999px;
-}
-
-.map-grid::before {
-  width: 70%;
-  height: 3px;
-  left: 14%;
-  top: 45%;
-  transform: rotate(-18deg);
-}
-
-.map-grid::after {
-  width: 3px;
-  height: 70%;
-  left: 54%;
-  top: 15%;
-  transform: rotate(18deg);
-}
-
-.map-pin {
-  position: absolute;
-  left: 50%;
-  top: 42%;
-  width: 64px;
-  height: 64px;
-  border-radius: 999px;
-  background: #fffaf3;
-  box-shadow: 0 12px 28px rgba(76, 47, 31, 0.18);
-  display: grid;
-  place-items: center;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-}
-
-.map-pin img {
-  width: 34px;
-  height: 34px;
-  object-fit: contain;
-}
-
-.map-card {
-  position: absolute;
-  left: 24px;
-  bottom: 24px;
-  padding: 16px 18px;
-  border: 1px solid #decbb8;
-  border-radius: 18px;
-  background: rgba(255, 250, 243, 0.92);
-  box-shadow: 0 10px 24px rgba(76, 47, 31, 0.12);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  z-index: 2;
-}
-
-.map-card strong {
-  color: #3b2418;
-  font-size: 1rem;
-}
-
-.map-card span {
-  color: #75675d;
-  font-size: 0.88rem;
-}
 
 @media (max-width: 1100px) {
   .home-hero-content {
