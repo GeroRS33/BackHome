@@ -11,6 +11,7 @@ import heartIcon from "../assets/images/corazon.png";
 import boxIcon from "../assets/images/disponibilidad.png";
 import tagIcon from "../assets/images/etiqueta.png";
 import plantIcon from "../assets/images/iconoplanta.png";
+import { registerUser } from "../services/api";
 
 function formatMemberDate() {
   const fecha = new Date();
@@ -35,22 +36,26 @@ function RegisterPage() {
 
   const password = watch("password");
 
-  const crearCuenta = (datos) => {
-    const nuevoUsuario = {
-      name: datos.nombre,
-      email: datos.email,
-      password: datos.password,
-      bio: "Agregá una descripción sobre vos.",
-      location: "Montevideo, Uruguay",
-      memberSince: formatMemberDate(),
-      avatar: "",
-    };
+  const crearCuenta = async (datos) => {
+    try {
+      const nuevoUsuario = {
+        email: datos.email,
+        password: datos.password,
+        data: {
+          nombre: datos.nombre,
+          bio: "Agregá una descripción sobre vos.",
+          location: "Montevideo, Uruguay",
+          memberSince: formatMemberDate(),
+          avatar: "",
+        },
+      };
 
-    localStorage.setItem("backhomeUser", JSON.stringify(nuevoUsuario));
-    localStorage.setItem("currentUser", JSON.stringify(nuevoUsuario));
-    localStorage.setItem("sesionActiva", "true");
+      await registerUser(nuevoUsuario);
 
-    navigate("/home");
+      navigate("/login");
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   return (

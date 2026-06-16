@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import "./ProfilePage.css";
 import Navbar from "../components/Navbar/Navbar";
@@ -12,6 +12,7 @@ import calendarioIcon from "../assets/images/calendario.png";
 import lapizIcon from "../assets/images/lapiz.png";
 import decoracionPerfil from "../assets/images/decoracionperfil.png";
 import { productos } from "../data/products";
+import { getCurrentUser, updateCurrentUser, logout as logoutSession } from "../services/api";
 
 function formatPrice(value) {
   const price = typeof value === "number" ? value : Number(value) || 0;
@@ -101,6 +102,28 @@ function getRealLastOrder() {
   };
 }
 
+function mapApiUserToProfile(user) {
+  return {
+    name: user?.data?.nombre || user?.data?.name || "",
+    bio: user?.data?.bio || "Agregá una descripción sobre vos.",
+    email: user?.email || "",
+    location: user?.data?.location || "Montevideo, Uruguay",
+    memberSince: user?.data?.memberSince || "Miembro desde hoy",
+    avatar: user?.data?.avatar || "",
+  };
+}
+
+function getDefaultProfile() {
+  return {
+    name: "",
+    bio: "Agregá una descripción sobre vos.",
+    email: "",
+    location: "Montevideo, Uruguay",
+    memberSince: "Miembro desde hoy",
+    avatar: "",
+  };
+}
+
 const orderOneProducts = [
   getOrderProduct(21, 1),
   getOrderProduct(22, 1),
@@ -174,28 +197,6 @@ const hardcodedOrders = [
   },
 ];
 
-function getStoredProfile() {
-  const currentUser = localStorage.getItem("currentUser");
-  const backhomeUser = localStorage.getItem("backhomeUser");
-
-  if (currentUser) {
-    return JSON.parse(currentUser);
-  }
-
-  if (backhomeUser) {
-    return JSON.parse(backhomeUser);
-  }
-
-  return {
-    name: "",
-    bio: "Agregá una descripción sobre vos.",
-    email: "",
-    location: "Montevideo, Uruguay",
-    memberSince: "Miembro desde hoy",
-    avatar: "",
-  };
-}
-
 function ProfilePage() {
   const navigate = useNavigate();
 
@@ -207,9 +208,30 @@ function ProfilePage() {
   const [selectedOrderId, setSelectedOrderId] = useState(profileOrders[0].id);
   const [isEditing, setIsEditing] = useState(false);
   const [visibleOrdersCount, setVisibleOrdersCount] = useState(3);
+  const [profile, setProfile] = useState(getDefaultProfile);
+  const [formData, setFormData] = useState(getDefaultProfile);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
-  const [profile, setProfile] = useState(() => getStoredProfile());
-  const [formData, setFormData] = useState(() => getStoredProfile());
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const user = await getCurrentUser();
+        const apiProfile = mapApiUserToProfile(user);
+
+        setProfile(apiProfile);
+        setFormData(apiProfile);
+        localStorage.setItem("currentUser", JSON.stringify(apiProfile));
+      } catch (error) {
+        console.log(error.message);
+        logoutSession();
+        navigate("/login");
+      } finally {
+        setIsLoadingProfile(false);
+      }
+    }
+
+    loadProfile();
+  }, [navigate]);
 
   const selectedOrder = profileOrders.find(
     (order) => order.id === selectedOrderId
@@ -266,19 +288,32 @@ function ProfilePage() {
     setIsEditing(false);
   };
 
-  const handleSave = (event) => {
+  const handleSave = async (event) => {
     event.preventDefault();
 
-    const updatedProfile = {
-      ...profile,
-      ...formData,
-    };
+    try {
+      const updatedProfile = {
+        ...profile,
+        ...formData,
+      };
 
-    setProfile(updatedProfile);
-    localStorage.setItem("currentUser", JSON.stringify(updatedProfile));
-    localStorage.setItem("backhomeUser", JSON.stringify(updatedProfile));
+      await updateCurrentUser({
+        data: {
+          nombre: updatedProfile.name,
+          bio: updatedProfile.bio,
+          location: updatedProfile.location,
+          memberSince: updatedProfile.memberSince,
+          avatar: updatedProfile.avatar,
+        },
+      });
 
-    setIsEditing(false);
+      setProfile(updatedProfile);
+      localStorage.setItem("currentUser", JSON.stringify(updatedProfile));
+
+      setIsEditing(false);
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const handleChange = (event) => {
@@ -291,11 +326,26 @@ function ProfilePage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("sesionActiva");
-    localStorage.removeItem("currentUser");
-
+    logoutSession();
     navigate("/login");
   };
+
+  if (isLoadingProfile) {
+    return (
+      <>
+        <Navbar activePage="perfil" />
+
+        <main className="profile-page">
+          <section className="profile-card">
+            <div className="profile-info">
+              <h1>Cargando perfil...</h1>
+              <p>Estamos trayendo tus datos desde BackHome.</p>
+            </div>
+          </section>
+        </main>
+      </>
+    );
+  }
 
   return (
     <>
@@ -400,7 +450,7 @@ function ProfilePage() {
                     type="email"
                     name="email"
                     value={formData.email}
-                    onChange={handleChange}
+                    readOnly
                   />
                 </label>
 

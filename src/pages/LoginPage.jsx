@@ -11,6 +11,7 @@ import heartIcon from "../assets/images/corazon.png";
 import boxIcon from "../assets/images/disponibilidad.png";
 import tagIcon from "../assets/images/etiqueta.png";
 import plantIcon from "../assets/images/iconoplanta.png";
+import { loginUser, saveSession } from "../services/api";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -19,39 +20,32 @@ function LoginPage() {
     register,
     handleSubmit,
     setError,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm();
 
-  const onSubmit = (datos) => {
-    const usuarioGuardado = localStorage.getItem("backhomeUser");
-
-    if (!usuarioGuardado) {
-      setError("email", {
-        type: "manual",
-        message: "Primero tenés que crear una cuenta",
+  const onSubmit = async (datos) => {
+    try {
+      const response = await loginUser({
+        email: datos.email,
+        password: datos.password,
       });
 
-      return;
-    }
+      saveSession(response.token);
 
-    const usuario = JSON.parse(usuarioGuardado);
+      localStorage.setItem(
+        "currentUser",
+        JSON.stringify({
+          email: datos.email,
+        })
+      );
 
-    const emailCorrecto = usuario.email === datos.email;
-    const passwordCorrecta = usuario.password === datos.password;
-
-    if (!emailCorrecto || !passwordCorrecta) {
+      navigate("/home");
+    } catch (error) {
       setError("password", {
         type: "manual",
-        message: "Correo o contraseña incorrectos",
+        message: error.message || "Correo o contraseña incorrectos",
       });
-
-      return;
     }
-
-    localStorage.setItem("sesionActiva", "true");
-    localStorage.setItem("currentUser", JSON.stringify(usuario));
-
-    navigate("/home");
   };
 
   return (
@@ -116,7 +110,9 @@ function LoginPage() {
               <a href="/registro">¿No tenés cuenta?</a>
             </div>
 
-            <PrimaryButton type="submit">Iniciar sesión</PrimaryButton>
+            <PrimaryButton type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}
+            </PrimaryButton>
 
             <a className="auth-secondary-button" href="/registro">
               Crear cuenta
