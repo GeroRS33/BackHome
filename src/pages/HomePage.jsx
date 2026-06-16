@@ -11,6 +11,7 @@ import lamparaIcon from "../assets/images/lampara.png";
 import lineasIcon from "../assets/images/lineas.png";
 import plantaIcon from "../assets/images/planta.png";
 import { productos } from "../data/products";
+import BackHomeMap from "../components/BackHomeMap/BackHomeMap";
 
 const decadesInfo = {
   1950: {
@@ -179,18 +180,7 @@ function HomePage({
             </div>
           </div>
 
-          <div className="home-map-placeholder">
-            <div className="map-grid"></div>
-
-            <div className="map-pin">
-              <img src={ubicacionIcon} alt="" />
-            </div>
-
-            <div className="map-card">
-              <strong>Mapa próximamente</strong>
-              <span>Espacio reservado para ubicación</span>
-            </div>
-          </div>
+          <BackHomeMap />
         </section>
       </main>
     </>
