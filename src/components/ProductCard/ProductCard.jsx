@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import "./ProductCard.css";
 
 function CartIcon({ className = "" }) {
@@ -15,16 +16,35 @@ function CartIcon({ className = "" }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx="14" cy="26" r="2" stroke="currentColor" strokeWidth="2.2" />
-      <circle cx="24" cy="26" r="2" stroke="currentColor" strokeWidth="2.2" />
+
+      <circle
+        cx="14"
+        cy="26"
+        r="2"
+        stroke="currentColor"
+        strokeWidth="2.2"
+      />
+
+      <circle
+        cx="24"
+        cy="26"
+        r="2"
+        stroke="currentColor"
+        strokeWidth="2.2"
+      />
     </svg>
   );
 }
 
 function formatPrice(value) {
-  const price = typeof value === "number" ? value : Number(value) || 0;
+  const price =
+    typeof value === "number"
+      ? value
+      : Number(value) || 0;
 
-  return `$${new Intl.NumberFormat("es-UY").format(price)}`;
+  return `$${new Intl.NumberFormat(
+    "es-UY"
+  ).format(price)}`;
 }
 
 function ProductCard({
@@ -39,35 +59,62 @@ function ProductCard({
     }
   };
 
-  const handleAddToCart = () => {
-    if (onAddToCart) {
-      onAddToCart(product);
+  const handleAddToCart = async () => {
+    if (!onAddToCart) {
+      return;
+    }
+
+    try {
+      await onAddToCart(product);
+    } catch (error) {
+      console.error(
+        "Error agregando producto al carrito:",
+        error
+      );
     }
   };
 
-  const productPrice = product.price || product.precio;
+  const productPrice =
+    product.price || product.precio || 0;
 
   return (
     <article className="product-card">
-      <img
-        className="product-card-image"
-        src={product.image}
-        alt={product.name}
-      />
+      {product.image ? (
+        <img
+          className="product-card-image"
+          src={product.image}
+          alt={product.name}
+        />
+      ) : (
+        <div
+          className="product-card-image"
+          aria-label="Imagen no disponible"
+        />
+      )}
 
       <div className="product-card-info">
         <h3>{product.name}</h3>
 
-        <p className="product-card-category">{product.category}</p>
+        <p className="product-card-category">
+          {product.category}
+        </p>
 
         {product.description && (
-          <p className="product-card-description">{product.description}</p>
+          <p className="product-card-description">
+            {product.description}
+          </p>
         )}
 
-        {productPrice && <strong>{formatPrice(productPrice)}</strong>}
-        
+        <strong>
+          {formatPrice(productPrice)}
+        </strong>
+
         <div className="product-card-actions">
-          <a href={`/producto/${product.id}?decada=${product.decade}`}>Ver detalle</a>
+          <Link
+            to={`/producto/${product.id}?decada=${product.decade}`}
+          >
+            Ver detalle
+          </Link>
 
           <button
             className="product-add-button"
@@ -75,15 +122,22 @@ function ProductCard({
             onClick={handleAddToCart}
           >
             <span>Agregar</span>
+
             <CartIcon className="product-add-cart-icon" />
           </button>
         </div>
 
         <button
-          className={`product-favorite-button ${isFavorite ? "active" : ""}`}
+          className={`product-favorite-button ${
+            isFavorite ? "active" : ""
+          }`}
           type="button"
           onClick={handleFavoriteClick}
-          aria-label={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
+          aria-label={
+            isFavorite
+              ? "Quitar de favoritos"
+              : "Agregar a favoritos"
+          }
         >
           {isFavorite ? "♥" : "♡"}
         </button>

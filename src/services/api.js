@@ -7,17 +7,29 @@ export const API_URL = "https://creacionaplicaciones.onrender.com";
 
 export const PROJECT_KEY = "backhome-retro";
 
+/* =========================
+   TOKEN
+========================= */
+
 export const getToken = () => localStorage.getItem("token");
 
-export const saveToken = (token) => localStorage.setItem("token", token);
+export const saveToken = (token) => {
+  localStorage.setItem("token", token);
+};
 
-export const removeToken = () => localStorage.removeItem("token");
+export const removeToken = () => {
+  localStorage.removeItem("token");
+};
 
-// Función genérica para hacer fetch a la API.
-// Ya agrega siempre:
+/* =========================
+   FETCH GENERAL
+========================= */
+
+// Función genérica para consumir la API.
+// Agrega automáticamente:
 // - Content-Type
 // - x-project-key
-// - Authorization si hay token
+// - Authorization si existe token
 export const apiFetch = async (path, options = {}) => {
   const token = getToken();
 
@@ -34,10 +46,24 @@ export const apiFetch = async (path, options = {}) => {
   });
 
   const text = await response.text();
-  const data = text ? JSON.parse(text) : null;
+
+  let data = null;
+
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = text;
+    }
+  }
 
   if (!response.ok) {
-    throw new Error(data?.error || data?.message || "Error consumiendo la API");
+    throw new Error(
+      data?.error ||
+        data?.message ||
+        (typeof data === "string" ? data : null) ||
+        "Error consumiendo la API"
+    );
   }
 
   return data;
@@ -76,8 +102,8 @@ export const updateCurrentUser = (userData) => {
    PRODUCTOS
 ========================= */
 
-export const getProducts = () => {
-  return apiFetch("/api/productos");
+export const getProducts = (page = 1, limit = 100) => {
+  return apiFetch(`/api/productos?page=${page}&limit=${limit}`);
 };
 
 export const getProductById = (productId) => {
