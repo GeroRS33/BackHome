@@ -262,14 +262,7 @@
   height: 260px;
 }
 
-.home-map-placeholder::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 26% 38%, rgba(217, 108, 43, 0.18), transparent 24%),
-    radial-gradient(circle at 72% 58%, rgba(76, 47, 31, 0.12), transparent 28%);
-}
+
 
 
 @media (max-width: 1100px) {

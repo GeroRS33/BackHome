@@ -1,7 +1,11 @@
 .navbar {
+  position: relative;
+  z-index: 1000;
+
   height: 92px;
   padding: 0 72px;
   background: #4c2f1f;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -11,6 +15,8 @@
   display: flex;
   align-items: center;
   text-decoration: none;
+  position: relative;
+  z-index: 1001;
 }
 
 .navbar-logo img {
@@ -23,6 +29,9 @@
   display: flex;
   align-items: center;
   gap: 46px;
+
+  position: relative;
+  z-index: 1001;
 }
 
 .navbar-links a {
@@ -32,6 +41,8 @@
   font-weight: 700;
   position: relative;
   padding: 10px 0;
+  cursor: pointer;
+  pointer-events: auto;
 }
 
 .navbar-links a:hover {
@@ -47,35 +58,6 @@
   height: 2px;
   background: #f8ead5;
   border-radius: 999px;
-}
-
-@media (max-width: 900px) {
-  .navbar {
-    height: auto;
-    padding: 22px 24px;
-    flex-direction: column;
-    gap: 18px;
-  }
-
-  .navbar-links {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-  }
-
-  .navbar-logo img {
-    height: 54px;
-  }
-}
-
-@media (max-width: 520px) {
-  .navbar-links {
-    gap: 14px;
-  }
-
-  .navbar-links a {
-    font-size: 0.9rem;
-  }
 }
 
 .cart-link {
@@ -102,6 +84,45 @@
   color: #fff;
   font-size: 0.75rem;
   font-weight: 800;
+
   display: grid;
   place-items: center;
+}
+
+@media (max-width: 900px) {
+  .navbar {
+    height: auto;
+    padding: 22px 24px;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .navbar-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .navbar-logo img {
+    width: 170px;
+    height: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .navbar {
+    padding: 18px 16px;
+  }
+
+  .navbar-links {
+    gap: 14px;
+  }
+
+  .navbar-links a {
+    font-size: 0.9rem;
+  }
+
+  .navbar-logo img {
+    width: 155px;
+  }
 }
