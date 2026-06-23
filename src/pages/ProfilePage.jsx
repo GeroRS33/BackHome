@@ -14,52 +14,54 @@ import calendarioIcon from "../assets/images/calendario.png";
 import lapizIcon from "../assets/images/lapiz.png";
 import decoracionPerfil from "../assets/images/decoracionperfil.png";
 
-import { productos } from "../data/products";
+import { productos as productosLocales } from "../data/products";
 
 import {
   getCurrentUser,
   updateCurrentUser,
+  getPurchases,
   logout as logoutSession,
 } from "../services/api";
 
 function formatPrice(value) {
-  const price = typeof value === "number" ? value : Number(value) || 0;
+  const price =
+    typeof value === "number"
+      ? value
+      : Number(value) || 0;
 
   return `$${new Intl.NumberFormat("es-UY").format(price)}`;
 }
 
-function getProductById(id) {
-  return productos.find((product) => product.id === id);
-}
-
-function getOrderProduct(id, quantity = 1) {
-  const product = getProductById(id);
-
-  if (!product) {
-    return null;
+function formatOrderDate(value) {
+  if (!value) {
+    return "Fecha no disponible";
   }
 
-  const price = product.price || product.precio || 0;
+  const date = new Date(value);
 
-  return {
-    id: product.id,
-    name: product.name,
-    category: product.category,
-    quantity,
-    price: formatPrice(price),
-    image: product.image,
-  };
+  if (Number.isNaN(date.getTime())) {
+    return "Fecha no disponible";
+  }
+
+  return date.toLocaleDateString("es-UY", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 }
 
-function getOrderTotal(products) {
-  const total = products.reduce((acc, product) => {
-    const originalProduct = getProductById(product.id);
-    const price = originalProduct?.price || originalProduct?.precio || 0;
+function createOrderCode(order) {
+  const year = order?.createdAt
+    ? new Date(order.createdAt).getFullYear()
+    : new Date().getFullYear();
 
-    return acc + price * product.quantity;
-  }, 0);
+  const shortId = String(order?.id || "")
+    .slice(-6)
+    .toUpperCase();
 
-  return formatPrice(total);
+  return shortId
+    ? `BH-${year}-${shortId}`
+    : `BH-${year}-PEDIDO`;
 }
 
 function getInitials(name) {
@@ -95,10 +97,16 @@ function getDefaultProfile() {
 
   return {
     name: storedUser?.name || "",
-    bio: storedUser?.bio || "Agregá una descripción sobre vos.",
+    bio:
+      storedUser?.bio ||
+      "Agregá una descripción sobre vos.",
     email: storedUser?.email || "",
-    location: storedUser?.location || "Montevideo, Uruguay",
-    memberSince: storedUser?.memberSince || "Miembro desde hoy",
+    location:
+      storedUser?.location ||
+      "Montevideo, Uruguay",
+    memberSince:
+      storedUser?.memberSince ||
+      "Miembro desde hoy",
     avatar: storedUser?.avatar || "",
   };
 }
@@ -138,39 +146,30 @@ function mapApiUserToProfile(response) {
 
   const userData = parsePossibleJson(rawUserData);
 
-  const possibleName =
-    userData?.nombre ||
-    userData?.name ||
-    userData?.data?.nombre ||
-    userData?.data?.name ||
-    userData?.datos?.nombre ||
-    userData?.datos?.name ||
-    parsedRootUser?.nombre ||
-    parsedRootUser?.name ||
-    response?.nombre ||
-    response?.name ||
-    storedUser?.name ||
-    "";
-
-  const possibleEmail =
-    parsedRootUser?.email ||
-    userData?.email ||
-    response?.email ||
-    storedUser?.email ||
-    "";
-
   return {
-    name: possibleName,
+    name:
+      userData?.nombre ||
+      userData?.name ||
+      parsedRootUser?.nombre ||
+      parsedRootUser?.name ||
+      response?.nombre ||
+      response?.name ||
+      storedUser?.name ||
+      "",
 
     bio:
       userData?.bio ||
       userData?.descripcion ||
       parsedRootUser?.bio ||
-      parsedRootUser?.descripcion ||
       storedUser?.bio ||
       "Agregá una descripción sobre vos.",
 
-    email: possibleEmail,
+    email:
+      parsedRootUser?.email ||
+      userData?.email ||
+      response?.email ||
+      storedUser?.email ||
+      "",
 
     location:
       userData?.location ||
@@ -184,7 +183,6 @@ function mapApiUserToProfile(response) {
       userData?.memberSince ||
       userData?.miembroDesde ||
       parsedRootUser?.memberSince ||
-      parsedRootUser?.miembroDesde ||
       storedUser?.memberSince ||
       "Miembro desde hoy",
 
@@ -192,160 +190,155 @@ function mapApiUserToProfile(response) {
       userData?.avatar ||
       userData?.imagen ||
       parsedRootUser?.avatar ||
-      parsedRootUser?.imagen ||
       storedUser?.avatar ||
       "",
   };
 }
 
-function getRealLastOrder() {
-  const ultimoPedidoGuardado = localStorage.getItem("ultimoPedido");
+function getLocalProduct(itemData) {
+  const idBH = Number(itemData?.idBH);
 
-  if (!ultimoPedidoGuardado) {
-    return null;
-  }
+  if (idBH) {
+    const byId = productosLocales.find(
+      (product) => Number(product.id) === idBH
+    );
 
-  try {
-    const ultimoPedido = JSON.parse(ultimoPedidoGuardado);
-
-    if (!ultimoPedido?.productos || ultimoPedido.productos.length === 0) {
-      return null;
+    if (byId) {
+      return byId;
     }
-
-    return {
-      id: "ultimo-pedido",
-      code: ultimoPedido.codigo || "BH-2026-ULTIMO",
-      date: ultimoPedido.fecha || "Fecha no disponible",
-      status: "Completado",
-      total: formatPrice(ultimoPedido.total || 0),
-
-      products: ultimoPedido.productos.map((product) => {
-        const quantity = product.cantidad || product.quantity || 1;
-        const price = product.price || product.precio || 0;
-
-        return {
-          id: product.id,
-          name: product.name || product.nombre,
-          category: product.category || product.categoria,
-          quantity,
-          price: formatPrice(price * quantity),
-          image: product.image || product.imagen,
-        };
-      }),
-    };
-  } catch {
-    return null;
   }
+
+  const normalizedName = String(
+    itemData?.nombre || ""
+  )
+    .trim()
+    .toLowerCase();
+
+  return productosLocales.find(
+    (product) =>
+      product.name.trim().toLowerCase() ===
+      normalizedName
+  );
 }
 
-const orderOneProducts = [
-  getOrderProduct(21, 1),
-  getOrderProduct(22, 1),
-  getOrderProduct(24, 1),
-].filter(Boolean);
+function mapPurchaseProduct(item) {
+  const data = item?.data || {};
+  const localProduct = getLocalProduct(data);
 
-const orderTwoProducts = [
-  getOrderProduct(11, 1),
-  getOrderProduct(14, 1),
-  getOrderProduct(16, 1),
-].filter(Boolean);
+  const quantity = Number(item?.cantidad) || 1;
+  const unitPrice = Number(data?.precio) || 0;
 
-const orderThreeProducts = [
-  getOrderProduct(41, 1),
-  getOrderProduct(44, 1),
-  getOrderProduct(45, 1),
-].filter(Boolean);
+  return {
+    id:
+      item?.productoId ||
+      item?._id ||
+      localProduct?.id,
 
-const orderFourProducts = [
-  getOrderProduct(23, 1),
-  getOrderProduct(25, 1),
-  getOrderProduct(26, 1),
-].filter(Boolean);
+    name:
+      data?.nombre ||
+      localProduct?.name ||
+      "Producto",
 
-const orderFiveProducts = [
-  getOrderProduct(52, 1),
-  getOrderProduct(54, 1),
-  getOrderProduct(55, 1),
-].filter(Boolean);
+    category:
+      data?.categoria ||
+      localProduct?.category ||
+      "",
 
-const hardcodedOrders = [
-  {
-    id: 1,
-    code: "BH-2026-003",
-    date: "15 de mayo, 2026",
-    status: "Completado",
-    total: getOrderTotal(orderOneProducts),
-    products: orderOneProducts,
-  },
-  {
-    id: 2,
-    code: "BH-2026-002",
-    date: "12 de mayo, 2026",
-    status: "Completado",
-    total: getOrderTotal(orderTwoProducts),
-    products: orderTwoProducts,
-  },
-  {
-    id: 3,
-    code: "BH-2026-001",
-    date: "5 de mayo, 2026",
-    status: "Completado",
-    total: getOrderTotal(orderThreeProducts),
-    products: orderThreeProducts,
-  },
-  {
-    id: 4,
-    code: "BH-2026-000",
-    date: "3 de mayo, 2026",
-    status: "Completado",
-    total: getOrderTotal(orderFourProducts),
-    products: orderFourProducts,
-  },
-  {
-    id: 5,
-    code: "BH-2025-009",
-    date: "1 de mayo, 2026",
-    status: "Completado",
-    total: getOrderTotal(orderFiveProducts),
-    products: orderFiveProducts,
-  },
-];
+    quantity,
+
+    price: formatPrice(
+      Number(item?.subtotal) ||
+        unitPrice * quantity
+    ),
+
+    image:
+      data?.imagen ||
+      localProduct?.image ||
+      "",
+  };
+}
+
+function mapPurchaseToOrder(purchase) {
+  const purchaseItems = Array.isArray(
+    purchase?.items
+  )
+    ? purchase.items
+    : [];
+
+  return {
+    id: purchase.id,
+
+    code: createOrderCode(purchase),
+
+    date: formatOrderDate(
+      purchase.createdAt
+    ),
+
+    status:
+      purchase?.data?.estado ||
+      purchase?.estado ||
+      "Completado",
+
+    total: formatPrice(
+      purchase?.total || 0
+    ),
+
+    products: purchaseItems.map(
+      mapPurchaseProduct
+    ),
+
+    deliveryData:
+      purchase?.datosCheckout || {},
+  };
+}
 
 function ProfilePage() {
   const navigate = useNavigate();
 
-  const realLastOrder = getRealLastOrder();
-
-  const profileOrders = realLastOrder
-    ? [realLastOrder, ...hardcodedOrders]
-    : hardcodedOrders;
-
-  const [selectedOrderId, setSelectedOrderId] = useState(
-    profileOrders[0]?.id || null
+  const [profile, setProfile] = useState(
+    getDefaultProfile
   );
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [visibleOrdersCount, setVisibleOrdersCount] = useState(3);
+  const [formData, setFormData] = useState(
+    getDefaultProfile
+  );
 
-  const [profile, setProfile] = useState(getDefaultProfile);
-  const [formData, setFormData] = useState(getDefaultProfile);
+  const [orders, setOrders] = useState([]);
 
-  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
-  const [isSavingProfile, setIsSavingProfile] = useState(false);
-  const [profileError, setProfileError] = useState("");
+  const [selectedOrderId, setSelectedOrderId] =
+    useState(null);
+
+  const [isEditing, setIsEditing] =
+    useState(false);
+
+  const [visibleOrdersCount, setVisibleOrdersCount] =
+    useState(3);
+
+  const [isLoadingProfile, setIsLoadingProfile] =
+    useState(true);
+
+  const [isLoadingOrders, setIsLoadingOrders] =
+    useState(true);
+
+  const [isSavingProfile, setIsSavingProfile] =
+    useState(false);
+
+  const [profileError, setProfileError] =
+    useState("");
+
+  const [ordersError, setOrdersError] =
+    useState("");
 
   useEffect(() => {
     async function loadProfile() {
       try {
         setProfileError("");
 
-        const response = await getCurrentUser();
+        const response =
+          await getCurrentUser();
 
-        console.log("Respuesta completa de GET Usuario:", response);
-
-        const apiProfile = mapApiUserToProfile(response);
-
-        console.log("Perfil transformado:", apiProfile);
+        const apiProfile =
+          mapApiUserToProfile(response);
 
         setProfile(apiProfile);
         setFormData(apiProfile);
@@ -355,18 +348,23 @@ function ProfilePage() {
           JSON.stringify(apiProfile)
         );
       } catch (error) {
-        console.error("Error cargando el perfil:", error);
-
-        setProfileError(
-          error.message || "No se pudieron cargar los datos del perfil."
+        console.error(
+          "Error cargando perfil:",
+          error
         );
 
-        const errorMessage = error.message?.toLowerCase() || "";
+        setProfileError(
+          error.message ||
+            "No se pudo cargar el perfil."
+        );
+
+        const message =
+          error.message?.toLowerCase() || "";
 
         if (
-          errorMessage.includes("token") ||
-          errorMessage.includes("autoriz") ||
-          errorMessage.includes("unauthorized")
+          message.includes("token") ||
+          message.includes("autoriz") ||
+          message.includes("unauthorized")
         ) {
           logoutSession();
           navigate("/login");
@@ -379,29 +377,101 @@ function ProfilePage() {
     loadProfile();
   }, [navigate]);
 
-  const selectedOrder = profileOrders.find(
-    (order) => order.id === selectedOrderId
+  useEffect(() => {
+    async function loadPurchases() {
+      try {
+        setOrdersError("");
+        setIsLoadingOrders(true);
+
+        const response =
+          await getPurchases();
+
+        const apiOrders = (
+          response?.items || []
+        )
+          .map(mapPurchaseToOrder)
+          .sort((a, b) => {
+            const orderA =
+              response.items.find(
+                (item) => item.id === a.id
+              );
+
+            const orderB =
+              response.items.find(
+                (item) => item.id === b.id
+              );
+
+            return (
+              new Date(orderB?.createdAt || 0) -
+              new Date(orderA?.createdAt || 0)
+            );
+          });
+
+        setOrders(apiOrders);
+
+        if (apiOrders.length > 0) {
+          setSelectedOrderId(
+            apiOrders[0].id
+          );
+        }
+      } catch (error) {
+        console.error(
+          "Error cargando compras:",
+          error
+        );
+
+        setOrdersError(
+          error.message ||
+            "No se pudieron cargar las compras."
+        );
+      } finally {
+        setIsLoadingOrders(false);
+      }
+    }
+
+    loadPurchases();
+  }, []);
+
+  const selectedOrder = orders.find(
+    (order) =>
+      order.id === selectedOrderId
   );
 
-  const visibleOrders = profileOrders.slice(0, visibleOrdersCount);
-  const hasMoreOrders = visibleOrdersCount < profileOrders.length;
-  const canShowLessOrders = visibleOrdersCount > 3;
+  const visibleOrders = orders.slice(
+    0,
+    visibleOrdersCount
+  );
+
+  const hasMoreOrders =
+    visibleOrdersCount < orders.length;
+
+  const canShowLessOrders =
+    visibleOrdersCount > 3;
 
   const handleShowMoreOrders = () => {
-    setVisibleOrdersCount((currentCount) =>
-      Math.min(currentCount + 2, profileOrders.length)
+    setVisibleOrdersCount(
+      (currentCount) =>
+        Math.min(
+          currentCount + 2,
+          orders.length
+        )
     );
   };
 
   const handleShowLessOrders = () => {
     setVisibleOrdersCount(3);
 
-    const selectedOrderIsVisible = profileOrders
+    const selectedOrderIsVisible = orders
       .slice(0, 3)
-      .some((order) => order.id === selectedOrderId);
+      .some(
+        (order) =>
+          order.id === selectedOrderId
+      );
 
     if (!selectedOrderIsVisible) {
-      setSelectedOrderId(profileOrders[0]?.id || null);
+      setSelectedOrderId(
+        orders[0]?.id || null
+      );
     }
   };
 
@@ -435,7 +505,8 @@ function ProfilePage() {
   };
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
+    const { name, value } =
+      event.target;
 
     setFormData((currentData) => ({
       ...currentData,
@@ -455,17 +526,17 @@ function ProfilePage() {
         ...formData,
       };
 
-      const response = await updateCurrentUser({
+      await updateCurrentUser({
         data: {
           nombre: updatedProfile.name,
           bio: updatedProfile.bio,
-          location: updatedProfile.location,
-          memberSince: updatedProfile.memberSince,
+          location:
+            updatedProfile.location,
+          memberSince:
+            updatedProfile.memberSince,
           avatar: updatedProfile.avatar,
         },
       });
-
-      console.log("Respuesta de PUT Usuario:", response);
 
       setProfile(updatedProfile);
       setFormData(updatedProfile);
@@ -477,10 +548,14 @@ function ProfilePage() {
 
       setIsEditing(false);
     } catch (error) {
-      console.error("Error actualizando perfil:", error);
+      console.error(
+        "Error guardando perfil:",
+        error
+      );
 
       setProfileError(
-        error.message || "No se pudo actualizar el perfil."
+        error.message ||
+          "No se pudo actualizar el perfil."
       );
     } finally {
       setIsSavingProfile(false);
@@ -501,7 +576,10 @@ function ProfilePage() {
           <section className="profile-card">
             <div className="profile-info">
               <h1>Cargando perfil...</h1>
-              <p>Estamos trayendo tus datos desde BackHome.</p>
+              <p>
+                Estamos trayendo tus datos
+                desde BackHome.
+              </p>
             </div>
           </section>
         </main>
@@ -524,28 +602,43 @@ function ProfilePage() {
           >
             {isEditing ? (
               formData.avatar ? (
-                <img src={formData.avatar} alt="Foto de perfil" />
+                <img
+                  src={formData.avatar}
+                  alt="Foto de perfil"
+                />
               ) : (
                 <div className="profile-avatar-placeholder">
-                  {getInitials(formData.name)}
+                  {getInitials(
+                    formData.name
+                  )}
                 </div>
               )
             ) : profile.avatar ? (
-              <img src={profile.avatar} alt="Foto de perfil" />
+              <img
+                src={profile.avatar}
+                alt="Foto de perfil"
+              />
             ) : (
               <div className="profile-avatar-placeholder">
-                {getInitials(profile.name)}
+                {getInitials(
+                  profile.name
+                )}
               </div>
             )}
 
             {isEditing && (
               <label className="change-avatar-overlay">
-                <img src={cambiarImagenIcon} alt="" />
+                <img
+                  src={cambiarImagenIcon}
+                  alt=""
+                />
 
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={handleAvatarChange}
+                  onChange={
+                    handleAvatarChange
+                  }
                 />
               </label>
             )}
@@ -553,19 +646,27 @@ function ProfilePage() {
 
           <div className="profile-info">
             {profileError && (
-              <p className="profile-error">{profileError}</p>
+              <p className="profile-error">
+                {profileError}
+              </p>
             )}
 
             {!isEditing ? (
               <>
-                <h1>{profile.name || "Usuario BackHome"}</h1>
+                <h1>
+                  {profile.name ||
+                    "Usuario BackHome"}
+                </h1>
 
                 <p>{profile.bio}</p>
 
                 <div className="profile-info-list">
                   <ProfileInfoItem
                     icon={mailIcon}
-                    text={profile.email || "Email no disponible"}
+                    text={
+                      profile.email ||
+                      "Email no disponible"
+                    }
                   />
 
                   <ProfileInfoItem
@@ -575,7 +676,9 @@ function ProfilePage() {
 
                   <ProfileInfoItem
                     icon={calendarioIcon}
-                    text={profile.memberSince}
+                    text={
+                      profile.memberSince
+                    }
                   />
                 </div>
 
@@ -585,14 +688,19 @@ function ProfilePage() {
                     className="edit-profile-button"
                     onClick={handleEdit}
                   >
-                    <img src={lapizIcon} alt="" />
+                    <img
+                      src={lapizIcon}
+                      alt=""
+                    />
                     Editar perfil
                   </button>
 
                   <button
                     type="button"
                     className="logout-profile-button"
-                    onClick={handleLogout}
+                    onClick={
+                      handleLogout
+                    }
                   >
                     Cerrar sesión
                   </button>
@@ -608,8 +716,12 @@ function ProfilePage() {
                   <input
                     type="text"
                     name="name"
-                    value={formData.name}
-                    onChange={handleChange}
+                    value={
+                      formData.name
+                    }
+                    onChange={
+                      handleChange
+                    }
                     required
                   />
                 </label>
@@ -620,8 +732,12 @@ function ProfilePage() {
                     type="text"
                     name="bio"
                     placeholder="Contá algo sobre vos"
-                    value={formData.bio}
-                    onChange={handleChange}
+                    value={
+                      formData.bio
+                    }
+                    onChange={
+                      handleChange
+                    }
                   />
                 </label>
 
@@ -630,7 +746,9 @@ function ProfilePage() {
                   <input
                     type="email"
                     name="email"
-                    value={formData.email}
+                    value={
+                      formData.email
+                    }
                     readOnly
                   />
                 </label>
@@ -640,8 +758,12 @@ function ProfilePage() {
                   <input
                     type="text"
                     name="location"
-                    value={formData.location}
-                    onChange={handleChange}
+                    value={
+                      formData.location
+                    }
+                    onChange={
+                      handleChange
+                    }
                   />
                 </label>
 
@@ -649,7 +771,9 @@ function ProfilePage() {
                   <button
                     type="submit"
                     className="save-profile-button"
-                    disabled={isSavingProfile}
+                    disabled={
+                      isSavingProfile
+                    }
                   >
                     {isSavingProfile
                       ? "Guardando..."
@@ -659,8 +783,12 @@ function ProfilePage() {
                   <button
                     type="button"
                     className="cancel-profile-button"
-                    onClick={handleCancel}
-                    disabled={isSavingProfile}
+                    onClick={
+                      handleCancel
+                    }
+                    disabled={
+                      isSavingProfile
+                    }
                   >
                     Cancelar
                   </button>
@@ -679,22 +807,52 @@ function ProfilePage() {
         <section className="profile-orders-section">
           <div className="profile-section-title">
             <h2>Mis compras</h2>
-            <p>Revisa el historial de tus compras y detalles.</p>
+            <p>
+              Revisa el historial de tus compras
+              y detalles.
+            </p>
           </div>
 
-          <div className="profile-orders-layout">
-            <OrderList
-              orders={visibleOrders}
-              selectedOrderId={selectedOrderId}
-              onSelectOrder={setSelectedOrderId}
-              hasMoreOrders={hasMoreOrders}
-              canShowLessOrders={canShowLessOrders}
-              onShowMoreOrders={handleShowMoreOrders}
-              onShowLessOrders={handleShowLessOrders}
-            />
+          {isLoadingOrders ? (
+            <p>Cargando compras...</p>
+          ) : ordersError ? (
+            <p className="profile-error">
+              {ordersError}
+            </p>
+          ) : orders.length === 0 ? (
+            <p>
+              Todavía no realizaste ninguna
+              compra.
+            </p>
+          ) : (
+            <div className="profile-orders-layout">
+              <OrderList
+                orders={visibleOrders}
+                selectedOrderId={
+                  selectedOrderId
+                }
+                onSelectOrder={
+                  setSelectedOrderId
+                }
+                hasMoreOrders={
+                  hasMoreOrders
+                }
+                canShowLessOrders={
+                  canShowLessOrders
+                }
+                onShowMoreOrders={
+                  handleShowMoreOrders
+                }
+                onShowLessOrders={
+                  handleShowLessOrders
+                }
+              />
 
-            <OrderDetail order={selectedOrder} />
-          </div>
+              <OrderDetail
+                order={selectedOrder}
+              />
+            </div>
+          )}
         </section>
       </main>
     </>

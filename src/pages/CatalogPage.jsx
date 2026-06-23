@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router";
 import "./CatalogPage.css";
 
 import Navbar from "../components/Navbar/Navbar";
@@ -6,9 +7,8 @@ import TimelineSelector from "../components/TimelineSelector/TimelineSelector";
 import CatalogFilters from "../components/CatalogFilters/CatalogFilters";
 import ProductCard from "../components/ProductCard/ProductCard";
 
-const API_URL = "https://creacionaplicaciones.onrender.com/api/productos?limit=100";
-const TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2YTFmNjY5OWNiZTFmNzg3ZTljNTY0NmEiLCJlbWFpbCI6ImRpZWdvY2Fib3RAZ21haWwuY29tIiwicHJvamVjdEtleSI6ImJhY2tob21lLXJldHJvIiwiaWF0IjoxNzgyMTU1OTQ1LCJleHAiOjE3ODI3NjA3NDV9.23zSxA_Kyh8Xt2N2TjhPjHnG2kPif_D9gXcKc-vgKsM";
+import { getProducts } from "../services/api";
+import { productos as productosLocales } from "../data/products";
 
 const sortOptions = [
   { value: "relevantes", label: "Más relevantes" },
@@ -17,60 +17,150 @@ const sortOptions = [
   { value: "nombre", label: "Nombre" },
 ];
 
-function CatalogPage({ favoritos = [], agregarAlCarrito, toggleFavorito }) {
+function transformarProductoApi(item) {
+  const data = item?.data || {};
+
+  const productoLocal = productosLocales.find(
+    (producto) => Number(producto.id) === Number(data.idBH)
+  );
+
+  return {
+    // Se mantiene el ID original de BackHome para favoritos y navegación.
+    id: Number(data.idBH),
+
+    // Este es el ID real del producto en el backend.
+    apiId: item.id,
+
+    idBH: Number(data.idBH),
+
+    name: data.nombre || productoLocal?.name || "Producto sin nombre",
+    nombre: data.nombre || productoLocal?.name || "Producto sin nombre",
+
+    category: data.categoria || productoLocal?.category || "",
+    categoria: data.categoria || productoLocal?.category || "",
+
+    material: data.material || productoLocal?.material || "",
+
+    decade: Number(data.decada || productoLocal?.decade || 0),
+    decada: Number(data.decada || productoLocal?.decade || 0),
+
+    price: Number(data.precio || productoLocal?.price || 0),
+    precio: Number(data.precio || productoLocal?.precio || 0),
+
+    slug: data.slug || productoLocal?.slug || "",
+
+    tag: data.tag || productoLocal?.tag || "",
+
+    description:
+      data.descripcion || productoLocal?.description || "",
+
+    descripcion:
+      data.descripcion || productoLocal?.description || "",
+
+    materialText:
+      data.materiales ||
+      productoLocal?.specs?.find(
+        (spec) => spec.title === "Materiales"
+      )?.text ||
+      "",
+
+    dimensionsText:
+      data.dimensiones ||
+      productoLocal?.specs?.find(
+        (spec) => spec.title === "Dimensiones"
+      )?.text ||
+      "",
+
+    // Primero usa Cloudinary y, si todavía no está, usa la imagen local.
+    image:
+      data.imagen ||
+      data.image ||
+      productoLocal?.image ||
+      "",
+
+    imagen:
+      data.imagen ||
+      data.image ||
+      productoLocal?.image ||
+      "",
+
+    images:
+      Array.isArray(data.imagenes) && data.imagenes.length > 0
+        ? data.imagenes
+        : productoLocal?.images || [],
+
+    colors:
+      Array.isArray(data.colores) && data.colores.length > 0
+        ? data.colores
+        : productoLocal?.colors || [],
+
+    specs: productoLocal?.specs || [],
+
+    createdAt: item.createdAt,
+    updatedAt: item.updatedAt,
+  };
+}
+
+function CatalogPage({
+  favoritos = [],
+  agregarAlCarrito,
+  toggleFavorito,
+}) {
+  const [searchParams] = useSearchParams();
+
   const initialDecade =
-    Number(new URLSearchParams(window.location.search).get("decada")) || 1970;
+    Number(searchParams.get("decada")) || 1970;
 
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedDecade, setSelectedDecade] = useState(initialDecade);
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedMaterials, setSelectedMaterials] = useState([]);
+  const [errorProductos, setErrorProductos] = useState("");
+
+  const [selectedDecade, setSelectedDecade] =
+    useState(initialDecade);
+
+  const [selectedCategory, setSelectedCategory] =
+    useState("");
+
+  const [selectedMaterials, setSelectedMaterials] =
+    useState([]);
+
   const [maxPrice, setMaxPrice] = useState(80000);
-  const [sortOption, setSortOption] = useState("relevantes");
-  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [sortOption, setSortOption] =
+    useState("relevantes");
+
+  const [isSortOpen, setIsSortOpen] =
+    useState(false);
 
   useEffect(() => {
-    const cargarProductos = async () => {
+    async function cargarProductos() {
       try {
-        const response = await fetch(API_URL, {
-          headers: {
-            "x-project-key": "backhome-retro",
-            Authorization: `Bearer ${TOKEN}`,
-          },
-        });
+        setLoading(true);
+        setErrorProductos("");
 
-        const data = await response.json();
+        const response = await getProducts(1, 100);
 
-        const productosTransformados = data.items
-          .filter((item) => item.data?.idBH)
-          .map((item) => ({
-            id: item.data.idBH,
-            apiId: item.id,
-            idBH: item.data.idBH,
-            name: item.data.nombre,
-            category: item.data.categoria,
-            material: item.data.material,
-            decade: item.data.decada,
-            price: item.data.precio,
-            precio: item.data.precio,
-            slug: item.data.slug,
-            tag: item.data.tag,
-            description: item.data.descripcion,
-            materialText: item.data.materiales,
-            dimensionsText: item.data.dimensiones,
-            image: "",
-            images: [],
-          }))
+        const productosTransformados = (
+          response?.items || []
+        )
+          .filter((item) => item?.data?.idBH)
+          .map(transformarProductoApi)
           .sort((a, b) => a.idBH - b.idBH);
 
         setProductos(productosTransformados);
       } catch (error) {
-        console.error("Error cargando productos:", error);
+        console.error(
+          "Error cargando productos:",
+          error
+        );
+
+        setErrorProductos(
+          error.message ||
+            "No se pudieron cargar los productos."
+        );
       } finally {
         setLoading(false);
       }
-    };
+    }
 
     cargarProductos();
   }, []);
@@ -78,7 +168,9 @@ function CatalogPage({ favoritos = [], agregarAlCarrito, toggleFavorito }) {
   const handleToggleMaterial = (material) => {
     setSelectedMaterials((currentMaterials) => {
       if (currentMaterials.includes(material)) {
-        return currentMaterials.filter((item) => item !== material);
+        return currentMaterials.filter(
+          (item) => item !== material
+        );
       }
 
       return [...currentMaterials, material];
@@ -91,53 +183,82 @@ function CatalogPage({ favoritos = [], agregarAlCarrito, toggleFavorito }) {
   };
 
   const getProductPrice = (product) => {
-    return Number(product.price || product.precio || 0);
+    return Number(
+      product.price || product.precio || 0
+    );
   };
 
   const selectedSortLabel =
-    sortOptions.find((option) => option.value === sortOption)?.label ||
-    "Más relevantes";
+    sortOptions.find(
+      (option) => option.value === sortOption
+    )?.label || "Más relevantes";
 
   const materialCounts = useMemo(() => {
     return productos
-      .filter((product) => product.decade === selectedDecade)
+      .filter(
+        (product) =>
+          product.decade === selectedDecade
+      )
       .reduce((counts, product) => {
-        counts[product.material] = (counts[product.material] || 0) + 1;
+        if (!product.material) {
+          return counts;
+        }
+
+        counts[product.material] =
+          (counts[product.material] || 0) + 1;
+
         return counts;
       }, {});
   }, [productos, selectedDecade]);
 
   const filteredProducts = useMemo(() => {
-    const filtered = productos.filter((product) => {
-      const matchesDecade = product.decade === selectedDecade;
+    const filtered = productos.filter(
+      (product) => {
+        const matchesDecade =
+          product.decade === selectedDecade;
 
-      const matchesCategory = selectedCategory
-        ? product.category === selectedCategory
-        : true;
+        const matchesCategory = selectedCategory
+          ? product.category === selectedCategory
+          : true;
 
-      const matchesMaterial =
-        selectedMaterials.length === 0 ||
-        selectedMaterials.includes(product.material);
+        const matchesMaterial =
+          selectedMaterials.length === 0 ||
+          selectedMaterials.includes(
+            product.material
+          );
 
-      const matchesPrice = getProductPrice(product) <= maxPrice;
+        const matchesPrice =
+          getProductPrice(product) <= maxPrice;
 
-      return matchesDecade && matchesCategory && matchesMaterial && matchesPrice;
-    });
+        return (
+          matchesDecade &&
+          matchesCategory &&
+          matchesMaterial &&
+          matchesPrice
+        );
+      }
+    );
 
     if (sortOption === "precio-menor") {
       return [...filtered].sort(
-        (a, b) => getProductPrice(a) - getProductPrice(b)
+        (a, b) =>
+          getProductPrice(a) -
+          getProductPrice(b)
       );
     }
 
     if (sortOption === "precio-mayor") {
       return [...filtered].sort(
-        (a, b) => getProductPrice(b) - getProductPrice(a)
+        (a, b) =>
+          getProductPrice(b) -
+          getProductPrice(a)
       );
     }
 
     if (sortOption === "nombre") {
-      return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+      return [...filtered].sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
     }
 
     return filtered;
@@ -154,8 +275,25 @@ function CatalogPage({ favoritos = [], agregarAlCarrito, toggleFavorito }) {
     return (
       <>
         <Navbar activePage="decadas" />
+
         <main className="catalog-page">
-          <p className="catalog-empty">Cargando productos...</p>
+          <p className="catalog-empty">
+            Cargando productos...
+          </p>
+        </main>
+      </>
+    );
+  }
+
+  if (errorProductos) {
+    return (
+      <>
+        <Navbar activePage="decadas" />
+
+        <main className="catalog-page">
+          <p className="catalog-empty">
+            {errorProductos}
+          </p>
         </main>
       </>
     );
@@ -167,10 +305,13 @@ function CatalogPage({ favoritos = [], agregarAlCarrito, toggleFavorito }) {
 
       <main className="catalog-page">
         <section className="catalog-header">
-          <a href="/home" className="catalog-back-button">
+          <Link
+            to="/home"
+            className="catalog-back-button"
+          >
             <span>‹</span>
             Volver
-          </a>
+          </Link>
 
           <TimelineSelector
             selectedDecade={selectedDecade}
@@ -180,8 +321,15 @@ function CatalogPage({ favoritos = [], agregarAlCarrito, toggleFavorito }) {
 
         <section className="catalog-title-row">
           <div>
-            <h1>Resultados - Años {String(selectedDecade).slice(2)}</h1>
-            <p>Mostrando {filteredProducts.length} productos</p>
+            <h1>
+              Resultados - Años{" "}
+              {String(selectedDecade).slice(2)}
+            </h1>
+
+            <p>
+              Mostrando {filteredProducts.length}{" "}
+              productos
+            </p>
           </div>
 
           <div className="catalog-sort">
@@ -191,7 +339,12 @@ function CatalogPage({ favoritos = [], agregarAlCarrito, toggleFavorito }) {
               <button
                 type="button"
                 className="catalog-sort-trigger"
-                onClick={() => setIsSortOpen(!isSortOpen)}
+                onClick={() =>
+                  setIsSortOpen(
+                    (currentValue) =>
+                      !currentValue
+                  )
+                }
               >
                 {selectedSortLabel}
                 <span>⌄</span>
@@ -203,8 +356,16 @@ function CatalogPage({ favoritos = [], agregarAlCarrito, toggleFavorito }) {
                     <button
                       key={option.value}
                       type="button"
-                      className={sortOption === option.value ? "active" : ""}
-                      onClick={() => handleSortChange(option.value)}
+                      className={
+                        sortOption === option.value
+                          ? "active"
+                          : ""
+                      }
+                      onClick={() =>
+                        handleSortChange(
+                          option.value
+                        )
+                      }
                     >
                       {option.label}
                     </button>
@@ -220,7 +381,9 @@ function CatalogPage({ favoritos = [], agregarAlCarrito, toggleFavorito }) {
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
             selectedMaterials={selectedMaterials}
-            onToggleMaterial={handleToggleMaterial}
+            onToggleMaterial={
+              handleToggleMaterial
+            }
             maxPrice={maxPrice}
             onChangeMaxPrice={setMaxPrice}
             materialCounts={materialCounts}
@@ -230,16 +393,23 @@ function CatalogPage({ favoritos = [], agregarAlCarrito, toggleFavorito }) {
             {filteredProducts.length > 0 ? (
               filteredProducts.map((product) => (
                 <ProductCard
-                  key={product.id}
+                  key={product.apiId}
                   product={product}
-                  isFavorite={favoritos.includes(product.id)}
-                  onToggleFavorite={toggleFavorito}
-                  onAddToCart={agregarAlCarrito}
+                  isFavorite={favoritos.includes(
+                    product.id
+                  )}
+                  onToggleFavorite={
+                    toggleFavorito
+                  }
+                  onAddToCart={
+                    agregarAlCarrito
+                  }
                 />
               ))
             ) : (
               <p className="catalog-empty">
-                No encontramos productos para estos filtros.
+                No encontramos productos para
+                estos filtros.
               </p>
             )}
           </div>
