@@ -10,6 +10,7 @@ import ProductCard from "../components/ProductCard/ProductCard";
 import { getProducts } from "../services/api";
 import { productos as productosLocales } from "../data/products";
 
+// Opciones disponibles para ordenar el catálogo.
 const sortOptions = [
   { value: "relevantes", label: "Más relevantes" },
   { value: "precio-menor", label: "Menor precio" },
@@ -17,45 +18,103 @@ const sortOptions = [
   { value: "nombre", label: "Nombre" },
 ];
 
+// =====================================================
+// TRANSFORMACIÓN DE PRODUCTOS
+// =====================================================
+
+// La API devuelve una estructura diferente a la que usan
+// nuestros componentes. Esta función adapta cada producto.
+//
+// Actualmente products.js se usa solo como respaldo temporal
+// para imágenes, colores y algunos datos visuales.
 function transformarProductoApi(item) {
   const data = item?.data || {};
 
+  // Relacionamos el producto de la API con el producto local
+  // mediante idBH mientras se completa Cloudinary.
   const productoLocal = productosLocales.find(
-    (producto) => Number(producto.id) === Number(data.idBH)
+    (producto) =>
+      Number(producto.id) === Number(data.idBH)
   );
 
   return {
-    // Se mantiene el ID original de BackHome para favoritos y navegación.
+    // ID original de BackHome.
+    // Se usa para favoritos y navegación.
     id: Number(data.idBH),
-
-    // Este es el ID real del producto en el backend.
-    apiId: item.id,
-
     idBH: Number(data.idBH),
 
-    name: data.nombre || productoLocal?.name || "Producto sin nombre",
-    nombre: data.nombre || productoLocal?.name || "Producto sin nombre",
+    // ID real del producto en el backend.
+    // Se usa en carrito, compras y operaciones con la API.
+    apiId: item.id,
 
-    category: data.categoria || productoLocal?.category || "",
-    categoria: data.categoria || productoLocal?.category || "",
+    name:
+      data.nombre ||
+      productoLocal?.name ||
+      "Producto sin nombre",
 
-    material: data.material || productoLocal?.material || "",
+    nombre:
+      data.nombre ||
+      productoLocal?.name ||
+      "Producto sin nombre",
 
-    decade: Number(data.decada || productoLocal?.decade || 0),
-    decada: Number(data.decada || productoLocal?.decade || 0),
+    category:
+      data.categoria ||
+      productoLocal?.category ||
+      "",
 
-    price: Number(data.precio || productoLocal?.price || 0),
-    precio: Number(data.precio || productoLocal?.precio || 0),
+    categoria:
+      data.categoria ||
+      productoLocal?.category ||
+      "",
 
-    slug: data.slug || productoLocal?.slug || "",
+    material:
+      data.material ||
+      productoLocal?.material ||
+      "",
 
-    tag: data.tag || productoLocal?.tag || "",
+    decade: Number(
+      data.decada ||
+        productoLocal?.decade ||
+        0
+    ),
+
+    decada: Number(
+      data.decada ||
+        productoLocal?.decade ||
+        0
+    ),
+
+    price: Number(
+      data.precio ||
+        productoLocal?.price ||
+        0
+    ),
+
+    precio: Number(
+      data.precio ||
+        productoLocal?.precio ||
+        0
+    ),
+
+    slug:
+      data.slug ||
+      productoLocal?.slug ||
+      "",
+
+    tag:
+      data.tag ||
+      productoLocal?.tag ||
+      "",
 
     description:
-      data.descripcion || productoLocal?.description || "",
+      data.descripcion ||
+      productoLocal?.description ||
+      "",
 
     descripcion:
-      data.descripcion || productoLocal?.description || "",
+      data.descripcion ||
+      productoLocal?.description ||
+      "",
 
     materialText:
       data.materiales ||
@@ -71,7 +130,8 @@ function transformarProductoApi(item) {
       )?.text ||
       "",
 
-    // Primero usa Cloudinary y, si todavía no está, usa la imagen local.
+    // Primero intentamos usar la imagen del backend.
+    // Si todavía no existe, usamos la imagen local.
     image:
       data.imagen ||
       data.image ||
@@ -85,12 +145,14 @@ function transformarProductoApi(item) {
       "",
 
     images:
-      Array.isArray(data.imagenes) && data.imagenes.length > 0
+      Array.isArray(data.imagenes) &&
+      data.imagenes.length > 0
         ? data.imagenes
         : productoLocal?.images || [],
 
     colors:
-      Array.isArray(data.colores) && data.colores.length > 0
+      Array.isArray(data.colores) &&
+      data.colores.length > 0
         ? data.colores
         : productoLocal?.colors || [],
 
@@ -106,15 +168,22 @@ function CatalogPage({
   agregarAlCarrito,
   toggleFavorito,
 }) {
+  // Permite leer la década desde la URL.
+  // Ejemplo: /productos?decada=1970
   const [searchParams] = useSearchParams();
 
   const initialDecade =
     Number(searchParams.get("decada")) || 1970;
 
+  // Estado donde guardamos los productos obtenidos de la API.
   const [productos, setProductos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [errorProductos, setErrorProductos] = useState("");
 
+  // Estados para manejar carga y errores.
+  const [loading, setLoading] = useState(true);
+  const [errorProductos, setErrorProductos] =
+    useState("");
+
+  // Estados de los filtros del catálogo.
   const [selectedDecade, setSelectedDecade] =
     useState(initialDecade);
 
@@ -124,27 +193,49 @@ function CatalogPage({
   const [selectedMaterials, setSelectedMaterials] =
     useState([]);
 
-  const [maxPrice, setMaxPrice] = useState(80000);
+  const [maxPrice, setMaxPrice] =
+    useState(80000);
+
   const [sortOption, setSortOption] =
     useState("relevantes");
 
   const [isSortOpen, setIsSortOpen] =
     useState(false);
 
+  // =====================================================
+  // CARGA DE PRODUCTOS DESDE LA API
+  // =====================================================
+
+  // useEffect se ejecuta al montar la página.
+  // Hace GET Productos y guarda la respuesta en el estado.
   useEffect(() => {
     async function cargarProductos() {
       try {
         setLoading(true);
         setErrorProductos("");
 
-        const response = await getProducts(1, 100);
+        const response = await getProducts(
+          1,
+          100
+        );
 
         const productosTransformados = (
           response?.items || []
         )
-          .filter((item) => item?.data?.idBH)
+          // Solo usamos productos que tengan idBH.
+          .filter(
+            (item) => item?.data?.idBH
+          )
+
+          // Adaptamos la estructura de la API
+          // al formato que usan los componentes.
           .map(transformarProductoApi)
-          .sort((a, b) => a.idBH - b.idBH);
+
+          // Ordenamos según el ID original.
+          .sort(
+            (a, b) =>
+              a.idBH - b.idBH
+          );
 
         setProductos(productosTransformados);
       } catch (error) {
@@ -165,34 +256,52 @@ function CatalogPage({
     cargarProductos();
   }, []);
 
+  // Agrega o elimina un material del filtro.
   const handleToggleMaterial = (material) => {
     setSelectedMaterials((currentMaterials) => {
-      if (currentMaterials.includes(material)) {
+      if (
+        currentMaterials.includes(material)
+      ) {
         return currentMaterials.filter(
           (item) => item !== material
         );
       }
 
-      return [...currentMaterials, material];
+      return [
+        ...currentMaterials,
+        material,
+      ];
     });
   };
 
+  // Cambia la opción de ordenamiento
+  // y cierra el menú desplegable.
   const handleSortChange = (value) => {
     setSortOption(value);
     setIsSortOpen(false);
   };
 
+  // Devuelve siempre un precio numérico.
   const getProductPrice = (product) => {
     return Number(
-      product.price || product.precio || 0
+      product.price ||
+        product.precio ||
+        0
     );
   };
 
   const selectedSortLabel =
     sortOptions.find(
-      (option) => option.value === sortOption
+      (option) =>
+        option.value === sortOption
     )?.label || "Más relevantes";
 
+  // =====================================================
+  // CONTEO DE MATERIALES
+  // =====================================================
+
+  // useMemo evita recalcular el conteo si no cambiaron
+  // los productos o la década seleccionada.
   const materialCounts = useMemo(() => {
     return productos
       .filter(
@@ -211,15 +320,23 @@ function CatalogPage({
       }, {});
   }, [productos, selectedDecade]);
 
+  // =====================================================
+  // FILTRADO Y ORDENAMIENTO
+  // =====================================================
+
+  // useMemo recalcula la lista únicamente cuando cambia
+  // algún producto, filtro u opción de ordenamiento.
   const filteredProducts = useMemo(() => {
     const filtered = productos.filter(
       (product) => {
         const matchesDecade =
           product.decade === selectedDecade;
 
-        const matchesCategory = selectedCategory
-          ? product.category === selectedCategory
-          : true;
+        const matchesCategory =
+          selectedCategory
+            ? product.category ===
+              selectedCategory
+            : true;
 
         const matchesMaterial =
           selectedMaterials.length === 0 ||
@@ -228,7 +345,8 @@ function CatalogPage({
           );
 
         const matchesPrice =
-          getProductPrice(product) <= maxPrice;
+          getProductPrice(product) <=
+          maxPrice;
 
         return (
           matchesDecade &&
@@ -256,8 +374,9 @@ function CatalogPage({
     }
 
     if (sortOption === "nombre") {
-      return [...filtered].sort((a, b) =>
-        a.name.localeCompare(b.name)
+      return [...filtered].sort(
+        (a, b) =>
+          a.name.localeCompare(b.name)
       );
     }
 
@@ -271,6 +390,8 @@ function CatalogPage({
     sortOption,
   ]);
 
+  // Mostramos un estado de carga mientras
+  // esperamos la respuesta del backend.
   if (loading) {
     return (
       <>
@@ -285,6 +406,7 @@ function CatalogPage({
     );
   }
 
+  // Si la API falla, mostramos un mensaje.
   if (errorProductos) {
     return (
       <>
@@ -315,7 +437,9 @@ function CatalogPage({
 
           <TimelineSelector
             selectedDecade={selectedDecade}
-            onSelectDecade={setSelectedDecade}
+            onSelectDecade={
+              setSelectedDecade
+            }
           />
         </section>
 
@@ -323,11 +447,14 @@ function CatalogPage({
           <div>
             <h1>
               Resultados - Años{" "}
-              {String(selectedDecade).slice(2)}
+              {String(
+                selectedDecade
+              ).slice(2)}
             </h1>
 
             <p>
-              Mostrando {filteredProducts.length}{" "}
+              Mostrando{" "}
+              {filteredProducts.length}{" "}
               productos
             </p>
           </div>
@@ -352,24 +479,29 @@ function CatalogPage({
 
               {isSortOpen && (
                 <div className="catalog-sort-menu">
-                  {sortOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      className={
-                        sortOption === option.value
-                          ? "active"
-                          : ""
-                      }
-                      onClick={() =>
-                        handleSortChange(
+                  {sortOptions.map(
+                    (option) => (
+                      <button
+                        key={
                           option.value
-                        )
-                      }
-                    >
-                      {option.label}
-                    </button>
-                  ))}
+                        }
+                        type="button"
+                        className={
+                          sortOption ===
+                          option.value
+                            ? "active"
+                            : ""
+                        }
+                        onClick={() =>
+                          handleSortChange(
+                            option.value
+                          )
+                        }
+                      >
+                        {option.label}
+                      </button>
+                    )
+                  )}
                 </div>
               )}
             </div>
@@ -378,34 +510,48 @@ function CatalogPage({
 
         <section className="catalog-layout">
           <CatalogFilters
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
-            selectedMaterials={selectedMaterials}
+            selectedCategory={
+              selectedCategory
+            }
+            onSelectCategory={
+              setSelectedCategory
+            }
+            selectedMaterials={
+              selectedMaterials
+            }
             onToggleMaterial={
               handleToggleMaterial
             }
             maxPrice={maxPrice}
-            onChangeMaxPrice={setMaxPrice}
-            materialCounts={materialCounts}
+            onChangeMaxPrice={
+              setMaxPrice
+            }
+            materialCounts={
+              materialCounts
+            }
           />
 
           <div className="catalog-grid">
             {filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.apiId}
-                  product={product}
-                  isFavorite={favoritos.includes(
-                    product.id
-                  )}
-                  onToggleFavorite={
-                    toggleFavorito
-                  }
-                  onAddToCart={
-                    agregarAlCarrito
-                  }
-                />
-              ))
+              filteredProducts.map(
+                (product) => (
+                  <ProductCard
+                    // React usa el ID real de la API
+                    // como key porque es único.
+                    key={product.apiId}
+                    product={product}
+                    isFavorite={favoritos.includes(
+                      product.id
+                    )}
+                    onToggleFavorite={
+                      toggleFavorito
+                    }
+                    onAddToCart={
+                      agregarAlCarrito
+                    }
+                  />
+                )
+              )
             ) : (
               <p className="catalog-empty">
                 No encontramos productos para
