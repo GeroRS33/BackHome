@@ -1,12 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import "./FavoritesPage.css";
-
 import Navbar from "../components/Navbar/Navbar";
 import FavoriteCard from "../components/FavoriteCard/FavoriteCard";
-
 import corazonIcon from "../assets/images/corazon.png";
-
 import { productos as productosLocales } from "../data/products";
 import { getProducts } from "../services/api";
 
