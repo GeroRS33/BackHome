@@ -1,0 +1,149 @@
+.not-found-page {
+  min-height: 100vh;
+  padding: 40px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: #f8ead5;
+  color: #4d2f20;
+}
+
+.not-found-card {
+  width: min(620px, 100%);
+  padding: 64px 48px;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  border: 1px solid rgba(77, 47, 32, 0.2);
+  border-radius: 32px;
+  background: rgba(255, 250, 241, 0.86);
+  box-shadow: 0 24px 70px rgba(77, 47, 32, 0.12);
+}
+
+.not-found-logo {
+  width: 120px;
+  height: 90px;
+  margin-bottom: 20px;
+  object-fit: contain;
+}
+
+.not-found-code {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: #c85b14;
+}
+
+.not-found-card h1 {
+  max-width: 480px;
+  margin: 0 auto 18px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(42px, 6vw, 68px);
+  line-height: 0.95;
+  color: #4d2f20;
+}
+
+.not-found-description {
+  max-width: 470px;
+  margin: 0 auto;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #6f594d;
+}
+
+.not-found-actions {
+  margin-top: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.not-found-primary-button,
+.not-found-secondary-button {
+  min-width: 170px;
+  padding: 15px 24px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.not-found-primary-button {
+  border: 1px solid #c85b14;
+  background: #c85b14;
+  color: #fffaf1;
+}
+
+.not-found-secondary-button {
+  border: 1px solid #c85b14;
+  background: transparent;
+  color: #c85b14;
+}
+
+.not-found-primary-button:hover,
+.not-found-secondary-button:hover {
+  transform: translateY(-2px);
+}
+
+.not-found-secondary-button:hover {
+  background: #c85b14;
+  color: #fffaf1;
+}
+
+.not-found-decoration {
+  width: 360px;
+  height: 360px;
+  position: absolute;
+  border-radius: 50%;
+  border: 70px solid rgba(200, 91, 20, 0.08);
+}
+
+.not-found-decoration-one {
+  top: -170px;
+  right: -120px;
+}
+
+.not-found-decoration-two {
+  bottom: -190px;
+  left: -140px;
+}
+
+@media (max-width: 600px) {
+  .not-found-page {
+    padding: 20px;
+  }
+
+  .not-found-card {
+    padding: 48px 24px;
+    border-radius: 24px;
+  }
+
+  .not-found-logo {
+    width: 95px;
+    height: 72px;
+  }
+
+  .not-found-description {
+    font-size: 16px;
+  }
+
+  .not-found-actions {
+    flex-direction: column;
+  }
+
+  .not-found-primary-button,
+  .not-found-secondary-button {
+    width: 100%;
+  }
+}

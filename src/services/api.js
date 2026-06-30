@@ -226,25 +226,15 @@ export const createPurchase = (
 // SESIÓN
 // =====================================================
 
-// Guarda el token y marca la sesión como activa.
+// Guarda el token recibido al iniciar sesión.
 export const saveSession = (token) => {
   saveToken(token);
-  localStorage.setItem(
-    "sesionActiva",
-    "true"
-  );
 };
 
 // Cierra la sesión local.
 // No elimina al usuario de la API.
 export const logout = () => {
   removeToken();
-  localStorage.removeItem(
-    "sesionActiva"
-  );
-  localStorage.removeItem(
-    "currentUser"
-  );
 };
 
 // Devuelve true si existe un token guardado.
