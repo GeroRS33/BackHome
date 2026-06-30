@@ -1,16 +1,22 @@
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import L from "leaflet";
-
+import isotipoBH from "../../assets/images/isotipo.png";
 import "./BackHomeMap.css";
 
 const backHomePosition = [-34.9011, -56.1645];
 
 const backHomeIcon = L.divIcon({
-  className: "backhome-map-marker",
-  html: "<span></span>",
-  iconSize: [34, 34],
-  iconAnchor: [17, 17],
-  popupAnchor: [0, -18],
+  className: "backhome-custom-marker-wrapper",
+  html: `
+    <div class="backhome-custom-marker">
+      <div class="backhome-custom-marker-pin">
+        <img src="${isotipoBH}" alt="BackHome" />
+      </div>
+    </div>
+  `,
+  iconSize: [52, 68],
+  iconAnchor: [26, 68],
+  popupAnchor: [0, -68],
 });
 
 function BackHomeMap() {
@@ -30,7 +36,7 @@ function BackHomeMap() {
           <Popup>
             <strong>BackHome</strong>
             <br />
-            Montevideo, Uruguay
+            Bulevar General Artigas 1465, Montevideo
           </Popup>
         </Marker>
       </MapContainer>

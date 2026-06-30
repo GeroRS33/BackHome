@@ -40,3 +40,37 @@
   font-size: 0.9rem;
   line-height: 1.4;
 }
+
+.backhome-custom-marker-wrapper {
+  background: transparent;
+  border: none;
+}
+
+.backhome-custom-marker {
+  width: 52px;
+  height: 68px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+}
+
+.backhome-custom-marker-pin {
+  width: 52px;
+  height: 52px;
+  background: #ffffff;
+  border: 3px solid #b46221;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 18px rgba(76, 47, 31, 0.18);
+  position: relative;
+}
+.backhome-custom-marker-pin img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  transform: rotate(45deg);
+}

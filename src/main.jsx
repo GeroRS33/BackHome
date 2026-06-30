@@ -1,14 +1,23 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
+
 import App from "./App.jsx";
+
+import { FavoritesProvider } from "./context/FavoritesContext.jsx";
+import { CartProvider } from "./context/CartContext.jsx";
+
 import "leaflet/dist/leaflet.css";
 import "./index.css";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <CartProvider>
+        <FavoritesProvider>
+          <App />
+        </FavoritesProvider>
+      </CartProvider>
     </BrowserRouter>
   </StrictMode>
 );
