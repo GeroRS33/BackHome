@@ -86,7 +86,7 @@ function transformApiProduct(item) {
   const cloudinaryImages =
     Array.isArray(data.imagenes) &&
     data.imagenes.length > 0
-      ? data.imagenes
+      ? data.imagenes.filter(Boolean)
       : [];
 
   const mainImage =
