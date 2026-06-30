@@ -1,5 +1,6 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -31,58 +32,71 @@ function CartProvider({ children }) {
   const [carritoError, setCarritoError] =
     useState("");
 
-  // Recuerda qué sesión ya cargó el carrito.
+  const carritoRef = useRef([]);
   const tokenCarritoCargado = useRef(null);
 
-  // Carga el carrito una sola vez por sesión.
-  useEffect(() => {
-    async function cargarCarrito() {
-      const token = getToken();
+  const actualizarCarritoLocal = useCallback(
+    (nuevoCarrito) => {
+      carritoRef.current = nuevoCarrito;
+      setCarrito(nuevoCarrito);
+    },
+    []
+  );
 
-      if (!token) {
-        setCarrito([]);
-        setCarritoError("");
-        setCarritoCargando(false);
-        tokenCarritoCargado.current = null;
-        return;
-      }
+  const cargarCarrito = useCallback(async () => {
+    const token = getToken();
 
-      // Evita volver a pedir el carrito
-      // cada vez que cambia la página.
-      if (tokenCarritoCargado.current === token) {
-        return;
-      }
+    if (!token) {
+      actualizarCarritoLocal([]);
+      setCarritoError("");
+      setCarritoCargando(false);
+      tokenCarritoCargado.current = null;
 
-      try {
-        setCarritoCargando(true);
-        setCarritoError("");
-
-        const response = await getCart();
-
-        setCarrito(
-          mapApiCartToFrontend(response)
-        );
-
-        tokenCarritoCargado.current = token;
-      } catch (error) {
-        console.error(
-          "Error cargando carrito:",
-          error
-        );
-
-        setCarritoError(
-          error.message ||
-            "No se pudo cargar el carrito."
-        );
-      } finally {
-        setCarritoCargando(false);
-      }
+      return [];
     }
 
-    cargarCarrito();
-  }, [location.pathname]);
+    if (tokenCarritoCargado.current === token) {
+      return carritoRef.current;
+    }
 
-  // Envía el carrito completo a la API.
+    try {
+      setCarritoCargando(true);
+      setCarritoError("");
+
+      const response = await getCart();
+
+      const carritoApi =
+        mapApiCartToFrontend(response);
+
+      actualizarCarritoLocal(carritoApi);
+      tokenCarritoCargado.current = token;
+
+      return carritoApi;
+    } catch (error) {
+      console.error(
+        "Error cargando carrito:",
+        error
+      );
+
+      setCarritoError(
+        error.message ||
+          "No se pudo cargar el carrito."
+      );
+
+      throw error;
+    } finally {
+      setCarritoCargando(false);
+    }
+  }, [actualizarCarritoLocal]);
+
+  // Solo carga automáticamente el carrito
+  // cuando el usuario entra a su página.
+  useEffect(() => {
+    if (location.pathname === "/carrito") {
+      cargarCarrito();
+    }
+  }, [location.pathname, cargarCarrito]);
+
   const guardarCarritoEnApi = async (
     nuevoCarrito
   ) => {
@@ -94,60 +108,64 @@ function CartProvider({ children }) {
   };
 
   const agregarAlCarrito = async (producto) => {
-    const productoId = String(
-      producto.apiId ||
-        producto.backendId ||
-        producto.id
-    );
-
-    const carritoAnterior = carrito;
-
-    const productoExiste = carrito.find(
-      (item) =>
-        String(item.apiId || item.id) ===
-        productoId
-    );
-
-    let carritoActualizado;
-
-    if (productoExiste) {
-      carritoActualizado = carrito.map(
-        (item) => {
-          const itemId = String(
-            item.apiId || item.id
-          );
-
-          if (itemId === productoId) {
-            return {
-              ...item,
-              cantidad:
-                (item.cantidad || 1) + 1,
-            };
-          }
-
-          return item;
-        }
-      );
-    } else {
-      carritoActualizado = [
-        ...carrito,
-        {
-          ...producto,
-          id: productoId,
-          apiId: productoId,
-          idBH:
-            producto.idBH ??
-            producto.localId ??
-            null,
-          cantidad: 1,
-        },
-      ];
-    }
-
-    // Actualización optimista.
-    setCarrito(carritoActualizado);
-
     try {
+      // Si todavía no se cargó, obtiene el carrito
+      // antes de agregar para conservar lo guardado.
+      const carritoBase =
+        await cargarCarrito();
+
+      const productoId = String(
+        producto.apiId ||
+          producto.backendId ||
+          producto.id
+      );
+
+      const productoExiste = carritoBase.find(
+        (item) =>
+          String(item.apiId || item.id) ===
+          productoId
+      );
+
+      let carritoActualizado;
+
+      if (productoExiste) {
+        carritoActualizado = carritoBase.map(
+          (item) => {
+            const itemId = String(
+              item.apiId || item.id
+            );
+
+            if (itemId === productoId) {
+              return {
+                ...item,
+                cantidad:
+                  (item.cantidad || 1) + 1,
+              };
+            }
+
+            return item;
+          }
+        );
+      } else {
+        carritoActualizado = [
+          ...carritoBase,
+          {
+            ...producto,
+            id: productoId,
+            apiId: productoId,
+            idBH:
+              producto.idBH ??
+              producto.localId ??
+              null,
+            cantidad: 1,
+          },
+        ];
+      }
+
+      actualizarCarritoLocal(
+        carritoActualizado
+      );
+
       await guardarCarritoEnApi(
         carritoActualizado
       );
@@ -156,8 +174,6 @@ function CartProvider({ children }) {
         "Error agregando al carrito:",
         error
       );
-
-      setCarrito(carritoAnterior);
 
       setCarritoError(
         error.message ||
@@ -171,15 +187,19 @@ function CartProvider({ children }) {
   const eliminarDelCarrito = async (
     productoId
   ) => {
-    const carritoAnterior = carrito;
+    const carritoAnterior =
+      carritoRef.current;
 
-    const carritoActualizado = carrito.filter(
-      (item) =>
-        String(item.apiId || item.id) !==
-        String(productoId)
+    const carritoActualizado =
+      carritoAnterior.filter(
+        (item) =>
+          String(item.apiId || item.id) !==
+          String(productoId)
+      );
+
+    actualizarCarritoLocal(
+      carritoActualizado
     );
-
-    setCarrito(carritoActualizado);
 
     try {
       await guardarCarritoEnApi(
@@ -191,7 +211,9 @@ function CartProvider({ children }) {
         error
       );
 
-      setCarrito(carritoAnterior);
+      actualizarCarritoLocal(
+        carritoAnterior
+      );
 
       setCarritoError(
         error.message ||
@@ -209,10 +231,11 @@ function CartProvider({ children }) {
       return;
     }
 
-    const carritoAnterior = carrito;
+    const carritoAnterior =
+      carritoRef.current;
 
-    const carritoActualizado = carrito.map(
-      (item) => {
+    const carritoActualizado =
+      carritoAnterior.map((item) => {
         const itemId = String(
           item.apiId || item.id
         );
@@ -225,10 +248,11 @@ function CartProvider({ children }) {
         }
 
         return item;
-      }
-    );
+      });
 
-    setCarrito(carritoActualizado);
+    actualizarCarritoLocal(
+      carritoActualizado
+    );
 
     try {
       await guardarCarritoEnApi(
@@ -240,7 +264,9 @@ function CartProvider({ children }) {
         error
       );
 
-      setCarrito(carritoAnterior);
+      actualizarCarritoLocal(
+        carritoAnterior
+      );
 
       setCarritoError(
         error.message ||
@@ -250,9 +276,10 @@ function CartProvider({ children }) {
   };
 
   const vaciarCarrito = async () => {
-    const carritoAnterior = carrito;
+    const carritoAnterior =
+      carritoRef.current;
 
-    setCarrito([]);
+    actualizarCarritoLocal([]);
 
     try {
       await clearCart();
@@ -262,7 +289,9 @@ function CartProvider({ children }) {
         error
       );
 
-      setCarrito(carritoAnterior);
+      actualizarCarritoLocal(
+        carritoAnterior
+      );
 
       setCarritoError(
         error.message ||
@@ -276,7 +305,8 @@ function CartProvider({ children }) {
   const totalCarrito = carrito.reduce(
     (total, item) => {
       const precio =
-        Number(item.price || item.precio) || 0;
+        Number(item.price || item.precio) ||
+        0;
 
       const cantidad =
         Number(item.cantidad) || 1;
