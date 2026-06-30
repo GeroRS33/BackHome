@@ -2,126 +2,58 @@ import {
   createContext,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from "react";
 
-import { useLocation } from "react-router";
-
-import {
-  getCurrentUser,
-  updateCurrentUser,
-  getToken,
-} from "../services/api";
+import { useUser } from "./UserContext.jsx";
 
 const FavoritesContext = createContext(null);
 
 function FavoritesProvider({ children }) {
-  const location = useLocation();
+  const {
+    usuario,
+    usuarioCargando,
+    actualizarUsuario,
+  } = useUser();
 
   const [favoritos, setFavoritos] = useState([]);
-  const [favoritosCargando, setFavoritosCargando] =
-    useState(false);
   const [favoritosError, setFavoritosError] =
     useState("");
-  const [usuarioActual, setUsuarioActual] =
-    useState(null);
 
-  // Recuerda para qué sesión ya cargamos los favoritos.
-  const tokenCargado = useRef(null);
-
+  // Cada vez que cambia el usuario global,
+  // sincronizamos sus favoritos.
   useEffect(() => {
-    async function cargarFavoritos() {
-      const token = getToken();
+    const favoritosGuardados =
+      usuario?.data?.favoritos;
 
-      // Si no hay sesión, limpiamos la información.
-      if (!token) {
-        setFavoritos([]);
-        setUsuarioActual(null);
-        setFavoritosCargando(false);
-        tokenCargado.current = null;
-        return;
-      }
+    setFavoritos(
+      Array.isArray(favoritosGuardados)
+        ? favoritosGuardados
+        : []
+    );
+  }, [usuario]);
 
-      // Evita repetir el GET en cada cambio de página.
-      if (tokenCargado.current === token) {
-        return;
-      }
-
-      try {
-        setFavoritosCargando(true);
-        setFavoritosError("");
-
-        const response = await getCurrentUser();
-        const usuario = response?.user || null;
-
-        setUsuarioActual(usuario);
-
-        const favoritosGuardados =
-          usuario?.data?.favoritos;
-
-        setFavoritos(
-          Array.isArray(favoritosGuardados)
-            ? favoritosGuardados
-            : []
-        );
-
-        tokenCargado.current = token;
-      } catch (error) {
-        console.error(
-          "Error cargando favoritos:",
-          error
-        );
-
-        setFavoritosError(
-          error.message ||
-            "No se pudieron cargar los favoritos."
-        );
-      } finally {
-        setFavoritosCargando(false);
-      }
-    }
-
-    cargarFavoritos();
-  }, [location.pathname]);
-
-  // Guarda favoritos sin borrar nombre, bio
-  // ni los demás datos del perfil.
+  // Guarda favoritos sin borrar los demás
+  // datos del perfil.
   const guardarFavoritosEnApi = async (
     nuevosFavoritos
   ) => {
-    let usuario = usuarioActual;
-
-    if (!usuario) {
-      const response = await getCurrentUser();
-      usuario = response?.user || null;
-    }
-
     const dataActual = usuario?.data || {};
 
-    const datosActualizados = {
+    await actualizarUsuario({
       nombre: dataActual.nombre || "",
       bio: dataActual.bio || "",
       location: dataActual.location || "",
-      memberSince: dataActual.memberSince || "",
+      memberSince:
+        dataActual.memberSince || "",
       avatar: dataActual.avatar || "",
       favoritos: nuevosFavoritos,
-    };
-
-    const response = await updateCurrentUser(
-      datosActualizados
-    );
-
-    const usuarioActualizado =
-      response?.user || {
-        ...usuario,
-        data: datosActualizados,
-      };
-
-    setUsuarioActual(usuarioActualizado);
+    });
   };
 
-  const toggleFavorito = async (productoId) => {
+  const toggleFavorito = async (
+    productoId
+  ) => {
     const favoritosAnteriores = favoritos;
 
     const favoritosActualizados =
@@ -131,7 +63,8 @@ function FavoritesProvider({ children }) {
           )
         : [...favoritos, productoId];
 
-    // Actualización optimista.
+    // Actualización optimista:
+    // primero cambia la interfaz.
     setFavoritos(favoritosActualizados);
     setFavoritosError("");
 
@@ -181,7 +114,8 @@ function FavoritesProvider({ children }) {
     <FavoritesContext.Provider
       value={{
         favoritos,
-        favoritosCargando,
+        favoritosCargando:
+          usuarioCargando,
         favoritosError,
         toggleFavorito,
         vaciarFavoritos,
@@ -193,7 +127,9 @@ function FavoritesProvider({ children }) {
 }
 
 function useFavorites() {
-  const context = useContext(FavoritesContext);
+  const context = useContext(
+    FavoritesContext
+  );
 
   if (!context) {
     throw new Error(

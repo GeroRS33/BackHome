@@ -17,11 +17,11 @@ import decoracionPerfil from "../assets/images/decoracionperfil.png";
 import { productos as productosLocales } from "../data/products";
 
 import {
-  getCurrentUser,
-  updateCurrentUser,
   getPurchases,
   logout as logoutSession,
 } from "../services/api";
+
+import { useUser } from "../context/UserContext.jsx";
 
 function formatPrice(value) {
   const price =
@@ -78,119 +78,51 @@ function getInitials(name) {
     .toUpperCase();
 }
 
-function getStoredUser() {
-  const currentUser = localStorage.getItem("currentUser");
-
-  if (!currentUser) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(currentUser);
-  } catch {
-    return null;
-  }
-}
-
+// Perfil vacío utilizado mientras se carga el usuario.
 function getDefaultProfile() {
-  const storedUser = getStoredUser();
-
   return {
-    name: storedUser?.name || "",
-    bio:
-      storedUser?.bio ||
-      "Agregá una descripción sobre vos.",
-    email: storedUser?.email || "",
-    location:
-      storedUser?.location ||
-      "Montevideo, Uruguay",
-    memberSince:
-      storedUser?.memberSince ||
-      "Miembro desde hoy",
-    avatar: storedUser?.avatar || "",
+    name: "",
+    bio: "Agregá una descripción sobre vos.",
+    email: "",
+    location: "Montevideo, Uruguay",
+    memberSince: "Miembro desde hoy",
+    avatar: "",
   };
 }
 
-function parsePossibleJson(value) {
-  if (typeof value !== "string") {
-    return value || {};
-  }
-
-  try {
-    return JSON.parse(value);
-  } catch {
-    return {};
-  }
-}
-
-function mapApiUserToProfile(response) {
-  const storedUser = getStoredUser();
-
-  const rootUser =
-    response?.usuario ||
-    response?.user ||
-    response?.data?.usuario ||
-    response?.data?.user ||
-    response?.data ||
-    response ||
-    {};
-
-  const parsedRootUser = parsePossibleJson(rootUser);
-
-  const rawUserData =
-    parsedRootUser?.data ||
-    parsedRootUser?.datos ||
-    parsedRootUser?.perfil ||
-    response?.datos ||
-    {};
-
-  const userData = parsePossibleJson(rawUserData);
+// Adapta el usuario global al formato de esta página.
+function mapUserToProfile(usuario) {
+  const userData = usuario?.data || {};
 
   return {
     name:
-      userData?.nombre ||
-      userData?.name ||
-      parsedRootUser?.nombre ||
-      parsedRootUser?.name ||
-      response?.nombre ||
-      response?.name ||
-      storedUser?.name ||
+      userData.nombre ||
+      userData.name ||
       "",
 
     bio:
-      userData?.bio ||
-      userData?.descripcion ||
-      parsedRootUser?.bio ||
-      storedUser?.bio ||
+      userData.bio ||
+      userData.descripcion ||
       "Agregá una descripción sobre vos.",
 
     email:
-      parsedRootUser?.email ||
-      userData?.email ||
-      response?.email ||
-      storedUser?.email ||
+      usuario?.email ||
+      userData.email ||
       "",
 
     location:
-      userData?.location ||
-      userData?.ubicacion ||
-      parsedRootUser?.location ||
-      parsedRootUser?.ubicacion ||
-      storedUser?.location ||
+      userData.location ||
+      userData.ubicacion ||
       "Montevideo, Uruguay",
 
     memberSince:
-      userData?.memberSince ||
-      userData?.miembroDesde ||
-      parsedRootUser?.memberSince ||
-      storedUser?.memberSince ||
+      userData.memberSince ||
+      userData.miembroDesde ||
       "Miembro desde hoy",
 
     avatar:
-      userData?.avatar ||
-      userData?.imagen ||
-      parsedRootUser?.avatar ||
-      storedUser?.avatar ||
+      userData.avatar ||
+      userData.imagen ||
       "",
   };
 }
@@ -200,7 +132,8 @@ function getLocalProduct(itemData) {
 
   if (idBH) {
     const byId = productosLocales.find(
-      (product) => Number(product.id) === idBH
+      (product) =>
+        Number(product.id) === idBH
     );
 
     if (byId) {
@@ -225,8 +158,11 @@ function mapPurchaseProduct(item) {
   const data = item?.data || {};
   const localProduct = getLocalProduct(data);
 
-  const quantity = Number(item?.cantidad) || 1;
-  const unitPrice = Number(data?.precio) || 0;
+  const quantity =
+    Number(item?.cantidad) || 1;
+
+  const unitPrice =
+    Number(data?.precio) || 0;
 
   return {
     id:
@@ -295,6 +231,16 @@ function mapPurchaseToOrder(purchase) {
 function ProfilePage() {
   const navigate = useNavigate();
 
+  // El usuario se obtiene desde UserContext.
+  // ProfilePage ya no hace otro GET /usuarios/me.
+  const {
+    usuario,
+    usuarioCargando,
+    usuarioError,
+    actualizarUsuario,
+    setUsuario,
+  } = useUser();
+
   const [profile, setProfile] = useState(
     getDefaultProfile
   );
@@ -305,23 +251,28 @@ function ProfilePage() {
 
   const [orders, setOrders] = useState([]);
 
-  const [selectedOrderId, setSelectedOrderId] =
-    useState(null);
+  const [
+    selectedOrderId,
+    setSelectedOrderId,
+  ] = useState(null);
 
   const [isEditing, setIsEditing] =
     useState(false);
 
-  const [visibleOrdersCount, setVisibleOrdersCount] =
-    useState(3);
+  const [
+    visibleOrdersCount,
+    setVisibleOrdersCount,
+  ] = useState(3);
 
-  const [isLoadingProfile, setIsLoadingProfile] =
-    useState(true);
+  const [
+    isLoadingOrders,
+    setIsLoadingOrders,
+  ] = useState(true);
 
-  const [isLoadingOrders, setIsLoadingOrders] =
-    useState(true);
-
-  const [isSavingProfile, setIsSavingProfile] =
-    useState(false);
+  const [
+    isSavingProfile,
+    setIsSavingProfile,
+  ] = useState(false);
 
   const [profileError, setProfileError] =
     useState("");
@@ -329,54 +280,21 @@ function ProfilePage() {
   const [ordersError, setOrdersError] =
     useState("");
 
+  // Sincroniza el perfil cuando UserContext
+  // obtiene o actualiza el usuario.
   useEffect(() => {
-    async function loadProfile() {
-      try {
-        setProfileError("");
-
-        const response =
-          await getCurrentUser();
-
-        const apiProfile =
-          mapApiUserToProfile(response);
-
-        setProfile(apiProfile);
-        setFormData(apiProfile);
-
-        localStorage.setItem(
-          "currentUser",
-          JSON.stringify(apiProfile)
-        );
-      } catch (error) {
-        console.error(
-          "Error cargando perfil:",
-          error
-        );
-
-        setProfileError(
-          error.message ||
-            "No se pudo cargar el perfil."
-        );
-
-        const message =
-          error.message?.toLowerCase() || "";
-
-        if (
-          message.includes("token") ||
-          message.includes("autoriz") ||
-          message.includes("unauthorized")
-        ) {
-          logoutSession();
-          navigate("/login");
-        }
-      } finally {
-        setIsLoadingProfile(false);
-      }
+    if (!usuario) {
+      return;
     }
 
-    loadProfile();
-  }, [navigate]);
+    const apiProfile =
+      mapUserToProfile(usuario);
 
+    setProfile(apiProfile);
+    setFormData(apiProfile);
+  }, [usuario]);
+
+  // Las compras siguen teniendo su propio endpoint.
   useEffect(() => {
     async function loadPurchases() {
       try {
@@ -386,24 +304,29 @@ function ProfilePage() {
         const response =
           await getPurchases();
 
-        const apiOrders = (
-          response?.items || []
-        )
+        const responseItems =
+          response?.items || [];
+
+        const apiOrders = responseItems
           .map(mapPurchaseToOrder)
           .sort((a, b) => {
             const orderA =
-              response.items.find(
+              responseItems.find(
                 (item) => item.id === a.id
               );
 
             const orderB =
-              response.items.find(
+              responseItems.find(
                 (item) => item.id === b.id
               );
 
             return (
-              new Date(orderB?.createdAt || 0) -
-              new Date(orderA?.createdAt || 0)
+              new Date(
+                orderB?.createdAt || 0
+              ) -
+              new Date(
+                orderA?.createdAt || 0
+              )
             );
           });
 
@@ -526,26 +449,25 @@ function ProfilePage() {
         ...formData,
       };
 
-      await updateCurrentUser({
-        data: {
-          nombre: updatedProfile.name,
-          bio: updatedProfile.bio,
-          location:
-            updatedProfile.location,
-          memberSince:
-            updatedProfile.memberSince,
-          avatar: updatedProfile.avatar,
-        },
+      const currentData =
+        usuario?.data || {};
+
+      // El PUT recibe los campos directamente.
+      // También conservamos favoritos y cualquier
+      // otro dato que ya tuviera el usuario.
+      await actualizarUsuario({
+        ...currentData,
+        nombre: updatedProfile.name,
+        bio: updatedProfile.bio,
+        location:
+          updatedProfile.location,
+        memberSince:
+          updatedProfile.memberSince,
+        avatar: updatedProfile.avatar,
       });
 
       setProfile(updatedProfile);
       setFormData(updatedProfile);
-
-      localStorage.setItem(
-        "currentUser",
-        JSON.stringify(updatedProfile)
-      );
-
       setIsEditing(false);
     } catch (error) {
       console.error(
@@ -564,10 +486,11 @@ function ProfilePage() {
 
   const handleLogout = () => {
     logoutSession();
+    setUsuario(null);
     navigate("/login");
   };
 
-  if (isLoadingProfile) {
+  if (usuarioCargando && !usuario) {
     return (
       <>
         <Navbar activePage="perfil" />
@@ -576,6 +499,7 @@ function ProfilePage() {
           <section className="profile-card">
             <div className="profile-info">
               <h1>Cargando perfil...</h1>
+
               <p>
                 Estamos trayendo tus datos
                 desde BackHome.
@@ -645,9 +569,11 @@ function ProfilePage() {
           </div>
 
           <div className="profile-info">
-            {profileError && (
+            {(profileError ||
+              usuarioError) && (
               <p className="profile-error">
-                {profileError}
+                {profileError ||
+                  usuarioError}
               </p>
             )}
 
@@ -698,9 +624,7 @@ function ProfilePage() {
                   <button
                     type="button"
                     className="logout-profile-button"
-                    onClick={
-                      handleLogout
-                    }
+                    onClick={handleLogout}
                   >
                     Cerrar sesión
                   </button>
@@ -713,57 +637,49 @@ function ProfilePage() {
               >
                 <label>
                   Nombre
+
                   <input
                     type="text"
                     name="name"
-                    value={
-                      formData.name
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={formData.name}
+                    onChange={handleChange}
                     required
                   />
                 </label>
 
                 <label>
                   Descripción
+
                   <input
                     type="text"
                     name="bio"
                     placeholder="Contá algo sobre vos"
-                    value={
-                      formData.bio
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={formData.bio}
+                    onChange={handleChange}
                   />
                 </label>
 
                 <label>
                   Email
+
                   <input
                     type="email"
                     name="email"
-                    value={
-                      formData.email
-                    }
+                    value={formData.email}
                     readOnly
                   />
                 </label>
 
                 <label>
                   Ubicación
+
                   <input
                     type="text"
                     name="location"
                     value={
                       formData.location
                     }
-                    onChange={
-                      handleChange
-                    }
+                    onChange={handleChange}
                   />
                 </label>
 
@@ -783,9 +699,7 @@ function ProfilePage() {
                   <button
                     type="button"
                     className="cancel-profile-button"
-                    onClick={
-                      handleCancel
-                    }
+                    onClick={handleCancel}
                     disabled={
                       isSavingProfile
                     }
@@ -807,6 +721,7 @@ function ProfilePage() {
         <section className="profile-orders-section">
           <div className="profile-section-title">
             <h2>Mis compras</h2>
+
             <p>
               Revisa el historial de tus compras
               y detalles.

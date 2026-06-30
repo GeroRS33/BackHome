@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router";
 
 import App from "./App.jsx";
 
+import { UserProvider } from "./context/UserContext.jsx";
 import { FavoritesProvider } from "./context/FavoritesContext.jsx";
 import { CartProvider } from "./context/CartContext.jsx";
 
@@ -13,11 +14,13 @@ import "./index.css";
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
-      <CartProvider>
-        <FavoritesProvider>
-          <App />
-        </FavoritesProvider>
-      </CartProvider>
+      <UserProvider>
+        <CartProvider>
+          <FavoritesProvider>
+            <App />
+          </FavoritesProvider>
+        </CartProvider>
+      </UserProvider>
     </BrowserRouter>
   </StrictMode>
 );
