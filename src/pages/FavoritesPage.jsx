@@ -1,126 +1,116 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import { Link } from "react-router";
+
 import "./FavoritesPage.css";
+
 import Navbar from "../components/Navbar/Navbar";
 import FavoriteCard from "../components/FavoriteCard/FavoriteCard";
+
 import corazonIcon from "../assets/images/corazon.png";
-import { productos as productosLocales } from "../data/products";
+
 import { getProducts } from "../services/api";
 
 function transformApiProduct(item) {
   const data = item?.data || {};
 
-  const localProduct = productosLocales.find(
-    (product) =>
-      Number(product.id) === Number(data.idBH)
-  );
-
-  const cloudinaryImages =
-    Array.isArray(data.imagenes) &&
-    data.imagenes.length > 0
-      ? data.imagenes.filter(Boolean)
-      : [];
+  const images = Array.isArray(
+    data.imagenes
+  )
+    ? data.imagenes.filter(Boolean)
+    : [];
 
   const mainImage =
     data.imagen ||
     data.image ||
-    cloudinaryImages[0] ||
-    localProduct?.image ||
+    images[0] ||
     "";
 
   return {
-    // ID utilizado por favoritos y las rutas.
-    id: Number(data.idBH),
-
-    // ID real del producto en la API.
-    apiId: item.id,
-
-    idBH: Number(data.idBH),
+    // ID real del backend.
+    id: item.id,
 
     name:
       data.nombre ||
-      localProduct?.name ||
+      data.name ||
       "Producto sin nombre",
 
     nombre:
       data.nombre ||
-      localProduct?.name ||
+      data.name ||
       "Producto sin nombre",
 
     category:
       data.categoria ||
-      localProduct?.category ||
+      data.category ||
       "",
 
     categoria:
       data.categoria ||
-      localProduct?.category ||
+      data.category ||
       "",
 
     material:
-      data.material ||
-      localProduct?.material ||
-      "",
+      data.material || "",
 
     decade: Number(
       data.decada ||
-        localProduct?.decade ||
+        data.decade ||
         0
     ),
 
     decada: Number(
       data.decada ||
-        localProduct?.decade ||
+        data.decade ||
         0
     ),
 
     price: Number(
       data.precio ||
-        localProduct?.price ||
+        data.price ||
         0
     ),
 
     precio: Number(
       data.precio ||
-        localProduct?.precio ||
+        data.price ||
         0
     ),
 
-    slug:
-      data.slug ||
-      localProduct?.slug ||
-      "",
+    slug: data.slug || "",
 
-    tag:
-      data.tag ||
-      localProduct?.tag ||
-      "",
+    tag: data.tag || "",
 
     description:
       data.descripcion ||
-      localProduct?.description ||
+      data.description ||
       "",
 
     descripcion:
       data.descripcion ||
-      localProduct?.description ||
+      data.description ||
       "",
 
     image: mainImage,
     imagen: mainImage,
 
-    images:
-      cloudinaryImages.length > 0
-        ? cloudinaryImages
-        : localProduct?.images || [],
+    images,
 
-    colors:
-      Array.isArray(data.colores) &&
-      data.colores.length > 0
-        ? data.colores
-        : localProduct?.colors || [],
+    colors: Array.isArray(
+      data.colores
+    )
+      ? data.colores
+      : [],
 
-    specs: localProduct?.specs || [],
+    specs: Array.isArray(
+      data.especificaciones
+    )
+      ? data.especificaciones
+      : [],
 
     createdAt: item.createdAt,
     updatedAt: item.updatedAt,
@@ -132,10 +122,16 @@ function FavoritesPage({
   toggleFavorito,
   vaciarFavoritos,
 }) {
-  const [productos, setProductos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [favoritesError, setFavoritesError] =
-    useState("");
+  const [productos, setProductos] =
+    useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [
+    favoritesError,
+    setFavoritesError,
+  ] = useState("");
 
   useEffect(() => {
     async function cargarProductos() {
@@ -143,16 +139,18 @@ function FavoritesPage({
         setLoading(true);
         setFavoritesError("");
 
-        const response = await getProducts(1, 100);
+        const response =
+          await getProducts(1, 100);
 
         const productosApi = (
           response?.items || []
         )
-          .filter((item) => item?.data?.idBH)
           .map(transformApiProduct)
-          .sort(
-            (a, b) =>
-              a.idBH - b.idBH
+          .filter(
+            (product) =>
+              product.id &&
+              product.name !==
+                "Producto sin nombre"
           );
 
         setProductos(productosApi);
@@ -174,19 +172,24 @@ function FavoritesPage({
     cargarProductos();
   }, []);
 
-  const productosFavoritos = useMemo(() => {
-    return productos.filter((producto) =>
-      favoritos.some(
-        (favoriteId) =>
-          Number(favoriteId) ===
-          Number(producto.idBH)
-      )
-    );
-  }, [productos, favoritos]);
+  const productosFavoritos =
+    useMemo(() => {
+      return productos.filter(
+        (producto) =>
+          favoritos.some(
+            (favoriteId) =>
+              String(favoriteId) ===
+              String(producto.id)
+          )
+      );
+    }, [productos, favoritos]);
 
-  const cantidad = productosFavoritos.length;
+  const cantidad =
+    productosFavoritos.length;
 
-  const handleRemoveFavorite = (productId) => {
+  const handleRemoveFavorite = (
+    productId
+  ) => {
     if (toggleFavorito) {
       toggleFavorito(productId);
     }
@@ -207,7 +210,10 @@ function FavoritesPage({
           <div>
             <h1>
               Mis favoritos{" "}
-              <img src={corazonIcon} alt="" />
+              <img
+                src={corazonIcon}
+                alt=""
+              />
             </h1>
 
             <p>
@@ -227,9 +233,12 @@ function FavoritesPage({
             <button
               type="button"
               className="clear-favorites-button"
-              onClick={handleClearFavorites}
+              onClick={
+                handleClearFavorites
+              }
               disabled={
-                cantidad === 0 || loading
+                cantidad === 0 ||
+                loading
               }
             >
               <svg
@@ -282,7 +291,9 @@ function FavoritesPage({
         {loading ? (
           <section className="favorites-empty">
             <div>
-              <h2>Cargando favoritos...</h2>
+              <h2>
+                Cargando favoritos...
+              </h2>
 
               <p>
                 Estamos trayendo tus productos
@@ -305,11 +316,11 @@ function FavoritesPage({
             {productosFavoritos.map(
               (product) => (
                 <FavoriteCard
-                  key={product.apiId}
+                  key={product.id}
                   product={product}
                   onRemove={() =>
                     handleRemoveFavorite(
-                      product.idBH
+                      product.id
                     )
                   }
                 />

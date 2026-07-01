@@ -14,8 +14,6 @@ import calendarioIcon from "../assets/images/calendario.png";
 import lapizIcon from "../assets/images/lapiz.png";
 import decoracionPerfil from "../assets/images/decoracionperfil.png";
 
-import { productos as productosLocales } from "../data/products";
-
 import {
   getPurchases,
   logout as logoutSession,
@@ -78,7 +76,6 @@ function getInitials(name) {
     .toUpperCase();
 }
 
-// Perfil vacío utilizado mientras se carga el usuario.
 function getDefaultProfile() {
   return {
     name: "",
@@ -90,7 +87,6 @@ function getDefaultProfile() {
   };
 }
 
-// Adapta el usuario global al formato de esta página.
 function mapUserToProfile(usuario) {
   const userData = usuario?.data || {};
 
@@ -127,69 +123,47 @@ function mapUserToProfile(usuario) {
   };
 }
 
-function getLocalProduct(itemData) {
-  const idBH = Number(itemData?.idBH);
-
-  if (idBH) {
-    const byId = productosLocales.find(
-      (product) =>
-        Number(product.id) === idBH
-    );
-
-    if (byId) {
-      return byId;
-    }
-  }
-
-  const normalizedName = String(
-    itemData?.nombre || ""
-  )
-    .trim()
-    .toLowerCase();
-
-  return productosLocales.find(
-    (product) =>
-      product.name.trim().toLowerCase() ===
-      normalizedName
-  );
-}
-
 function mapPurchaseProduct(item) {
   const data = item?.data || {};
-  const localProduct = getLocalProduct(data);
 
   const quantity =
     Number(item?.cantidad) || 1;
 
   const unitPrice =
-    Number(data?.precio) || 0;
+    Number(
+      data.precio ||
+      data.price ||
+      0
+    );
+
+  const subtotal =
+    Number(item?.subtotal) ||
+    unitPrice * quantity;
 
   return {
     id:
       item?.productoId ||
+      item?.id ||
       item?._id ||
-      localProduct?.id,
+      "",
 
     name:
-      data?.nombre ||
-      localProduct?.name ||
+      data.nombre ||
+      data.name ||
       "Producto",
 
     category:
-      data?.categoria ||
-      localProduct?.category ||
+      data.categoria ||
+      data.category ||
       "",
 
     quantity,
 
-    price: formatPrice(
-      Number(item?.subtotal) ||
-        unitPrice * quantity
-    ),
+    price: formatPrice(subtotal),
 
     image:
-      data?.imagen ||
-      localProduct?.image ||
+      data.imagen ||
+      data.image ||
       "",
   };
 }
@@ -202,12 +176,15 @@ function mapPurchaseToOrder(purchase) {
     : [];
 
   return {
-    id: purchase.id,
+    id:
+      purchase?.id ||
+      purchase?._id ||
+      "",
 
     code: createOrderCode(purchase),
 
     date: formatOrderDate(
-      purchase.createdAt
+      purchase?.createdAt
     ),
 
     status:
@@ -219,20 +196,21 @@ function mapPurchaseToOrder(purchase) {
       purchase?.total || 0
     ),
 
-    products: purchaseItems.map(
-      mapPurchaseProduct
-    ),
+    products:
+      purchaseItems.map(
+        mapPurchaseProduct
+      ),
 
     deliveryData:
-      purchase?.datosCheckout || {},
+      purchase?.datosCheckout ||
+      purchase?.deliveryData ||
+      {},
   };
 }
 
 function ProfilePage() {
   const navigate = useNavigate();
 
-  // El usuario se obtiene desde UserContext.
-  // ProfilePage ya no hace otro GET /usuarios/me.
   const {
     usuario,
     usuarioCargando,
@@ -241,15 +219,14 @@ function ProfilePage() {
     setUsuario,
   } = useUser();
 
-  const [profile, setProfile] = useState(
-    getDefaultProfile
-  );
+  const [profile, setProfile] =
+    useState(getDefaultProfile);
 
-  const [formData, setFormData] = useState(
-    getDefaultProfile
-  );
+  const [formData, setFormData] =
+    useState(getDefaultProfile);
 
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] =
+    useState([]);
 
   const [
     selectedOrderId,
@@ -274,14 +251,16 @@ function ProfilePage() {
     setIsSavingProfile,
   ] = useState(false);
 
-  const [profileError, setProfileError] =
-    useState("");
+  const [
+    profileError,
+    setProfileError,
+  ] = useState("");
 
-  const [ordersError, setOrdersError] =
-    useState("");
+  const [
+    ordersError,
+    setOrdersError,
+  ] = useState("");
 
-  // Sincroniza el perfil cuando UserContext
-  // obtiene o actualiza el usuario.
   useEffect(() => {
     if (!usuario) {
       return;
@@ -294,7 +273,6 @@ function ProfilePage() {
     setFormData(apiProfile);
   }, [usuario]);
 
-  // Las compras siguen teniendo su propio endpoint.
   useEffect(() => {
     async function loadPurchases() {
       try {
@@ -305,30 +283,43 @@ function ProfilePage() {
           await getPurchases();
 
         const responseItems =
-          response?.items || [];
+          Array.isArray(response?.items)
+            ? response.items
+            : [];
 
-        const apiOrders = responseItems
-          .map(mapPurchaseToOrder)
-          .sort((a, b) => {
-            const orderA =
-              responseItems.find(
-                (item) => item.id === a.id
+        const apiOrders =
+          responseItems
+            .map(mapPurchaseToOrder)
+            .sort((a, b) => {
+              const orderA =
+                responseItems.find(
+                  (item) =>
+                    String(
+                      item.id ||
+                      item._id
+                    ) ===
+                    String(a.id)
+                );
+
+              const orderB =
+                responseItems.find(
+                  (item) =>
+                    String(
+                      item.id ||
+                      item._id
+                    ) ===
+                    String(b.id)
+                );
+
+              return (
+                new Date(
+                  orderB?.createdAt || 0
+                ) -
+                new Date(
+                  orderA?.createdAt || 0
+                )
               );
-
-            const orderB =
-              responseItems.find(
-                (item) => item.id === b.id
-              );
-
-            return (
-              new Date(
-                orderB?.createdAt || 0
-              ) -
-              new Date(
-                orderA?.createdAt || 0
-              )
-            );
-          });
+            });
 
         setOrders(apiOrders);
 
@@ -345,7 +336,7 @@ function ProfilePage() {
 
         setOrdersError(
           error.message ||
-            "No se pudieron cargar las compras."
+          "No se pudieron cargar las compras."
         );
       } finally {
         setIsLoadingOrders(false);
@@ -355,18 +346,21 @@ function ProfilePage() {
     loadPurchases();
   }, []);
 
-  const selectedOrder = orders.find(
-    (order) =>
-      order.id === selectedOrderId
-  );
+  const selectedOrder =
+    orders.find(
+      (order) =>
+        order.id === selectedOrderId
+    );
 
-  const visibleOrders = orders.slice(
-    0,
-    visibleOrdersCount
-  );
+  const visibleOrders =
+    orders.slice(
+      0,
+      visibleOrdersCount
+    );
 
   const hasMoreOrders =
-    visibleOrdersCount < orders.length;
+    visibleOrdersCount <
+    orders.length;
 
   const canShowLessOrders =
     visibleOrdersCount > 3;
@@ -384,12 +378,14 @@ function ProfilePage() {
   const handleShowLessOrders = () => {
     setVisibleOrdersCount(3);
 
-    const selectedOrderIsVisible = orders
-      .slice(0, 3)
-      .some(
-        (order) =>
-          order.id === selectedOrderId
-      );
+    const selectedOrderIsVisible =
+      orders
+        .slice(0, 3)
+        .some(
+          (order) =>
+            order.id ===
+            selectedOrderId
+        );
 
     if (!selectedOrderIsVisible) {
       setSelectedOrderId(
@@ -398,20 +394,26 @@ function ProfilePage() {
     }
   };
 
-  const handleAvatarChange = (event) => {
-    const file = event.target.files?.[0];
+  const handleAvatarChange = (
+    event
+  ) => {
+    const file =
+      event.target.files?.[0];
 
     if (!file) {
       return;
     }
 
-    const reader = new FileReader();
+    const reader =
+      new FileReader();
 
     reader.onload = () => {
-      setFormData((currentData) => ({
-        ...currentData,
-        avatar: reader.result,
-      }));
+      setFormData(
+        (currentData) => ({
+          ...currentData,
+          avatar: reader.result,
+        })
+      );
     };
 
     reader.readAsDataURL(file);
@@ -427,17 +429,23 @@ function ProfilePage() {
     setIsEditing(false);
   };
 
-  const handleChange = (event) => {
+  const handleChange = (
+    event
+  ) => {
     const { name, value } =
       event.target;
 
-    setFormData((currentData) => ({
-      ...currentData,
-      [name]: value,
-    }));
+    setFormData(
+      (currentData) => ({
+        ...currentData,
+        [name]: value,
+      })
+    );
   };
 
-  const handleSave = async (event) => {
+  const handleSave = async (
+    event
+  ) => {
     event.preventDefault();
 
     try {
@@ -452,18 +460,18 @@ function ProfilePage() {
       const currentData =
         usuario?.data || {};
 
-      // El PUT recibe los campos directamente.
-      // También conservamos favoritos y cualquier
-      // otro dato que ya tuviera el usuario.
       await actualizarUsuario({
         ...currentData,
-        nombre: updatedProfile.name,
-        bio: updatedProfile.bio,
+        nombre:
+          updatedProfile.name,
+        bio:
+          updatedProfile.bio,
         location:
           updatedProfile.location,
         memberSince:
           updatedProfile.memberSince,
-        avatar: updatedProfile.avatar,
+        avatar:
+          updatedProfile.avatar,
       });
 
       setProfile(updatedProfile);
@@ -477,7 +485,7 @@ function ProfilePage() {
 
       setProfileError(
         error.message ||
-          "No se pudo actualizar el perfil."
+        "No se pudo actualizar el perfil."
       );
     } finally {
       setIsSavingProfile(false);
@@ -490,7 +498,10 @@ function ProfilePage() {
     navigate("/login");
   };
 
-  if (usuarioCargando && !usuario) {
+  if (
+    usuarioCargando &&
+    !usuario
+  ) {
     return (
       <>
         <Navbar activePage="perfil" />
@@ -498,7 +509,9 @@ function ProfilePage() {
         <main className="profile-page">
           <section className="profile-card">
             <div className="profile-info">
-              <h1>Cargando perfil...</h1>
+              <h1>
+                Cargando perfil...
+              </h1>
 
               <p>
                 Estamos trayendo tus datos
@@ -527,7 +540,9 @@ function ProfilePage() {
             {isEditing ? (
               formData.avatar ? (
                 <img
-                  src={formData.avatar}
+                  src={
+                    formData.avatar
+                  }
                   alt="Foto de perfil"
                 />
               ) : (
@@ -553,7 +568,9 @@ function ProfilePage() {
             {isEditing && (
               <label className="change-avatar-overlay">
                 <img
-                  src={cambiarImagenIcon}
+                  src={
+                    cambiarImagenIcon
+                  }
                   alt=""
                 />
 
@@ -596,12 +613,18 @@ function ProfilePage() {
                   />
 
                   <ProfileInfoItem
-                    icon={ubicacionIcon}
-                    text={profile.location}
+                    icon={
+                      ubicacionIcon
+                    }
+                    text={
+                      profile.location
+                    }
                   />
 
                   <ProfileInfoItem
-                    icon={calendarioIcon}
+                    icon={
+                      calendarioIcon
+                    }
                     text={
                       profile.memberSince
                     }
@@ -612,7 +635,9 @@ function ProfilePage() {
                   <button
                     type="button"
                     className="edit-profile-button"
-                    onClick={handleEdit}
+                    onClick={
+                      handleEdit
+                    }
                   >
                     <img
                       src={lapizIcon}
@@ -624,7 +649,9 @@ function ProfilePage() {
                   <button
                     type="button"
                     className="logout-profile-button"
-                    onClick={handleLogout}
+                    onClick={
+                      handleLogout
+                    }
                   >
                     Cerrar sesión
                   </button>
@@ -633,7 +660,9 @@ function ProfilePage() {
             ) : (
               <form
                 className="profile-edit-form"
-                onSubmit={handleSave}
+                onSubmit={
+                  handleSave
+                }
               >
                 <label>
                   Nombre
@@ -641,8 +670,12 @@ function ProfilePage() {
                   <input
                     type="text"
                     name="name"
-                    value={formData.name}
-                    onChange={handleChange}
+                    value={
+                      formData.name
+                    }
+                    onChange={
+                      handleChange
+                    }
                     required
                   />
                 </label>
@@ -654,8 +687,12 @@ function ProfilePage() {
                     type="text"
                     name="bio"
                     placeholder="Contá algo sobre vos"
-                    value={formData.bio}
-                    onChange={handleChange}
+                    value={
+                      formData.bio
+                    }
+                    onChange={
+                      handleChange
+                    }
                   />
                 </label>
 
@@ -665,7 +702,9 @@ function ProfilePage() {
                   <input
                     type="email"
                     name="email"
-                    value={formData.email}
+                    value={
+                      formData.email
+                    }
                     readOnly
                   />
                 </label>
@@ -679,7 +718,9 @@ function ProfilePage() {
                     value={
                       formData.location
                     }
-                    onChange={handleChange}
+                    onChange={
+                      handleChange
+                    }
                   />
                 </label>
 
@@ -699,7 +740,9 @@ function ProfilePage() {
                   <button
                     type="button"
                     className="cancel-profile-button"
-                    onClick={handleCancel}
+                    onClick={
+                      handleCancel
+                    }
                     disabled={
                       isSavingProfile
                     }
@@ -723,13 +766,15 @@ function ProfilePage() {
             <h2>Mis compras</h2>
 
             <p>
-              Revisa el historial de tus compras
-              y detalles.
+              Revisa el historial de tus
+              compras y detalles.
             </p>
           </div>
 
           {isLoadingOrders ? (
-            <p>Cargando compras...</p>
+            <p>
+              Cargando compras...
+            </p>
           ) : ordersError ? (
             <p className="profile-error">
               {ordersError}
@@ -742,7 +787,9 @@ function ProfilePage() {
           ) : (
             <div className="profile-orders-layout">
               <OrderList
-                orders={visibleOrders}
+                orders={
+                  visibleOrders
+                }
                 selectedOrderId={
                   selectedOrderId
                 }
@@ -764,7 +811,9 @@ function ProfilePage() {
               />
 
               <OrderDetail
-                order={selectedOrder}
+                order={
+                  selectedOrder
+                }
               />
             </div>
           )}

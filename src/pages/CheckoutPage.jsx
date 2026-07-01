@@ -25,20 +25,12 @@ function formatPrice(value) {
 
 function mapCartToPurchaseItems(carrito) {
   return carrito.map((product) => ({
-    productoId: String(
-      product.apiId ||
-        product.backendId ||
-        product.id
-    ),
+    productoId: String(product.id),
 
-    cantidad: product.cantidad || 1,
+    cantidad:
+      Number(product.cantidad) || 1,
 
     data: {
-      idBH:
-        product.idBH ||
-        product.localId ||
-        null,
-
       nombre:
         product.name ||
         product.nombre ||
@@ -60,7 +52,8 @@ function mapCartToPurchaseItems(carrito) {
         product.categoria ||
         "",
 
-      material: product.material || "",
+      material:
+        product.material || "",
 
       decada: Number(
         product.decade ||
@@ -68,7 +61,8 @@ function mapCartToPurchaseItems(carrito) {
           0
       ),
 
-      slug: product.slug || "",
+      slug:
+        product.slug || "",
 
       descripcion:
         product.description ||
@@ -103,7 +97,7 @@ function CheckoutPage({
 
   const itemCount = carrito.reduce(
     (acc, item) =>
-      acc + (item.cantidad || 1),
+      acc + (Number(item.cantidad) || 1),
     0
   );
 
@@ -132,7 +126,9 @@ function CheckoutPage({
       const fechaActual = new Date();
 
       const purchaseData = {
-        items: mapCartToPurchaseItems(carrito),
+        items: mapCartToPurchaseItems(
+          carrito
+        ),
 
         total: Number(total),
 
@@ -151,7 +147,9 @@ function CheckoutPage({
       };
 
       const purchaseResponse =
-        await createPurchase(purchaseData);
+        await createPurchase(
+          purchaseData
+        );
 
       const purchase =
         purchaseResponse?.compra ||
@@ -163,30 +161,38 @@ function CheckoutPage({
         purchase?.id ||
         purchase?._id ||
         purchaseResponse?.id ||
-        purchaseResponse?._id;
+        purchaseResponse?._id ||
+        null;
 
       const ultimoPedido = {
-        id: purchaseId || null,
-        codigo: createOrderCode(purchaseId),
+        id: purchaseId,
 
-        fechaISO: fechaActual.toISOString(),
+        codigo:
+          createOrderCode(
+            purchaseId
+          ),
 
-        fecha: fechaActual.toLocaleDateString(
-          "es-UY",
-          {
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
-          }
-        ),
+        fechaISO:
+          fechaActual.toISOString(),
 
-        hora: fechaActual.toLocaleTimeString(
-          "es-UY",
-          {
-            hour: "2-digit",
-            minute: "2-digit",
-          }
-        ),
+        fecha:
+          fechaActual.toLocaleDateString(
+            "es-UY",
+            {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            }
+          ),
+
+        hora:
+          fechaActual.toLocaleTimeString(
+            "es-UY",
+            {
+              hour: "2-digit",
+              minute: "2-digit",
+            }
+          ),
 
         productos: carrito,
 
@@ -195,21 +201,22 @@ function CheckoutPage({
         datosEntrega: {
           nombre: data.nombre,
           email: data.email,
-          direccion: data.direccion,
-          telefono: data.telefono,
+          direccion:
+            data.direccion,
+          telefono:
+            data.telefono,
         },
       };
-
-      localStorage.setItem(
-        "ultimoPedido",
-        JSON.stringify(ultimoPedido)
-      );
 
       if (vaciarCarrito) {
         await vaciarCarrito();
       }
 
-      navigate("/confirmacion");
+      navigate("/confirmacion", {
+        state: {
+          pedido: ultimoPedido,
+        },
+      });
     } catch (error) {
       console.error(
         "Error confirmando compra:",
@@ -242,7 +249,9 @@ function CheckoutPage({
         <section className="checkout-layout">
           <form
             className="checkout-form-card"
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSubmit(
+              onSubmit
+            )}
           >
             <h2>Datos personales</h2>
 
@@ -256,6 +265,7 @@ function CheckoutPage({
               reglas={{
                 required:
                   "El nombre es obligatorio",
+
                 minLength: {
                   value: 3,
                   message:
@@ -275,9 +285,11 @@ function CheckoutPage({
               reglas={{
                 required:
                   "El correo es obligatorio",
+
                 pattern: {
                   value:
                     /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+
                   message:
                     "Ingresá un correo válido",
                 },
@@ -295,6 +307,7 @@ function CheckoutPage({
               reglas={{
                 required:
                   "La dirección es obligatoria",
+
                 minLength: {
                   value: 5,
                   message:
@@ -314,6 +327,7 @@ function CheckoutPage({
               reglas={{
                 required:
                   "El teléfono es obligatorio",
+
                 minLength: {
                   value: 8,
                   message:
@@ -349,11 +363,14 @@ function CheckoutPage({
 
             <div className="checkout-summary-row">
               <span>Productos</span>
-              <strong>{itemCount}</strong>
+              <strong>
+                {itemCount}
+              </strong>
             </div>
 
             <div className="checkout-summary-row">
               <span>Subtotal</span>
+
               <strong>
                 {formatPrice(total)}
               </strong>
@@ -368,6 +385,7 @@ function CheckoutPage({
 
             <div className="checkout-summary-total">
               <span>Total</span>
+
               <strong>
                 {formatPrice(total)}
               </strong>

@@ -1,14 +1,21 @@
+import { Link } from "react-router";
+
 import "./FavoriteCard.css";
 
 function formatPrice(price) {
   if (typeof price === "number") {
-    return `$${new Intl.NumberFormat("es-UY").format(price)}`;
+    return `$${new Intl.NumberFormat(
+      "es-UY"
+    ).format(price)}`;
   }
 
   return price || "$0";
 }
 
-function FavoriteCard({ product, onRemove }) {
+function FavoriteCard({
+  product,
+  onRemove,
+}) {
   return (
     <article className="favorite-card">
       <button
@@ -20,25 +27,39 @@ function FavoriteCard({ product, onRemove }) {
         ×
       </button>
 
-      <img
-        className="favorite-card-image"
-        src={product.image}
-        alt={product.name}
-      />
+      {product.image ? (
+        <img
+          className="favorite-card-image"
+          src={product.image}
+          alt={product.name}
+        />
+      ) : (
+        <div
+          className="favorite-card-image"
+          aria-label="Imagen no disponible"
+        />
+      )}
 
       <div className="favorite-card-info">
         <h3>{product.name}</h3>
 
-        <p className="favorite-card-category">{product.category}</p>
+        <p className="favorite-card-category">
+          {product.category}
+        </p>
 
         <p className="favorite-card-price">
-          {formatPrice(product.price || product.precio)}
+          {formatPrice(
+            product.price ||
+              product.precio
+          )}
         </p>
 
         <div className="favorite-card-actions">
-          <a href={`/producto/${product.id}?decada=${product.decade}`}>
+          <Link
+            to={`/producto/${product.id}?decada=${product.decade}`}
+          >
             Ver detalle
-          </a>
+          </Link>
 
           <button
             type="button"

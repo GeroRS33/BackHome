@@ -89,8 +89,6 @@ function CartProvider({ children }) {
     }
   }, [actualizarCarritoLocal]);
 
-  // Solo carga automáticamente el carrito
-  // cuando el usuario entra a su página.
   useEffect(() => {
     if (location.pathname === "/carrito") {
       cargarCarrito();
@@ -107,56 +105,50 @@ function CartProvider({ children }) {
     );
   };
 
-  const agregarAlCarrito = async (producto) => {
+  const agregarAlCarrito = async (
+    producto
+  ) => {
     try {
-      // Si todavía no se cargó, obtiene el carrito
-      // antes de agregar para conservar lo guardado.
       const carritoBase =
         await cargarCarrito();
 
       const productoId = String(
-        producto.apiId ||
-          producto.backendId ||
-          producto.id
+        producto.id
       );
 
-      const productoExiste = carritoBase.find(
-        (item) =>
-          String(item.apiId || item.id) ===
-          productoId
-      );
+      const productoExiste =
+        carritoBase.find(
+          (item) =>
+            String(item.id) ===
+            productoId
+        );
 
       let carritoActualizado;
 
       if (productoExiste) {
-        carritoActualizado = carritoBase.map(
-          (item) => {
-            const itemId = String(
-              item.apiId || item.id
-            );
-
-            if (itemId === productoId) {
+        carritoActualizado =
+          carritoBase.map((item) => {
+            if (
+              String(item.id) ===
+              productoId
+            ) {
               return {
                 ...item,
                 cantidad:
-                  (item.cantidad || 1) + 1,
+                  Number(
+                    item.cantidad
+                  ) + 1,
               };
             }
 
             return item;
-          }
-        );
+          });
       } else {
         carritoActualizado = [
           ...carritoBase,
           {
             ...producto,
             id: productoId,
-            apiId: productoId,
-            idBH:
-              producto.idBH ??
-              producto.localId ??
-              null,
             cantidad: 1,
           },
         ];
@@ -193,7 +185,7 @@ function CartProvider({ children }) {
     const carritoActualizado =
       carritoAnterior.filter(
         (item) =>
-          String(item.apiId || item.id) !==
+          String(item.id) !==
           String(productoId)
       );
 
@@ -227,7 +219,9 @@ function CartProvider({ children }) {
     nuevaCantidad
   ) => {
     if (nuevaCantidad <= 0) {
-      await eliminarDelCarrito(productoId);
+      await eliminarDelCarrito(
+        productoId
+      );
       return;
     }
 
@@ -236,14 +230,14 @@ function CartProvider({ children }) {
 
     const carritoActualizado =
       carritoAnterior.map((item) => {
-        const itemId = String(
-          item.apiId || item.id
-        );
-
-        if (itemId === String(productoId)) {
+        if (
+          String(item.id) ===
+          String(productoId)
+        ) {
           return {
             ...item,
-            cantidad: nuevaCantidad,
+            cantidad:
+              Number(nuevaCantidad),
           };
         }
 
@@ -304,14 +298,19 @@ function CartProvider({ children }) {
 
   const totalCarrito = carrito.reduce(
     (total, item) => {
-      const precio =
-        Number(item.price || item.precio) ||
-        0;
+      const precio = Number(
+        item.price ||
+          item.precio ||
+          0
+      );
 
       const cantidad =
         Number(item.cantidad) || 1;
 
-      return total + precio * cantidad;
+      return (
+        total +
+        precio * cantidad
+      );
     },
     0
   );
@@ -335,7 +334,9 @@ function CartProvider({ children }) {
 }
 
 function useCart() {
-  const context = useContext(CartContext);
+  const context = useContext(
+    CartContext
+  );
 
   if (!context) {
     throw new Error(

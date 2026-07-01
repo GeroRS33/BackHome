@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import {
   Link,
   useLocation,
@@ -13,8 +14,10 @@ import ProductGallery from "../components/ProductGallery/ProductGallery";
 import ProductSpecs from "../components/ProductSpecs/ProductSpecs";
 import ProductCard from "../components/ProductCard/ProductCard";
 
-import { productos as productosLocales } from "../data/products";
-import { getProducts } from "../services/api";
+import {
+  getProductById,
+  getProducts,
+} from "../services/api";
 
 import precioIcon from "../assets/images/etiquetaprecio.png";
 import envioIcon from "../assets/images/envio.png";
@@ -49,7 +52,7 @@ function HeartIcon({ filled = false }) {
   );
 }
 
-function createSpecs(data, localProduct) {
+function createSpecs(data) {
   if (
     Array.isArray(data.especificaciones) &&
     data.especificaciones.length > 0
@@ -57,143 +60,130 @@ function createSpecs(data, localProduct) {
     return data.especificaciones;
   }
 
-  if (data.materiales || data.dimensiones) {
-    return [
-      {
-        title: "Materiales",
-        text: data.materiales || "No disponible",
-        icon: materialesIcon,
-      },
-      {
-        title: "Dimensiones",
-        text: data.dimensiones || "No disponible",
-        icon: dimensionesIcon,
-      },
-    ];
+  const specs = [];
+
+  if (data.materiales || data.material) {
+    specs.push({
+      title: "Materiales",
+      text:
+        data.materiales ||
+        data.material ||
+        "No disponible",
+      icon: materialesIcon,
+    });
   }
 
-  return localProduct?.specs || [];
+  if (data.dimensiones) {
+    specs.push({
+      title: "Dimensiones",
+      text: data.dimensiones,
+      icon: dimensionesIcon,
+    });
+  }
+
+  return specs;
 }
 
 function transformApiProduct(item) {
   const data = item?.data || {};
 
-  const localProduct = productosLocales.find(
-    (product) =>
-      Number(product.id) === Number(data.idBH)
-  );
-
-  const cloudinaryImages =
-    Array.isArray(data.imagenes) &&
-    data.imagenes.length > 0
-      ? data.imagenes.filter(Boolean)
-      : [];
+  const images = Array.isArray(
+    data.imagenes
+  )
+    ? data.imagenes.filter(Boolean)
+    : [];
 
   const mainImage =
     data.imagen ||
     data.image ||
-    localProduct?.image ||
+    images[0] ||
     "";
 
   const productImages =
-    cloudinaryImages.length > 0
-      ? cloudinaryImages
-      : localProduct?.images?.length
-        ? localProduct.images
-        : mainImage
-          ? [mainImage]
-          : [];
+    images.length > 0
+      ? images
+      : mainImage
+        ? [mainImage]
+        : [];
 
   return {
-    // ID usado por las rutas y favoritos.
-    id: Number(data.idBH),
-
-    // ID real que necesita carrito y backend.
-    apiId: item.id,
-
-    idBH: Number(data.idBH),
+    id: item.id,
 
     name:
       data.nombre ||
-      localProduct?.name ||
+      data.name ||
       "Producto sin nombre",
 
     nombre:
       data.nombre ||
-      localProduct?.name ||
+      data.name ||
       "Producto sin nombre",
 
     category:
       data.categoria ||
-      localProduct?.category ||
+      data.category ||
       "",
 
     categoria:
       data.categoria ||
-      localProduct?.category ||
+      data.category ||
       "",
 
     material:
-      data.material ||
-      localProduct?.material ||
-      "",
+      data.material || "",
 
     decade: Number(
       data.decada ||
-        localProduct?.decade ||
+        data.decade ||
         0
     ),
 
     decada: Number(
       data.decada ||
-        localProduct?.decade ||
+        data.decade ||
         0
     ),
 
     price: Number(
       data.precio ||
-        localProduct?.price ||
+        data.price ||
         0
     ),
 
     precio: Number(
       data.precio ||
-        localProduct?.precio ||
+        data.price ||
         0
     ),
 
-    slug:
-      data.slug ||
-      localProduct?.slug ||
-      "",
+    slug: data.slug || "",
 
     tag:
       data.tag ||
       data.etiqueta ||
-      localProduct?.tag ||
       "",
 
     description:
       data.descripcion ||
-      localProduct?.description ||
+      data.description ||
       "",
 
     descripcion:
       data.descripcion ||
-      localProduct?.description ||
+      data.description ||
       "",
 
     image: mainImage,
     imagen: mainImage,
     images: productImages,
 
-    colors:
-      Array.isArray(data.colores) &&
-      data.colores.length > 0
-        ? data.colores
-        : localProduct?.colors || [],
+    colors: Array.isArray(
+      data.colores
+    )
+      ? data.colores
+      : [],
 
-    specs: createSpecs(data, localProduct),
+    specs: createSpecs(data),
 
     createdAt: item.createdAt,
     updatedAt: item.updatedAt,
@@ -209,34 +199,68 @@ function ProductDetailPage({
   const navigate = useNavigate();
   const location = useLocation();
 
-  const searchParams = new URLSearchParams(
-    location.search
-  );
+  const searchParams =
+    new URLSearchParams(location.search);
 
   const decadeFromUrl =
     searchParams.get("decada");
 
-  const [productos, setProductos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [errorProducto, setErrorProducto] =
-    useState("");
+  const [product, setProduct] =
+    useState(null);
+
+  const [
+    relatedProducts,
+    setRelatedProducts,
+  ] = useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [
+    errorProducto,
+    setErrorProducto,
+  ] = useState("");
 
   useEffect(() => {
-    async function cargarProductos() {
+    async function cargarProducto() {
       try {
         setLoading(true);
         setErrorProducto("");
 
-        const response = await getProducts(1, 100);
+        const productResponse =
+          await getProductById(id);
+
+        const productItem =
+          productResponse?.item ||
+          productResponse?.product ||
+          productResponse;
+
+        const productoTransformado =
+          transformApiProduct(productItem);
+
+        setProduct(productoTransformado);
+
+        const productsResponse =
+          await getProducts(1, 100);
 
         const productosTransformados = (
-          response?.items || []
+          productsResponse?.items || []
         )
-          .filter((item) => item?.data?.idBH)
           .map(transformApiProduct)
-          .sort((a, b) => a.idBH - b.idBH);
+          .filter(
+            (item) =>
+              String(item.id) !==
+                String(
+                  productoTransformado.id
+                ) &&
+              item.category ===
+                productoTransformado.category
+          )
+          .slice(0, 3);
 
-        setProductos(productosTransformados);
+        setRelatedProducts(
+          productosTransformados
+        );
       } catch (error) {
         console.error(
           "Error cargando el producto:",
@@ -252,12 +276,8 @@ function ProductDetailPage({
       }
     }
 
-    cargarProductos();
-  }, []);
-
-  const product = productos.find(
-    (item) => Number(item.idBH) === Number(id)
-  );
+    cargarProducto();
+  }, [id]);
 
   if (loading) {
     return (
@@ -271,14 +291,19 @@ function ProductDetailPage({
     );
   }
 
-  if (errorProducto) {
+  if (errorProducto || !product) {
     return (
       <>
         <Navbar activePage="" />
 
         <main className="product-detail-page">
-          <h1>No se pudo cargar el producto</h1>
-          <p>{errorProducto}</p>
+          <h1>
+            Producto no encontrado
+          </h1>
+
+          {errorProducto && (
+            <p>{errorProducto}</p>
+          )}
 
           <Link to="/productos">
             Volver al catálogo
@@ -288,33 +313,11 @@ function ProductDetailPage({
     );
   }
 
-  if (!product) {
-    return (
-      <>
-        <Navbar activePage="" />
-
-        <main className="product-detail-page">
-          <h1>Producto no encontrado</h1>
-
-          <Link to="/productos">
-            Volver al catálogo
-          </Link>
-        </main>
-      </>
-    );
-  }
-
-  const isFavorite = favoritos.includes(
-    product.id
+  const isFavorite = favoritos.some(
+    (favoriteId) =>
+      String(favoriteId) ===
+      String(product.id)
   );
-
-  const relatedProducts = productos
-    .filter(
-      (item) =>
-        item.id !== product.id &&
-        item.category === product.category
-    )
-    .slice(0, 3);
 
   const handleSave = () => {
     if (toggleFavorito) {
@@ -350,7 +353,8 @@ function ProductDetailPage({
 
           <Link
             to={`/productos?decada=${
-              decadeFromUrl || product.decade
+              decadeFromUrl ||
+              product.decade
             }`}
           >
             Productos
@@ -380,11 +384,16 @@ function ProductDetailPage({
               {product.description}
             </p>
 
-            <ProductSpecs specs={product.specs} />
+            <ProductSpecs
+              specs={product.specs}
+            />
 
             <div className="product-price-box">
               <div className="product-color-icon">
-                <img src={precioIcon} alt="" />
+                <img
+                  src={precioIcon}
+                  alt=""
+                />
               </div>
 
               <div>
@@ -392,8 +401,7 @@ function ProductDetailPage({
 
                 <strong>
                   {formatPrice(
-                    product.price ||
-                      product.precio
+                    product.price
                   )}
                 </strong>
               </div>
@@ -402,12 +410,16 @@ function ProductDetailPage({
             <div className="product-actions">
               <button
                 className={`save-button ${
-                  isFavorite ? "active" : ""
+                  isFavorite
+                    ? "active"
+                    : ""
                 }`}
                 type="button"
                 onClick={handleSave}
               >
-                <HeartIcon filled={isFavorite} />
+                <HeartIcon
+                  filled={isFavorite}
+                />
                 Guardar
               </button>
 
@@ -421,7 +433,10 @@ function ProductDetailPage({
             </div>
 
             <div className="product-shipping">
-              <img src={envioIcon} alt="" />
+              <img
+                src={envioIcon}
+                alt=""
+              />
 
               <span>
                 Envíos a todo el país
@@ -437,16 +452,26 @@ function ProductDetailPage({
         </section>
 
         <section className="related-section">
-          <h2>Productos relacionados</h2>
+          <h2>
+            Productos relacionados
+          </h2>
 
           <div className="related-grid">
             {relatedProducts.map(
               (relatedProduct) => (
                 <ProductCard
-                  key={relatedProduct.apiId}
-                  product={relatedProduct}
-                  isFavorite={favoritos.includes(
-                    relatedProduct.id
+                  key={relatedProduct.id}
+                  product={
+                    relatedProduct
+                  }
+                  isFavorite={favoritos.some(
+                    (favoriteId) =>
+                      String(
+                        favoriteId
+                      ) ===
+                      String(
+                        relatedProduct.id
+                      )
                   )}
                   onToggleFavorite={
                     toggleFavorito

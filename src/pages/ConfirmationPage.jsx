@@ -1,4 +1,9 @@
-import { Link, Navigate } from "react-router";
+import {
+  Link,
+  Navigate,
+  useLocation,
+} from "react-router";
+
 import "./ConfirmationPage.css";
 
 import Navbar from "../components/Navbar/Navbar";
@@ -32,33 +37,49 @@ function getProductPrice(product) {
 }
 
 function formatShortDate(date) {
-  return date.toLocaleDateString("es-UY", {
-    day: "numeric",
-    month: "short",
-  });
+  return date.toLocaleDateString(
+    "es-UY",
+    {
+      day: "numeric",
+      month: "short",
+    }
+  );
 }
 
 function getEstimatedDeliveryRange(
   orderDate = new Date()
 ) {
-  const startDate = new Date(orderDate);
-  startDate.setDate(startDate.getDate() + 3);
+  const startDate =
+    new Date(orderDate);
 
-  const endDate = new Date(orderDate);
-  endDate.setDate(endDate.getDate() + 7);
+  startDate.setDate(
+    startDate.getDate() + 3
+  );
+
+  const endDate =
+    new Date(orderDate);
+
+  endDate.setDate(
+    endDate.getDate() + 7
+  );
 
   return `${formatShortDate(
     startDate
-  )} - ${formatShortDate(endDate)}`;
+  )} - ${formatShortDate(
+    endDate
+  )}`;
 }
 
-function getOrderDate(ultimoPedido) {
-  if (ultimoPedido?.fechaISO) {
-    const isoDate = new Date(
-      ultimoPedido.fechaISO
-    );
+function getOrderDate(pedido) {
+  if (pedido?.fechaISO) {
+    const isoDate =
+      new Date(pedido.fechaISO);
 
-    if (!Number.isNaN(isoDate.getTime())) {
+    if (
+      !Number.isNaN(
+        isoDate.getTime()
+      )
+    ) {
       return isoDate;
     }
   }
@@ -66,25 +87,13 @@ function getOrderDate(ultimoPedido) {
   return new Date();
 }
 
-function getStoredLastOrder() {
-  const storedOrder =
-    localStorage.getItem("ultimoPedido");
-
-  if (!storedOrder) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(storedOrder);
-  } catch {
-    return null;
-  }
-}
-
 function ConfirmationPage() {
-  const ultimoPedido = getStoredLastOrder();
+  const location = useLocation();
 
-  if (!ultimoPedido) {
+  const pedido =
+    location.state?.pedido || null;
+
+  if (!pedido) {
     return (
       <Navigate
         to="/productos"
@@ -94,19 +103,25 @@ function ConfirmationPage() {
   }
 
   const productosPedido =
-    ultimoPedido.productos || [];
+    Array.isArray(
+      pedido.productos
+    )
+      ? pedido.productos
+      : [];
 
   const datosEntrega =
-    ultimoPedido.datosEntrega || {};
+    pedido.datosEntrega || {};
 
   const totalPedido =
-    ultimoPedido.total || 0;
+    Number(pedido.total) || 0;
 
   const orderDate =
-    getOrderDate(ultimoPedido);
+    getOrderDate(pedido);
 
   const estimatedDelivery =
-    getEstimatedDeliveryRange(orderDate);
+    getEstimatedDeliveryRange(
+      orderDate
+    );
 
   return (
     <>
@@ -122,10 +137,14 @@ function ConfirmationPage() {
           </div>
 
           <div>
-            <h1>¡Compra realizada! ✨</h1>
+            <h1>
+              ¡Compra realizada! ✨
+            </h1>
+
             <p>
               Gracias por elegir BackHome.
             </p>
+
             <p>
               Tu pedido fue confirmado
               correctamente.
@@ -151,7 +170,7 @@ function ConfirmationPage() {
 
               <h2>
                 Pedido #
-                {ultimoPedido.codigo ||
+                {pedido.codigo ||
                   "BH-PEDIDO"}
               </h2>
             </header>
@@ -164,13 +183,17 @@ function ConfirmationPage() {
                 />
 
                 <div>
-                  <h3>Fecha del pedido</h3>
+                  <h3>
+                    Fecha del pedido
+                  </h3>
+
                   <p>
-                    {ultimoPedido.fecha ||
+                    {pedido.fecha ||
                       "Fecha no disponible"}
                   </p>
+
                   <p>
-                    {ultimoPedido.hora || ""}
+                    {pedido.hora || ""}
                   </p>
                 </div>
               </div>
@@ -182,8 +205,13 @@ function ConfirmationPage() {
                 />
 
                 <div>
-                  <h3>Estado de pago</h3>
-                  <span>Pago aprobado</span>
+                  <h3>
+                    Estado de pago
+                  </h3>
+
+                  <span>
+                    Pago aprobado
+                  </span>
                 </div>
               </div>
 
@@ -194,8 +222,14 @@ function ConfirmationPage() {
                 />
 
                 <div>
-                  <h3>Método de envío</h3>
-                  <p>Envío estándar</p>
+                  <h3>
+                    Método de envío
+                  </h3>
+
+                  <p>
+                    Envío estándar
+                  </p>
+
                   <p>
                     Entrega estimada:{" "}
                     {estimatedDelivery}
@@ -205,12 +239,18 @@ function ConfirmationPage() {
             </section>
 
             <section className="order-products-summary">
-              <h3>Resumen de tu pedido</h3>
+              <h3>
+                Resumen de tu pedido
+              </h3>
 
-              {productosPedido.length > 0 ? (
+              {productosPedido.length >
+              0 ? (
                 <div className="confirmation-products-list">
                   {productosPedido.map(
-                    (product, index) => {
+                    (
+                      product,
+                      index
+                    ) => {
                       const productName =
                         product.name ||
                         product.nombre ||
@@ -227,44 +267,62 @@ function ConfirmationPage() {
                         "";
 
                       const quantity =
-                        product.cantidad || 1;
+                        Number(
+                          product.cantidad
+                        ) || 1;
 
                       const productKey =
-                        product.apiId ||
                         product.id ||
                         `${productName}-${index}`;
 
                       return (
                         <article
-                          key={productKey}
+                          key={
+                            productKey
+                          }
                           className="confirmation-product"
                         >
-                          {productImage && (
+                          {productImage ? (
                             <img
-                              src={productImage}
-                              alt={productName}
+                              src={
+                                productImage
+                              }
+                              alt={
+                                productName
+                              }
+                            />
+                          ) : (
+                            <div
+                              className="confirmation-product-image-placeholder"
+                              aria-label="Imagen no disponible"
                             />
                           )}
 
                           <div>
                             <h4>
-                              {productName}
+                              {
+                                productName
+                              }
                             </h4>
 
                             <p>
-                              {productCategory}
+                              {
+                                productCategory
+                              }
                             </p>
                           </div>
 
                           <span>
-                            Cantidad: {quantity}
+                            Cantidad:{" "}
+                            {quantity}
                           </span>
 
                           <strong>
                             {formatPrice(
                               getProductPrice(
                                 product
-                              ) * quantity
+                              ) *
+                                quantity
                             )}
                           </strong>
                         </article>
@@ -274,15 +332,20 @@ function ConfirmationPage() {
                 </div>
               ) : (
                 <p className="confirmation-empty">
-                  No hay productos guardados en
-                  este pedido.
+                  No hay productos en este
+                  pedido.
                 </p>
               )}
 
               <footer className="confirmation-total">
-                <span>Total pagado</span>
+                <span>
+                  Total pagado
+                </span>
+
                 <strong>
-                  {formatPrice(totalPedido)}
+                  {formatPrice(
+                    totalPedido
+                  )}
                 </strong>
               </footer>
             </section>
@@ -297,12 +360,15 @@ function ConfirmationPage() {
                 />
               </div>
 
-              <h2>Detalles de entrega</h2>
+              <h2>
+                Detalles de entrega
+              </h2>
             </header>
 
             <div className="delivery-info">
               <div>
                 <h3>Nombre</h3>
+
                 <p>
                   {datosEntrega.nombre ||
                     "No disponible"}
@@ -311,6 +377,7 @@ function ConfirmationPage() {
 
               <div>
                 <h3>Email</h3>
+
                 <p>
                   {datosEntrega.email ||
                     "No disponible"}
@@ -321,6 +388,7 @@ function ConfirmationPage() {
                 <h3>
                   Dirección de envío
                 </h3>
+
                 <p>
                   {datosEntrega.direccion ||
                     "No disponible"}
@@ -331,6 +399,7 @@ function ConfirmationPage() {
                 <h3>
                   Teléfono de contacto
                 </h3>
+
                 <p>
                   {datosEntrega.telefono ||
                     "No disponible"}
@@ -341,16 +410,19 @@ function ConfirmationPage() {
             <article className="delivery-note">
               <div>
                 <img
-                  src={disponibilidadIcon}
+                  src={
+                    disponibilidadIcon
+                  }
                   alt=""
                 />
               </div>
 
               <p>
-                Te enviaremos un correo con los
-                detalles de tu pedido y el número
-                de seguimiento cuando tu compra
-                sea despachada.
+                Te enviaremos un correo con
+                los detalles de tu pedido y
+                el número de seguimiento
+                cuando tu compra sea
+                despachada.
               </p>
             </article>
           </aside>

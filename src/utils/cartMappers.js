@@ -1,42 +1,89 @@
 // Adapta el carrito recibido desde la API
 // al formato que usan las páginas y componentes.
 export function mapApiCartToFrontend(response) {
-  const items = response?.items || [];
+  const items = Array.isArray(response?.items)
+    ? response.items
+    : [];
 
   return items.map((item) => {
     const data = item?.data || {};
 
     return {
       // ID real del producto en el backend.
-      id: item.productoId,
-      apiId: item.productoId,
+      id: String(item.productoId),
 
-      // ID original de BackHome.
-      idBH: data.idBH ?? null,
+      cantidad:
+        Number(item.cantidad) || 1,
 
-      cantidad: item.cantidad || 1,
+      name:
+        data.nombre ||
+        data.name ||
+        "Producto",
 
-      name: data.nombre || "Producto",
-      nombre: data.nombre || "Producto",
+      nombre:
+        data.nombre ||
+        data.name ||
+        "Producto",
 
-      price: Number(data.precio) || 0,
-      precio: Number(data.precio) || 0,
+      price: Number(
+        data.precio ||
+          data.price ||
+          0
+      ),
 
-      image: data.imagen || "",
-      imagen: data.imagen || "",
+      precio: Number(
+        data.precio ||
+          data.price ||
+          0
+      ),
 
-      category: data.categoria || "",
-      categoria: data.categoria || "",
+      image:
+        data.imagen ||
+        data.image ||
+        "",
 
-      material: data.material || "",
+      imagen:
+        data.imagen ||
+        data.image ||
+        "",
 
-      decade: Number(data.decada) || null,
-      decada: Number(data.decada) || null,
+      category:
+        data.categoria ||
+        data.category ||
+        "",
 
-      slug: data.slug || "",
+      categoria:
+        data.categoria ||
+        data.category ||
+        "",
 
-      description: data.descripcion || "",
-      descripcion: data.descripcion || "",
+      material:
+        data.material || "",
+
+      decade: Number(
+        data.decada ||
+          data.decade ||
+          0
+      ),
+
+      decada: Number(
+        data.decada ||
+          data.decade ||
+          0
+      ),
+
+      slug:
+        data.slug || "",
+
+      description:
+        data.descripcion ||
+        data.description ||
+        "",
+
+      descripcion:
+        data.descripcion ||
+        data.description ||
+        "",
     };
   });
 }
@@ -44,57 +91,54 @@ export function mapApiCartToFrontend(response) {
 // Adapta el carrito del frontend
 // a la estructura que espera la API.
 export function mapFrontendCartToApi(cart) {
-  return {
-    items: cart.map((producto) => ({
-      productoId: String(
-        producto.apiId ||
-          producto.backendId ||
-          producto.id
-      ),
+  const items = Array.isArray(cart)
+    ? cart
+    : [];
 
-      cantidad: producto.cantidad || 1,
+  return {
+    items: items.map((product) => ({
+      productoId: String(product.id),
+
+      cantidad:
+        Number(product.cantidad) || 1,
 
       data: {
-        idBH:
-          producto.idBH ??
-          producto.localId ??
-          null,
-
         nombre:
-          producto.name ||
-          producto.nombre ||
+          product.name ||
+          product.nombre ||
           "Producto",
 
         precio: Number(
-          producto.price ||
-            producto.precio ||
+          product.price ||
+            product.precio ||
             0
         ),
 
         imagen:
-          producto.image ||
-          producto.imagen ||
+          product.image ||
+          product.imagen ||
           "",
 
         categoria:
-          producto.category ||
-          producto.categoria ||
+          product.category ||
+          product.categoria ||
           "",
 
         material:
-          producto.material || "",
+          product.material || "",
 
         decada: Number(
-          producto.decade ||
-            producto.decada ||
+          product.decade ||
+            product.decada ||
             0
         ),
 
-        slug: producto.slug || "",
+        slug:
+          product.slug || "",
 
         descripcion:
-          producto.description ||
-          producto.descripcion ||
+          product.description ||
+          product.descripcion ||
           "",
       },
     })),

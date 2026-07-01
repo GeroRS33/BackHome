@@ -1,4 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import { Link } from "react-router";
 import "./HomePage.css";
 
@@ -15,7 +20,6 @@ import lamparaIcon from "../assets/images/lampara.png";
 import lineasIcon from "../assets/images/lineas.png";
 import plantaIcon from "../assets/images/planta.png";
 
-import { productos as productosLocales } from "../data/products";
 import { getProducts } from "../services/api";
 
 const decadesInfo = {
@@ -32,6 +36,7 @@ const decadesInfo = {
       "#EFE6D8",
     ],
   },
+
   1960: {
     title: "Años 60",
     description:
@@ -45,6 +50,7 @@ const decadesInfo = {
       "#3B2A24",
     ],
   },
+
   1970: {
     title: "Años 70",
     description:
@@ -58,6 +64,7 @@ const decadesInfo = {
       "#E5D6BD",
     ],
   },
+
   1980: {
     title: "Años 80",
     description:
@@ -71,6 +78,7 @@ const decadesInfo = {
       "#F4F1E8",
     ],
   },
+
   1990: {
     title: "Años 90",
     description:
@@ -84,6 +92,7 @@ const decadesInfo = {
       "#4A3A32",
     ],
   },
+
   2000: {
     title: "Años 2000",
     description:
@@ -102,117 +111,99 @@ const decadesInfo = {
 function transformApiProduct(item) {
   const data = item?.data || {};
 
-  const localProduct = productosLocales.find(
-    (product) =>
-      Number(product.id) === Number(data.idBH)
-  );
-
-  const cloudinaryImages =
-    Array.isArray(data.imagenes) &&
-    data.imagenes.length > 0
-      ? data.imagenes.filter(Boolean)
-      : [];
+  const images = Array.isArray(
+    data.imagenes
+  )
+    ? data.imagenes.filter(Boolean)
+    : [];
 
   const mainImage =
     data.imagen ||
     data.image ||
-    cloudinaryImages[0] ||
-    localProduct?.image ||
+    images[0] ||
     "";
 
   return {
-    // ID que usamos para las rutas y favoritos.
-    id: Number(data.idBH),
-
-    // ID real del producto en el backend.
-    apiId: item.id,
-
-    idBH: Number(data.idBH),
+    // ID real del backend.
+    id: item.id,
 
     name:
       data.nombre ||
-      localProduct?.name ||
+      data.name ||
       "Producto sin nombre",
 
     nombre:
       data.nombre ||
-      localProduct?.name ||
+      data.name ||
       "Producto sin nombre",
 
     category:
       data.categoria ||
-      localProduct?.category ||
+      data.category ||
       "",
 
     categoria:
       data.categoria ||
-      localProduct?.category ||
+      data.category ||
       "",
 
     material:
-      data.material ||
-      localProduct?.material ||
-      "",
+      data.material || "",
 
     decade: Number(
       data.decada ||
-        localProduct?.decade ||
+        data.decade ||
         0
     ),
 
     decada: Number(
       data.decada ||
-        localProduct?.decade ||
+        data.decade ||
         0
     ),
 
     price: Number(
       data.precio ||
-        localProduct?.price ||
+        data.price ||
         0
     ),
 
     precio: Number(
       data.precio ||
-        localProduct?.precio ||
+        data.price ||
         0
     ),
 
-    slug:
-      data.slug ||
-      localProduct?.slug ||
-      "",
+    slug: data.slug || "",
 
-    tag:
-      data.tag ||
-      localProduct?.tag ||
-      "",
+    tag: data.tag || "",
 
     description:
       data.descripcion ||
-      localProduct?.description ||
+      data.description ||
       "",
 
     descripcion:
       data.descripcion ||
-      localProduct?.description ||
+      data.description ||
       "",
 
     image: mainImage,
     imagen: mainImage,
 
-    images:
-      cloudinaryImages.length > 0
-        ? cloudinaryImages
-        : localProduct?.images || [],
+    images,
 
-    colors:
-      Array.isArray(data.colores) &&
-      data.colores.length > 0
-        ? data.colores
-        : localProduct?.colors || [],
+    colors: Array.isArray(
+      data.colores
+    )
+      ? data.colores
+      : [],
 
-    specs: localProduct?.specs || [],
+    specs: Array.isArray(
+      data.especificaciones
+    )
+      ? data.especificaciones
+      : [],
 
     createdAt: item.createdAt,
     updatedAt: item.updatedAt,
@@ -224,8 +215,10 @@ function HomePage({
   agregarAlCarrito,
   toggleFavorito,
 }) {
-  const [selectedDecade, setSelectedDecade] =
-    useState(1970);
+  const [
+    selectedDecade,
+    setSelectedDecade,
+  ] = useState(1970);
 
   const [searchTerm, setSearchTerm] =
     useState("");
@@ -236,8 +229,10 @@ function HomePage({
   const [loading, setLoading] =
     useState(true);
 
-  const [productsError, setProductsError] =
-    useState("");
+  const [
+    productsError,
+    setProductsError,
+  ] = useState("");
 
   const decadeInfo =
     decadesInfo[selectedDecade];
@@ -248,21 +243,24 @@ function HomePage({
         setLoading(true);
         setProductsError("");
 
-        const response = await getProducts(
-          1,
-          100
-        );
+        const response =
+          await getProducts(1, 100);
 
         const productosApi = (
           response?.items || []
         )
-          .filter(
-            (item) => item?.data?.idBH
-          )
           .map(transformApiProduct)
-          .sort(
-            (a, b) =>
-              a.idBH - b.idBH
+          .filter(
+            (product) =>
+              product.id &&
+              product.name !==
+                "Producto sin nombre"
+          )
+          .sort((a, b) =>
+            a.name.localeCompare(
+              b.name,
+              "es"
+            )
           );
 
         setProductos(productosApi);
@@ -285,9 +283,10 @@ function HomePage({
   }, []);
 
   const filteredProducts = useMemo(() => {
-    const normalizedSearch = searchTerm
-      .toLowerCase()
-      .trim();
+    const normalizedSearch =
+      searchTerm
+        .toLowerCase()
+        .trim();
 
     const decadeProducts =
       productos.filter(
@@ -379,7 +378,10 @@ function HomePage({
             </p>
 
             <div className="home-search">
-              <img src={searchIcon} alt="" />
+              <img
+                src={searchIcon}
+                alt=""
+              />
 
               <input
                 type="text"
@@ -425,7 +427,9 @@ function HomePage({
               className="selected-link"
             >
               Ver inspiración de los{" "}
-              {String(selectedDecade).slice(2)}
+              {String(
+                selectedDecade
+              ).slice(2)}
               <span>›</span>
             </Link>
 
@@ -462,7 +466,7 @@ function HomePage({
               filteredProducts.map(
                 (product) => (
                   <ProductCard
-                    key={product.apiId}
+                    key={product.id}
                     product={product}
                     isFavorite={favoritos.includes(
                       product.id
