@@ -1,3 +1,8 @@
+import {
+  useEffect,
+  useState,
+} from "react";
+
 import { Link } from "react-router";
 import "./ProductCard.css";
 
@@ -36,6 +41,25 @@ function CartIcon({ className = "" }) {
   );
 }
 
+function CheckIcon({ className = "" }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M5 12.5L9.2 16.5L19 7"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function formatPrice(value) {
   const price =
     typeof value === "number"
@@ -53,6 +77,27 @@ function ProductCard({
   onToggleFavorite,
   onAddToCart,
 }) {
+  const [isAdding, setIsAdding] =
+    useState(false);
+
+  const [wasAdded, setWasAdded] =
+    useState(false);
+
+  useEffect(() => {
+    if (!wasAdded) {
+      return undefined;
+    }
+
+    const timeout =
+      window.setTimeout(() => {
+        setWasAdded(false);
+      }, 2000);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [wasAdded]);
+
   const handleFavoriteClick = () => {
     if (onToggleFavorite) {
       onToggleFavorite(product.id);
@@ -60,22 +105,31 @@ function ProductCard({
   };
 
   const handleAddToCart = async () => {
-    if (!onAddToCart) {
+    if (!onAddToCart || isAdding) {
       return;
     }
 
     try {
+      setIsAdding(true);
+      setWasAdded(false);
+
       await onAddToCart(product);
+
+      setWasAdded(true);
     } catch (error) {
       console.error(
         "Error agregando producto al carrito:",
         error
       );
+    } finally {
+      setIsAdding(false);
     }
   };
 
   const productPrice =
-    product.price || product.precio || 0;
+    product.price ||
+    product.precio ||
+    0;
 
   return (
     <article className="product-card">
@@ -117,20 +171,25 @@ function ProductCard({
           </Link>
 
           <button
-            className="product-add-button"
+            className={`product-add-button ${wasAdded ? "added" : ""
+              }`}
             type="button"
             onClick={handleAddToCart}
+            disabled={isAdding}
           >
             <span>Agregar</span>
 
-            <CartIcon className="product-add-cart-icon" />
+            {wasAdded ? (
+              <CheckIcon className="product-add-check-icon" />
+            ) : (
+              <CartIcon className="product-add-cart-icon" />
+            )}
           </button>
         </div>
 
         <button
-          className={`product-favorite-button ${
-            isFavorite ? "active" : ""
-          }`}
+          className={`product-favorite-button ${isFavorite ? "active" : ""
+            }`}
           type="button"
           onClick={handleFavoriteClick}
           aria-label={

@@ -122,6 +122,47 @@
   z-index: 2;
 }
 
+.product-add-button {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    opacity 0.2s ease;
+}
+
+.product-add-button:disabled {
+  cursor: wait;
+  opacity: 0.85;
+}
+
+.product-add-button.added {
+  background: #6f7b3c;
+  border-color: #6f7b3c;
+  color: #fffaf2;
+}
+
+.product-add-cart-icon,
+.product-add-check-icon {
+  width: 21px;
+  height: 21px;
+  flex: 0 0 auto;
+}
+
+.product-add-spinner {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: product-add-spin 0.75s linear infinite;
+}
+
+@keyframes product-add-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .product-favorite-button:hover,
 .product-favorite-button.active {
   background: #fff3e4;
