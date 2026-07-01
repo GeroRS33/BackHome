@@ -38,8 +38,8 @@ function mapCartToPurchaseItems(carrito) {
 
       precio: Number(
         product.price ||
-          product.precio ||
-          0
+        product.precio ||
+        0
       ),
 
       imagen:
@@ -57,8 +57,8 @@ function mapCartToPurchaseItems(carrito) {
 
       decada: Number(
         product.decade ||
-          product.decada ||
-          0
+        product.decada ||
+        0
       ),
 
       slug:
@@ -91,6 +91,8 @@ function createOrderCode(purchaseId) {
 function CheckoutPage({
   carrito = [],
   total = 0,
+  carritoCargando = false,
+  carritoError = "",
   vaciarCarrito,
 }) {
   const navigate = useNavigate();
@@ -231,6 +233,85 @@ function CheckoutPage({
       });
     }
   };
+  if (carritoCargando) {
+  return (
+    <>
+      <Navbar activePage="carrito" />
+
+      <main className="checkout-page">
+        <section className="checkout-header">
+          <h1>Checkout</h1>
+
+          <p>
+            Estamos preparando el resumen de
+            tu compra.
+          </p>
+        </section>
+
+        <section className="checkout-layout">
+          <div className="checkout-form-card">
+            <div className="skeleton checkout-loading-title" />
+
+            {Array.from({ length: 4 }).map(
+              (_, index) => (
+                <div
+                  key={index}
+                  className="checkout-loading-field"
+                >
+                  <div className="skeleton checkout-loading-label" />
+
+                  <div className="skeleton checkout-loading-input" />
+                </div>
+              )
+            )}
+
+            <div className="skeleton checkout-loading-button" />
+          </div>
+
+          <aside className="checkout-summary-card">
+            <div className="skeleton checkout-loading-summary-title" />
+
+            <div className="checkout-loading-summary">
+              <div className="skeleton checkout-loading-summary-row" />
+              <div className="skeleton checkout-loading-summary-row" />
+              <div className="skeleton checkout-loading-summary-row" />
+              <div className="skeleton checkout-loading-total" />
+            </div>
+          </aside>
+        </section>
+      </main>
+    </>
+  );
+}
+
+if (
+  carritoError &&
+  carrito.length === 0
+) {
+  return (
+    <>
+      <Navbar activePage="carrito" />
+
+      <main className="checkout-page">
+        <section className="checkout-header">
+          <h1>Checkout</h1>
+
+          <p>
+            No pudimos cargar tu carrito.
+          </p>
+        </section>
+
+        <section className="checkout-error-card">
+          <h2>
+            Hubo un problema
+          </h2>
+
+          <p>{carritoError}</p>
+        </section>
+      </main>
+    </>
+  );
+}
 
   return (
     <>

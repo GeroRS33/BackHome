@@ -80,7 +80,7 @@ function CartProvider({ children }) {
 
       setCarritoError(
         error.message ||
-          "No se pudo cargar el carrito."
+        "No se pudo cargar el carrito."
       );
 
       throw error;
@@ -90,7 +90,11 @@ function CartProvider({ children }) {
   }, [actualizarCarritoLocal]);
 
   useEffect(() => {
-    if (location.pathname === "/carrito") {
+    const debeCargarCarrito =
+      location.pathname === "/carrito" ||
+      location.pathname === "/checkout";
+
+    if (debeCargarCarrito) {
       cargarCarrito();
     }
   }, [location.pathname, cargarCarrito]);
@@ -169,7 +173,7 @@ function CartProvider({ children }) {
 
       setCarritoError(
         error.message ||
-          "No se pudo agregar el producto."
+        "No se pudo agregar el producto."
       );
 
       throw error;
@@ -209,7 +213,7 @@ function CartProvider({ children }) {
 
       setCarritoError(
         error.message ||
-          "No se pudo eliminar el producto."
+        "No se pudo eliminar el producto."
       );
     }
   };
@@ -264,7 +268,7 @@ function CartProvider({ children }) {
 
       setCarritoError(
         error.message ||
-          "No se pudo modificar la cantidad."
+        "No se pudo modificar la cantidad."
       );
     }
   };
@@ -289,7 +293,7 @@ function CartProvider({ children }) {
 
       setCarritoError(
         error.message ||
-          "No se pudo vaciar el carrito."
+        "No se pudo vaciar el carrito."
       );
 
       throw error;
@@ -300,8 +304,8 @@ function CartProvider({ children }) {
     (total, item) => {
       const precio = Number(
         item.price ||
-          item.precio ||
-          0
+        item.precio ||
+        0
       );
 
       const cantidad =

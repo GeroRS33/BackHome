@@ -157,6 +157,12 @@ function App() {
             <CheckoutPage
               carrito={carrito}
               total={totalCarrito}
+              carritoCargando={
+                carritoCargando
+              }
+              carritoError={
+                carritoError
+              }
               vaciarCarrito={
                 vaciarCarrito
               }
