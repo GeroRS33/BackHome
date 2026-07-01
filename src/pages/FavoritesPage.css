@@ -13,6 +13,89 @@
   margin-bottom: 28px;
 }
 
+.favorite-loading-card {
+  overflow: hidden;
+  min-height: 410px;
+  background: #fff8ef;
+  border: 1.5px solid #d6bba3;
+  border-radius: 24px;
+}
+
+.favorite-loading-image {
+  width: 100%;
+  height: 250px;
+  border-radius: 0;
+}
+
+.favorite-loading-info {
+  padding: 20px;
+}
+
+.favorite-loading-title {
+  width: 72%;
+  height: 26px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+}
+
+.favorite-loading-category {
+  width: 42%;
+  height: 14px;
+  margin-bottom: 18px;
+  border-radius: 999px;
+}
+
+.favorite-loading-price {
+  width: 90px;
+  height: 22px;
+  margin-bottom: 22px;
+  border-radius: 8px;
+}
+
+.favorite-loading-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.favorite-loading-button {
+  flex: 1;
+  height: 42px;
+  border-radius: 999px;
+}
+
+.favorite-loading-heart {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #eadfd3;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.72),
+    transparent
+  );
+  animation: favorites-skeleton-loading 1.4s infinite;
+}
+
+@keyframes favorites-skeleton-loading {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 .favorites-header h1 {
   margin: 0 0 10px;
   color: #3b2418;

@@ -279,17 +279,59 @@ function ProductDetailPage({
     cargarProducto();
   }, [id]);
 
-  if (loading) {
-    return (
-      <>
-        <Navbar activePage="" />
+if (loading) {
+  return (
+    <>
+      <Navbar activePage="" />
 
-        <main className="product-detail-page">
-          <h1>Cargando producto...</h1>
-        </main>
-      </>
-    );
-  }
+      <main className="product-detail-page">
+        <div className="product-breadcrumb product-breadcrumb-loading">
+          <span className="skeleton skeleton-text skeleton-small" />
+          <span>›</span>
+          <span className="skeleton skeleton-text skeleton-medium" />
+          <span>›</span>
+          <span className="skeleton skeleton-text skeleton-large" />
+        </div>
+
+        <section className="product-detail-main product-detail-loading">
+          <div className="product-loading-gallery">
+            <div className="skeleton product-loading-main-image" />
+
+            <div className="product-loading-thumbnails">
+              <div className="skeleton product-loading-thumbnail" />
+              <div className="skeleton product-loading-thumbnail" />
+              <div className="skeleton product-loading-thumbnail" />
+            </div>
+          </div>
+
+          <section className="product-detail-info">
+            <div className="skeleton skeleton-text skeleton-tag" />
+
+            <div className="skeleton skeleton-text skeleton-title" />
+
+            <div className="product-loading-description">
+              <div className="skeleton skeleton-text" />
+              <div className="skeleton skeleton-text" />
+              <div className="skeleton skeleton-text skeleton-description-short" />
+            </div>
+
+            <div className="product-loading-specs">
+              <div className="skeleton product-loading-spec" />
+              <div className="skeleton product-loading-spec" />
+            </div>
+
+            <div className="skeleton product-loading-price" />
+
+            <div className="product-loading-actions">
+              <div className="skeleton product-loading-button" />
+              <div className="skeleton product-loading-button" />
+            </div>
+          </section>
+        </section>
+      </main>
+    </>
+  );
+}
 
   if (errorProducto || !product) {
     return (

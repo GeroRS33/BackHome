@@ -59,26 +59,26 @@ function transformApiProduct(item) {
 
     decade: Number(
       data.decada ||
-        data.decade ||
-        0
+      data.decade ||
+      0
     ),
 
     decada: Number(
       data.decada ||
-        data.decade ||
-        0
+      data.decade ||
+      0
     ),
 
     price: Number(
       data.precio ||
-        data.price ||
-        0
+      data.price ||
+      0
     ),
 
     precio: Number(
       data.precio ||
-        data.price ||
-        0
+      data.price ||
+      0
     ),
 
     slug: data.slug || "",
@@ -150,7 +150,7 @@ function FavoritesPage({
             (product) =>
               product.id &&
               product.name !==
-                "Producto sin nombre"
+              "Producto sin nombre"
           );
 
         setProductos(productosApi);
@@ -162,7 +162,7 @@ function FavoritesPage({
 
         setFavoritesError(
           error.message ||
-            "No se pudieron cargar tus favoritos."
+          "No se pudieron cargar tus favoritos."
         );
       } finally {
         setLoading(false);
@@ -289,17 +289,29 @@ function FavoritesPage({
         </section>
 
         {loading ? (
-          <section className="favorites-empty">
-            <div>
-              <h2>
-                Cargando favoritos...
-              </h2>
+          <section className="favorites-grid">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <article
+                key={index}
+                className="favorite-loading-card"
+              >
+                <div className="skeleton favorite-loading-image" />
 
-              <p>
-                Estamos trayendo tus productos
-                guardados.
-              </p>
-            </div>
+                <div className="favorite-loading-info">
+                  <div className="skeleton favorite-loading-title" />
+
+                  <div className="skeleton favorite-loading-category" />
+
+                  <div className="skeleton favorite-loading-price" />
+
+                  <div className="favorite-loading-actions">
+                    <div className="skeleton favorite-loading-button" />
+
+                    <div className="skeleton favorite-loading-heart" />
+                  </div>
+                </div>
+              </article>
+            ))}
           </section>
         ) : favoritesError ? (
           <section className="favorites-empty">

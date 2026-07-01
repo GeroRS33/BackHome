@@ -152,26 +152,26 @@ function transformApiProduct(item) {
 
     decade: Number(
       data.decada ||
-        data.decade ||
-        0
+      data.decade ||
+      0
     ),
 
     decada: Number(
       data.decada ||
-        data.decade ||
-        0
+      data.decade ||
+      0
     ),
 
     price: Number(
       data.precio ||
-        data.price ||
-        0
+      data.price ||
+      0
     ),
 
     precio: Number(
       data.precio ||
-        data.price ||
-        0
+      data.price ||
+      0
     ),
 
     slug: data.slug || "",
@@ -254,7 +254,7 @@ function HomePage({
             (product) =>
               product.id &&
               product.name !==
-                "Producto sin nombre"
+              "Producto sin nombre"
           )
           .sort((a, b) =>
             a.name.localeCompare(
@@ -272,7 +272,7 @@ function HomePage({
 
         setProductsError(
           error.message ||
-            "No se pudieron cargar los productos."
+          "No se pudieron cargar los productos."
         );
       } finally {
         setLoading(false);
@@ -454,36 +454,53 @@ function HomePage({
 
           <div className="selected-products">
             {loading ? (
-              <p className="no-products-message">
-                Cargando productos...
-              </p>
+              Array.from({ length: 3 }).map((_, index) => (
+                <article
+                  key={index}
+                  className="home-product-skeleton-card"
+                >
+                  <div className="skeleton home-product-skeleton-image" />
+
+                  <div className="home-product-skeleton-info">
+                    <div className="skeleton home-product-skeleton-title" />
+
+                    <div className="skeleton home-product-skeleton-category" />
+
+                    <div className="skeleton home-product-skeleton-text" />
+
+                    <div className="skeleton home-product-skeleton-price" />
+
+                    <div className="home-product-skeleton-actions">
+                      <div className="skeleton home-product-skeleton-button" />
+
+                      <div className="skeleton home-product-skeleton-button" />
+                    </div>
+                  </div>
+                </article>
+              ))
             ) : productsError ? (
               <p className="no-products-message">
                 {productsError}
               </p>
-            ) : filteredProducts.length >
-              0 ? (
-              filteredProducts.map(
-                (product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    isFavorite={favoritos.includes(
-                      product.id
-                    )}
-                    onToggleFavorite={
-                      toggleFavorito
-                    }
-                    onAddToCart={
-                      agregarAlCarrito
-                    }
-                  />
-                )
-              )
+            ) : filteredProducts.length > 0 ? (
+              filteredProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  isFavorite={favoritos.includes(
+                    product.id
+                  )}
+                  onToggleFavorite={
+                    toggleFavorito
+                  }
+                  onAddToCart={
+                    agregarAlCarrito
+                  }
+                />
+              ))
             ) : (
               <p className="no-products-message">
-                No encontramos productos para
-                esa búsqueda en esta década.
+                No encontramos productos para esa búsqueda en esta década.
               </p>
             )}
           </div>

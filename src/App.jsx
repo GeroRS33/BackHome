@@ -140,21 +140,10 @@ function App() {
           <ProtectedRoute>
             <CartPage
               carrito={carrito}
-              carritoCargando={
-                carritoCargando
-              }
-              carritoError={
-                carritoError
-              }
-              eliminarDelCarrito={
-                eliminarDelCarrito
-              }
-              modificarCantidad={
-                modificarCantidad
-              }
-              vaciarCarrito={
-                vaciarCarrito
-              }
+              carritoCargando={carritoCargando}
+              carritoError={carritoError}
+              eliminarDelCarrito={eliminarDelCarrito}
+              modificarCantidad={modificarCantidad}
               total={totalCarrito}
             />
           </ProtectedRoute>

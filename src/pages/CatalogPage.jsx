@@ -386,19 +386,81 @@ function CatalogPage({
     sortOption,
   ]);
 
-  if (loading) {
-    return (
-      <>
-        <Navbar activePage="decadas" />
+if (loading) {
+  return (
+    <>
+      <Navbar activePage="decadas" />
 
-        <main className="catalog-page">
-          <p className="catalog-empty">
-            Cargando productos...
-          </p>
-        </main>
-      </>
-    );
-  }
+      <main className="catalog-page">
+        <section className="catalog-header">
+          <div className="catalog-loading-back skeleton" />
+
+          <div className="catalog-loading-timeline">
+            {Array.from({ length: 6 }).map(
+              (_, index) => (
+                <div
+                  key={index}
+                  className="catalog-loading-year"
+                >
+                  <span className="skeleton catalog-loading-dot" />
+                  <span className="skeleton catalog-loading-year-text" />
+                </div>
+              )
+            )}
+          </div>
+        </section>
+
+        <section className="catalog-title-row">
+          <div>
+            <div className="skeleton catalog-loading-title" />
+            <div className="skeleton catalog-loading-subtitle" />
+          </div>
+
+          <div className="skeleton catalog-loading-sort" />
+        </section>
+
+        <section className="catalog-layout">
+          <aside className="catalog-loading-filters">
+            <div className="skeleton catalog-loading-filter-title" />
+
+            {Array.from({ length: 6 }).map(
+              (_, index) => (
+                <div
+                  key={index}
+                  className="skeleton catalog-loading-filter-row"
+                />
+              )
+            )}
+          </aside>
+
+          <div className="catalog-grid">
+            {Array.from({ length: 6 }).map(
+              (_, index) => (
+                <article
+                  key={index}
+                  className="catalog-loading-card"
+                >
+                  <div className="skeleton catalog-loading-image" />
+
+                  <div className="catalog-loading-card-info">
+                    <div className="skeleton catalog-loading-card-title" />
+                    <div className="skeleton catalog-loading-card-text" />
+                    <div className="skeleton catalog-loading-card-price" />
+
+                    <div className="catalog-loading-card-actions">
+                      <div className="skeleton catalog-loading-card-button" />
+                      <div className="skeleton catalog-loading-card-button" />
+                    </div>
+                  </div>
+                </article>
+              )
+            )}
+          </div>
+        </section>
+      </main>
+    </>
+  );
+}
 
   if (errorProductos) {
     return (

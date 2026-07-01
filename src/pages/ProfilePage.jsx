@@ -507,16 +507,59 @@ function ProfilePage() {
         <Navbar activePage="perfil" />
 
         <main className="profile-page">
-          <section className="profile-card">
-            <div className="profile-info">
-              <h1>
-                Cargando perfil...
-              </h1>
+          <section className="profile-card profile-loading-card">
+            <div className="skeleton profile-loading-avatar" />
 
-              <p>
-                Estamos trayendo tus datos
-                desde BackHome.
-              </p>
+            <div className="profile-loading-info">
+              <div className="skeleton profile-loading-name" />
+
+              <div className="skeleton profile-loading-bio" />
+              <div className="skeleton profile-loading-bio profile-loading-bio-short" />
+
+              <div className="profile-loading-data">
+                <div className="skeleton profile-loading-data-row" />
+                <div className="skeleton profile-loading-data-row" />
+                <div className="skeleton profile-loading-data-row" />
+              </div>
+
+              <div className="profile-loading-actions">
+                <div className="skeleton profile-loading-button" />
+                <div className="skeleton profile-loading-button" />
+              </div>
+            </div>
+
+            <div className="skeleton profile-loading-decoration" />
+          </section>
+
+          <section className="profile-orders-section">
+            <div className="profile-section-title">
+              <div className="skeleton profile-loading-orders-title" />
+              <div className="skeleton profile-loading-orders-subtitle" />
+            </div>
+
+            <div className="profile-orders-layout">
+              <div className="profile-loading-orders-list">
+                {Array.from({
+                  length: 3,
+                }).map((_, index) => (
+                  <article
+                    key={index}
+                    className="profile-loading-order-card"
+                  >
+                    <div className="skeleton profile-loading-order-code" />
+                    <div className="skeleton profile-loading-order-date" />
+                    <div className="skeleton profile-loading-order-total" />
+                  </article>
+                ))}
+              </div>
+
+              <article className="profile-loading-order-detail">
+                <div className="skeleton profile-loading-detail-title" />
+                <div className="skeleton profile-loading-detail-line" />
+                <div className="skeleton profile-loading-detail-line" />
+                <div className="skeleton profile-loading-detail-product" />
+                <div className="skeleton profile-loading-detail-product" />
+              </article>
             </div>
           </section>
         </main>
@@ -588,11 +631,11 @@ function ProfilePage() {
           <div className="profile-info">
             {(profileError ||
               usuarioError) && (
-              <p className="profile-error">
-                {profileError ||
-                  usuarioError}
-              </p>
-            )}
+                <p className="profile-error">
+                  {profileError ||
+                    usuarioError}
+                </p>
+              )}
 
             {!isEditing ? (
               <>
@@ -772,9 +815,36 @@ function ProfilePage() {
           </div>
 
           {isLoadingOrders ? (
-            <p>
-              Cargando compras...
-            </p>
+            <div className="profile-orders-layout">
+              <div className="profile-loading-orders-list">
+                {Array.from({
+                  length: 3,
+                }).map((_, index) => (
+                  <article
+                    key={index}
+                    className="profile-loading-order-card"
+                  >
+                    <div className="skeleton profile-loading-order-code" />
+
+                    <div className="skeleton profile-loading-order-date" />
+
+                    <div className="skeleton profile-loading-order-total" />
+                  </article>
+                ))}
+              </div>
+
+              <article className="profile-loading-order-detail">
+                <div className="skeleton profile-loading-detail-title" />
+
+                <div className="skeleton profile-loading-detail-line" />
+
+                <div className="skeleton profile-loading-detail-line" />
+
+                <div className="skeleton profile-loading-detail-product" />
+
+                <div className="skeleton profile-loading-detail-product" />
+              </article>
+            </div>
           ) : ordersError ? (
             <p className="profile-error">
               {ordersError}
